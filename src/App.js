@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import * as firebase from "firebase";
 
 const MenuItem = props => {
   const [title, SetTitle] = useState("title");
@@ -19,6 +20,7 @@ const MenuItem = props => {
         <strong> Price: </strong> {props.price}
       </p>
       <button> Edit </button>
+      <button> Delete </button>
     </div>
   );
 };
@@ -58,6 +60,7 @@ const UpdateMenuForm = props => {
 };
 
 const App = () => {
+  var database = firebase.database();
   const [val, setVal] = useState(2);
   const [menu, setMenu] = useState([]);
 
@@ -70,17 +73,27 @@ const App = () => {
     };
     tempMenu.push(tempItem);
     setMenu(tempMenu);
+    database.ref("menu/").push(tempItem);
   };
 
   useEffect(() => {
     var tempMenu = [...menu];
-    var tempItem = {
-      title: "Burger",
-      description: "delicious sandwich with patty",
-      price: "10.99"
-    };
-    tempMenu.push(tempItem);
-    setMenu(tempMenu);
+    database
+      .ref("menu")
+      .once("value")
+      .then(function(snapshot) {
+        for (var key in snapshot.val()) {
+          var item = snapshot.val()[key];
+          var tempItem = {
+            title: item.title,
+            description: item.description,
+            price: item.price
+          };
+          tempMenu.push(tempItem);
+        }
+        return tempMenu;
+      })
+      .then(menu => setMenu(menu));
   }, []);
 
   return (
