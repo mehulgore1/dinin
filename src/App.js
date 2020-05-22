@@ -19,8 +19,7 @@ const MenuItem = props => {
         {" "}
         <strong> Price: </strong> {props.price}
       </p>
-      <button> Edit </button>
-      <button> Delete </button>
+      <button onClick={() => props.deleteMenuItem(props.id)}> Delete </button>
     </div>
   );
 };
@@ -71,9 +70,19 @@ const App = () => {
       description: description,
       price: price
     };
+    var key = database.ref("menu/").push(tempItem).key;
+    tempItem["id"] = key;
+    console.log(tempItem);
     tempMenu.push(tempItem);
     setMenu(tempMenu);
-    database.ref("menu/").push(tempItem);
+  };
+
+  const deleteMenuItem = id => {
+    database
+      .ref("menu")
+      .child(id)
+      .remove();
+    setMenu(menu.filter(item => item.id !== id));
   };
 
   useEffect(() => {
@@ -85,6 +94,7 @@ const App = () => {
         for (var key in snapshot.val()) {
           var item = snapshot.val()[key];
           var tempItem = {
+            id: key,
             title: item.title,
             description: item.description,
             price: item.price
@@ -102,9 +112,12 @@ const App = () => {
       <ul>
         {menu.map(item => (
           <MenuItem
+            key={item.id}
+            id={item.id}
             title={item.title}
             description={item.description}
             price={item.price}
+            deleteMenuItem={deleteMenuItem}
           />
         ))}
       </ul>
