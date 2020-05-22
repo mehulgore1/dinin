@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import * as firebase from "firebase";
+import { notStrictEqual } from "assert";
 
 const MenuItem = props => {
-  const [title, SetTitle] = useState("title");
-  const [description, setDescription] = useState("description");
-  const [price, setPrice] = useState("price");
+  const [notes, setNotes] = useState("");
 
   return (
     <div>
@@ -18,7 +17,13 @@ const MenuItem = props => {
         {" "}
         <strong> Price: </strong> {props.price}
       </p>
-      <button onClick={() => props.sendToWaiter(props.title)}>
+      <input
+        type="text"
+        value={notes}
+        placeholder="notes"
+        onChange={e => setNotes(e.target.value)}
+      />
+      <button onClick={() => props.sendToWaiter(props.title, notes)}>
         {" "}
         Send to Waiter{" "}
       </button>
@@ -31,8 +36,13 @@ const CustomerMenu = props => {
   const [val, setVal] = useState(2);
   const [menu, setMenu] = useState([]);
 
-  const sendToWaiter = title => {
-    database.ref("orders").push(title);
+  const sendToWaiter = (title, notes) => {
+    var temp = {
+      title: title,
+      notes: notes
+    };
+    console.log(temp);
+    database.ref("orders").push(temp);
   };
 
   useEffect(() => {

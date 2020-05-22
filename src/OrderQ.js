@@ -4,7 +4,9 @@ import * as firebase from "firebase";
 const Order = props => {
   return (
     <div>
+      <strong> Item </strong>
       {props.title}
+      <strong> Notes </strong> {props.notes}
       <button onClick={() => props.completeOrder(props.id)}> Done </button>
     </div>
   );
@@ -26,21 +28,24 @@ const OrderQ = props => {
     database.ref("orders").on("value", function(snapshot) {
       var tempOrders = [...orders];
       for (var key in snapshot.val()) {
+        var thisOrder = snapshot.val()[key];
         var tempOrder = {
           id: key,
-          title: snapshot.val()[key]
+          title: thisOrder.title,
+          notes: thisOrder.notes
         };
         tempOrders.push(tempOrder);
       }
-      console.log(tempOrders);
       setOrders(tempOrders);
     });
 
     database.ref("orders").on("child_added", function(snapshot, irr) {
       var tempOrders = [...orders];
+      var thisOrder = snapshot.val();
       var tempOrder = {
         id: snapshot.key,
-        title: snapshot.val()
+        title: thisOrder.title,
+        notes: thisOrder.notes
       };
       tempOrders.push(tempOrder);
       setOrders(tempOrders);
@@ -54,6 +59,7 @@ const OrderQ = props => {
           key={order.id}
           id={order.id}
           title={order.title}
+          notes={order.notes}
           completeOrder={completeOrder}
         />
       ))}
