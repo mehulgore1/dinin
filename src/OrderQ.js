@@ -5,7 +5,7 @@ const Order = props => {
   return (
     <div>
       {props.title}
-      <button> Done </button>
+      <button onClick={() => props.completeOrder(props.id)}> Done </button>
     </div>
   );
 };
