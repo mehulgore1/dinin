@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import * as firebase from "firebase";
 import MenuEditor from "./MenuEditor";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import CustomerMenu from "./CustomerMenu";
+import OrderQ from "./OrderQ";
 
 const App = () => {
   return (
@@ -12,6 +12,7 @@ const App = () => {
       <Switch>
         <Route exact path="/manager" component={MenuEditor} />
         <Route exact path="/customer" component={CustomerMenu} />
+        <Route exact path="/orders" component={OrderQ} />
       </Switch>
     </BrowserRouter>
   );

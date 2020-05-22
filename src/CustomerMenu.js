@@ -19,7 +19,10 @@ const MenuItem = props => {
         {" "}
         <strong> Price: </strong> {props.price}
       </p>
-      <button> Send to Waiter </button>
+      <button onClick={() => props.sendToWaiter(props.title)}>
+        {" "}
+        Send to Waiter{" "}
+      </button>
     </div>
   );
 };
@@ -28,6 +31,10 @@ const CustomerMenu = props => {
   var database = firebase.database();
   const [val, setVal] = useState(2);
   const [menu, setMenu] = useState([]);
+
+  const sendToWaiter = title => {
+    database.ref("orders").push(title);
+  };
 
   useEffect(() => {
     var tempMenu = [...menu];
@@ -60,6 +67,7 @@ const CustomerMenu = props => {
             title={item.title}
             description={item.description}
             price={item.price}
+            sendToWaiter={sendToWaiter}
           />
         ))}
       </ul>
