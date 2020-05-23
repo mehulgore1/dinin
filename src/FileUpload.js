@@ -1,13 +1,20 @@
 import { CSVReader } from "react-papaparse";
 import React, { useState, useEffect } from "react";
-
-const buttonRef = React.createRef();
+import * as firebase from "firebase";
 
 const FileUpload = props => {
   const handleOnDrop = data => {
-    console.log("---------------------------");
-    console.log(data);
-    console.log("---------------------------");
+    var database = firebase.database();
+    database.ref("menu").remove();
+    for (var itemArray of data) {
+      var itemData = itemArray["data"];
+      var tempItem = {
+        title: itemData[0],
+        description: itemData[1],
+        price: itemData[2]
+      };
+      database.ref("menu").push(tempItem);
+    }
   };
 
   const handleOnError = (err, file, inputElem, reason) => {
