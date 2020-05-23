@@ -72,7 +72,6 @@ const MenuEditor = () => {
     };
     var key = database.ref("menu/").push(tempItem).key;
     tempItem["id"] = key;
-    console.log(tempItem);
     tempMenu.push(tempItem);
     setMenu(tempMenu);
   };

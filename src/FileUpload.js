@@ -15,7 +15,8 @@ const FileUpload = props => {
         description: itemData[1],
         price: itemData[2]
       };
-      database.ref("menu").push(tempItem);
+      var key = database.ref("menu").push(tempItem).key;
+      tempItem["id"] = key;
       finalMenu.push(tempItem);
     }
     props.handleSetMenu(finalMenu);
