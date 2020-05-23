@@ -106,9 +106,13 @@ const MenuEditor = () => {
       .then(menu => setMenu(menu));
   }, []);
 
+  const handleSetMenu = menu => {
+    setMenu(menu);
+  };
+
   return (
     <div className="App">
-      <FileUpload />
+      <FileUpload handleSetMenu={handleSetMenu} />
       <UpdateMenuForm addMenuItem={addMenuItem} />
       <ul>
         {menu.map(item => (
