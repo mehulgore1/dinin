@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import * as firebase from "firebase";
+import FileUpload from "./FileUpload";
 
 const MenuItem = props => {
   const [title, SetTitle] = useState("title");
@@ -107,6 +108,7 @@ const MenuEditor = () => {
 
   return (
     <div className="App">
+      <FileUpload />
       <UpdateMenuForm addMenuItem={addMenuItem} />
       <ul>
         {menu.map(item => (
