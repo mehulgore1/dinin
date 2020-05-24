@@ -4,9 +4,10 @@ import * as firebase from "firebase";
 import { isProperty } from "@babel/types";
 
 const FileUpload = props => {
+  const restaurant = props.match.params.restaurant;
   const handleOnDrop = data => {
     var database = firebase.database();
-    database.ref("menu").remove();
+    database.ref(restaurant).remove();
     var finalMenu = [];
     for (var itemArray of data) {
       var itemData = itemArray["data"];
@@ -15,7 +16,10 @@ const FileUpload = props => {
         description: itemData[1],
         price: itemData[2]
       };
-      var key = database.ref("menu").push(tempItem).key;
+      var key = database
+        .ref(restaurant)
+        .child("menu")
+        .push(tempItem).key;
       tempItem["id"] = key;
       finalMenu.push(tempItem);
     }

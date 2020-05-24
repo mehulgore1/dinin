@@ -115,7 +115,7 @@ const MenuEditor = props => {
   return (
     <>
       <h1>Manager dashboard for {restaurant} </h1>
-      <FileUpload handleSetMenu={handleSetMenu} />
+      <FileUpload match={match} handleSetMenu={handleSetMenu} />
       <UpdateMenuForm addMenuItem={addMenuItem} />
       <ul>
         {menu.map(item => (
