@@ -64,6 +64,7 @@ const MenuEditor = props => {
   const [menu, setMenu] = useState([]);
   const [restaurant, setRestaurant] = useState("");
   const { match } = props;
+  const tempRest = match.params.restaurant;
 
   const addMenuItem = (title, description, price) => {
     var tempMenu = [...menu];

@@ -18,43 +18,51 @@ const OrderQ = props => {
   const [orders, setOrders] = useState([]);
   const [restaurant, setRestaurant] = useState("");
   const { match } = props;
+  const tempRest = match.params.restaurant;
 
   const completeOrder = id => {
     database
-      .ref("orders")
+      .ref(tempRest)
+      .child("orders")
       .child(id)
       .remove();
     setOrders(orders.filter(item => item.id !== id));
   };
 
   useEffect(() => {
-    setRestaurant(match.params.restaurant);
-    database.ref("orders").on("value", function(snapshot) {
-      var tempOrders = [...orders];
-      for (var key in snapshot.val()) {
-        var thisOrder = snapshot.val()[key];
+    setRestaurant(tempRest);
+    database
+      .ref(tempRest)
+      .child("orders")
+      .on("value", function(snapshot) {
+        var tempOrders = [...orders];
+        for (var key in snapshot.val()) {
+          var thisOrder = snapshot.val()[key];
+          var tempOrder = {
+            id: key,
+            title: thisOrder.title,
+            notes: thisOrder.notes,
+            table: thisOrder.table
+          };
+          tempOrders.push(tempOrder);
+        }
+        setOrders(tempOrders);
+      });
+
+    database
+      .ref(tempRest)
+      .child("orders")
+      .on("child_added", function(snapshot, irr) {
+        var tempOrders = [...orders];
+        var thisOrder = snapshot.val();
         var tempOrder = {
-          id: key,
+          id: snapshot.key,
           title: thisOrder.title,
-          notes: thisOrder.notes,
-          table: thisOrder.table
+          notes: thisOrder.notes
         };
         tempOrders.push(tempOrder);
-      }
-      setOrders(tempOrders);
-    });
-
-    database.ref("orders").on("child_added", function(snapshot, irr) {
-      var tempOrders = [...orders];
-      var thisOrder = snapshot.val();
-      var tempOrder = {
-        id: snapshot.key,
-        title: thisOrder.title,
-        notes: thisOrder.notes
-      };
-      tempOrders.push(tempOrder);
-      setOrders(tempOrders);
-    });
+        setOrders(tempOrders);
+      });
   }, []);
 
   return (

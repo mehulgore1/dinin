@@ -37,6 +37,7 @@ const CustomerMenu = props => {
   const [table, setTable] = useState("");
   const [isValid, setIsValid] = useState(true);
   const { match } = props;
+  const tempRest = match.params.restaurant;
 
   const sendToWaiter = (title, notes) => {
     var temp = {
@@ -44,11 +45,13 @@ const CustomerMenu = props => {
       notes: notes,
       table: table
     };
-    database.ref("orders").push(temp);
+    database
+      .ref(tempRest)
+      .child("orders")
+      .push(temp);
   };
 
   useEffect(() => {
-    var tempRest = match.params.restaurant;
     setRestaurant(tempRest);
     setTable(match.params.table);
     var tempMenu = [...menu];
