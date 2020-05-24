@@ -73,7 +73,10 @@ const MenuEditor = props => {
       description: description,
       price: price
     };
-    var key = database.ref("menu/").push(tempItem).key;
+    var key = database
+      .ref(tempRest)
+      .child("menu/")
+      .push(tempItem).key;
     tempItem["id"] = key;
     tempMenu.push(tempItem);
     setMenu(tempMenu);
@@ -81,7 +84,8 @@ const MenuEditor = props => {
 
   const deleteMenuItem = id => {
     database
-      .ref("menu")
+      .ref(tempRest)
+      .child("menu")
       .child(id)
       .remove();
     setMenu(menu.filter(item => item.id !== id));
@@ -91,7 +95,8 @@ const MenuEditor = props => {
     setRestaurant(match.params.restaurant);
     var tempMenu = [...menu];
     database
-      .ref("menu")
+      .ref(tempRest)
+      .child("menu")
       .once("value")
       .then(function(snapshot) {
         for (var key in snapshot.val()) {
