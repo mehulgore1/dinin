@@ -7,6 +7,7 @@ const Order = props => {
       <strong> Item </strong>
       {props.title}
       <strong> Notes </strong> {props.notes}
+      <strong> Table </strong> {props.table}
       <button onClick={() => props.completeOrder(props.id)}> Done </button>
     </div>
   );
@@ -15,6 +16,8 @@ const Order = props => {
 const OrderQ = props => {
   var database = firebase.database();
   const [orders, setOrders] = useState([]);
+  const [restaurant, setRestaurant] = useState("");
+  const { match } = props;
 
   const completeOrder = id => {
     database
@@ -25,6 +28,7 @@ const OrderQ = props => {
   };
 
   useEffect(() => {
+    setRestaurant(match.params.restaurant);
     database.ref("orders").on("value", function(snapshot) {
       var tempOrders = [...orders];
       for (var key in snapshot.val()) {
@@ -32,7 +36,8 @@ const OrderQ = props => {
         var tempOrder = {
           id: key,
           title: thisOrder.title,
-          notes: thisOrder.notes
+          notes: thisOrder.notes,
+          table: thisOrder.table
         };
         tempOrders.push(tempOrder);
       }
@@ -54,6 +59,7 @@ const OrderQ = props => {
 
   return (
     <>
+      <h1> Orders for {restaurant} </h1>
       {orders.map(order => (
         <Order
           key={order.id}
@@ -61,6 +67,7 @@ const OrderQ = props => {
           title={order.title}
           notes={order.notes}
           completeOrder={completeOrder}
+          table={order.table}
         />
       ))}
     </>

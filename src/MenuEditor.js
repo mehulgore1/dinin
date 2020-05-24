@@ -58,10 +58,12 @@ const UpdateMenuForm = props => {
   );
 };
 
-const MenuEditor = () => {
+const MenuEditor = props => {
   var database = firebase.database();
   const [val, setVal] = useState(2);
   const [menu, setMenu] = useState([]);
+  const [restaurant, setRestaurant] = useState("");
+  const { match } = props;
 
   const addMenuItem = (title, description, price) => {
     var tempMenu = [...menu];
@@ -85,6 +87,7 @@ const MenuEditor = () => {
   };
 
   useEffect(() => {
+    setRestaurant(match.params.restaurant);
     var tempMenu = [...menu];
     database
       .ref("menu")
@@ -110,7 +113,8 @@ const MenuEditor = () => {
   };
 
   return (
-    <div className="App">
+    <>
+      <h1>Manager dashboard for {restaurant} </h1>
       <FileUpload handleSetMenu={handleSetMenu} />
       <UpdateMenuForm addMenuItem={addMenuItem} />
       <ul>
@@ -125,7 +129,7 @@ const MenuEditor = () => {
           />
         ))}
       </ul>
-    </div>
+    </>
   );
 };
 

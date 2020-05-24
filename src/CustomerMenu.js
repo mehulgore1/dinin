@@ -9,12 +9,10 @@ const MenuItem = props => {
   return (
     <div>
       <p>
-        {" "}
-        <strong> {props.title} </strong>{" "}
+        <strong> {props.title} </strong>
       </p>
       <p>{props.description} </p>
       <p>
-        {" "}
         <strong> Price: </strong> {props.price}
       </p>
       <input
@@ -24,8 +22,7 @@ const MenuItem = props => {
         onChange={e => setNotes(e.target.value)}
       />
       <button onClick={() => props.sendToWaiter(props.title, notes)}>
-        {" "}
-        Send to Waiter{" "}
+        Send to Waiter
       </button>
     </div>
   );
@@ -35,17 +32,22 @@ const CustomerMenu = props => {
   var database = firebase.database();
   const [val, setVal] = useState(2);
   const [menu, setMenu] = useState([]);
+  const [restaurant, setRestaurant] = useState("");
+  const [table, setTable] = useState("");
+  const { match } = props;
 
   const sendToWaiter = (title, notes) => {
     var temp = {
       title: title,
-      notes: notes
+      notes: notes,
+      table: table
     };
-    console.log(temp);
     database.ref("orders").push(temp);
   };
 
   useEffect(() => {
+    setRestaurant(match.params.restaurant);
+    setTable(match.params.table);
     var tempMenu = [...menu];
     database
       .ref("menu")
@@ -68,6 +70,8 @@ const CustomerMenu = props => {
 
   return (
     <div>
+      <h1> Welcome to {restaurant}</h1>
+      <h1> You are at table {table} </h1>
       <ul>
         {menu.map(item => (
           <MenuItem

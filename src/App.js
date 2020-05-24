@@ -9,9 +9,9 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/manager" component={MenuEditor} />
-        <Route exact path="/customer" component={CustomerMenu} />
-        <Route exact path="/orders" component={OrderQ} />
+        <Route exact path="/manager/:restaurant" component={MenuEditor} />
+        <Route exact path="/menu/:restaurant/:table" component={CustomerMenu} />
+        <Route exact path="/orders/:restaurant" component={OrderQ} />
       </Switch>
     </BrowserRouter>
   );
