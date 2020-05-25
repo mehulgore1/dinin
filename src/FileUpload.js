@@ -7,7 +7,10 @@ const FileUpload = props => {
   const restaurant = props.match.params.restaurant;
   const handleOnDrop = data => {
     var database = firebase.database();
-    database.ref(restaurant).remove();
+    database
+      .ref(restaurant)
+      .child("menu")
+      .remove();
     var finalMenu = {};
     for (var itemArray of data) {
       var itemData = itemArray.data;
