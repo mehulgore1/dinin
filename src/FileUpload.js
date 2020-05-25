@@ -8,20 +8,25 @@ const FileUpload = props => {
   const handleOnDrop = data => {
     var database = firebase.database();
     database.ref(restaurant).remove();
-    var finalMenu = [];
+    var finalMenu = {};
     for (var itemArray of data) {
-      var itemData = itemArray["data"];
+      var itemData = itemArray.data;
+      if (!(itemData[3] in finalMenu)) {
+        finalMenu[itemData[3]] = [];
+      }
       var tempItem = {
         title: itemData[0],
         description: itemData[1],
-        price: itemData[2]
+        price: itemData[2],
+        category: itemData[3]
       };
       var key = database
         .ref(restaurant)
         .child("menu")
+        .child(tempItem.category)
         .push(tempItem).key;
-      tempItem["id"] = key;
-      finalMenu.push(tempItem);
+      tempItem.id = key;
+      finalMenu[itemData[3]].push(tempItem);
     }
     props.handleSetMenu(finalMenu);
   };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import * as firebase from "firebase";
 import FileUpload from "./FileUpload";
+import { connect } from "tls";
 
 const MenuItem = props => {
   const [title, SetTitle] = useState("title");
@@ -66,50 +67,57 @@ const MenuEditor = props => {
   const { match } = props;
   const tempRest = match.params.restaurant;
 
-  const addMenuItem = (title, description, price) => {
-    var tempMenu = [...menu];
-    var tempItem = {
-      title: title,
-      description: description,
-      price: price
-    };
-    var key = database
-      .ref(tempRest)
-      .child("menu/")
-      .push(tempItem).key;
-    tempItem["id"] = key;
-    tempMenu.push(tempItem);
-    setMenu(tempMenu);
-  };
+  //   const addMenuItem = (title, description, price) => {
+  //     var tempMenu = [...menu];
+  //     var tempItem = {
+  //       title: title,
+  //       description: description,
+  //       price: price
+  //     };
+  //     var key = database
+  //       .ref(tempRest)
+  //       .child("menu/")
+  //       .push(tempItem).key;
+  //     tempItem["id"] = key;
+  //     tempMenu.push(tempItem);
+  //     setMenu(tempMenu);
+  //   };
 
-  const deleteMenuItem = id => {
-    database
-      .ref(tempRest)
-      .child("menu")
-      .child(id)
-      .remove();
-    setMenu(menu.filter(item => item.id !== id));
-  };
+  //   const deleteMenuItem = id => {
+  //     database
+  //       .ref(tempRest)
+  //       .child("menu")
+  //       .child(id)
+  //       .remove();
+  //     setMenu(menu.filter(item => item.id !== id));
+  //   };
 
   useEffect(() => {
     setRestaurant(match.params.restaurant);
-    var tempMenu = [...menu];
+    var finalMenu = {};
     database
       .ref(tempRest)
       .child("menu")
       .once("value")
       .then(function(snapshot) {
-        for (var key in snapshot.val()) {
-          var item = snapshot.val()[key];
-          var tempItem = {
-            id: key,
-            title: item.title,
-            description: item.description,
-            price: item.price
-          };
-          tempMenu.push(tempItem);
+        for (var category in snapshot.val()) {
+          if (!(category in finalMenu)) {
+            finalMenu[category] = [];
+          }
+          var categoryItems = snapshot.val()[category];
+          for (var key in categoryItems) {
+            var item = categoryItems[key];
+            var tempItem = {
+              id: key,
+              title: item.title,
+              description: item.description,
+              price: item.price
+            };
+            finalMenu[category].push(tempItem);
+          }
         }
-        return tempMenu;
+        console.log(finalMenu);
+        return finalMenu;
       })
       .then(menu => setMenu(menu));
   }, []);
@@ -122,19 +130,26 @@ const MenuEditor = props => {
     <>
       <h1>Manager dashboard for {restaurant} </h1>
       <FileUpload match={match} handleSetMenu={handleSetMenu} />
-      <UpdateMenuForm addMenuItem={addMenuItem} />
-      <ul>
-        {menu.map(item => (
-          <MenuItem
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            description={item.description}
-            price={item.price}
-            deleteMenuItem={deleteMenuItem}
-          />
-        ))}
-      </ul>
+      {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
+      {Object.keys(menu).map((key, i) => {
+        return (
+          <>
+            <h1> {key} </h1>
+            {menu[key].map(item => (
+              <ul>
+                <MenuItem
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  description={item.description}
+                  price={item.price}
+                  //deleteMenuItem={deleteMenuItem}
+                />
+              </ul>
+            ))}
+          </>
+        );
+      })}
     </>
   );
 };
