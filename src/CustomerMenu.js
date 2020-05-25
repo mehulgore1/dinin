@@ -54,7 +54,7 @@ const CustomerMenu = props => {
   useEffect(() => {
     setRestaurant(tempRest);
     setTable(match.params.table);
-    var tempMenu = [...menu];
+    var finalMenu = {};
 
     database
       .ref(tempRest)
@@ -69,18 +69,24 @@ const CustomerMenu = props => {
             .child("menu")
             .once("value")
             .then(function(snapshot) {
-              for (var key in snapshot.val()) {
-                var item = snapshot.val()[key];
-                var tempItem = {
-                  id: key,
-                  title: item.title,
-                  description: item.description,
-                  price: item.price
-                };
-                tempMenu.push(tempItem);
+              for (var category in snapshot.val()) {
+                if (!(category in finalMenu)) {
+                  finalMenu[category] = [];
+                }
+                var categoryItems = snapshot.val()[category];
+                for (var key in categoryItems) {
+                  var item = categoryItems[key];
+                  var tempItem = {
+                    id: key,
+                    title: item.title,
+                    description: item.description,
+                    price: item.price
+                  };
+                  finalMenu[category].push(tempItem);
+                }
               }
-              console.log(tempMenu);
-              return tempMenu;
+              console.log(finalMenu);
+              return finalMenu;
             })
             .then(menu => {
               setMenu(menu);
@@ -99,18 +105,26 @@ const CustomerMenu = props => {
         <>
           <h1> Welcome to {restaurant}</h1>
           <h1> You are at table {table} </h1>
-          <ul>
-            {menu.map(item => (
-              <MenuItem
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                description={item.description}
-                price={item.price}
-                sendToWaiter={sendToWaiter}
-              />
-            ))}
-          </ul>
+          {Object.keys(menu).map((key, i) => {
+            return (
+              <>
+                <h1> {key} </h1>
+                {menu[key].map(item => (
+                  <ul>
+                    <MenuItem
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
+                      description={item.description}
+                      price={item.price}
+                      sendToWaiter={sendToWaiter}
+                      //deleteMenuItem={deleteMenuItem}
+                    />
+                  </ul>
+                ))}
+              </>
+            );
+          })}
         </>
       ) : (
         <h1> Whoops! You've reached an invalid URL. Try a different link! </h1>

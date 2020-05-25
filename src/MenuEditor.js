@@ -11,16 +11,13 @@ const MenuItem = props => {
 
   return (
     <div>
-      <p>
-        {" "}
-        <strong> {props.title} </strong>{" "}
-      </p>
+      <h3> {props.title} </h3>
       <p>{props.description} </p>
       <p>
         {" "}
         <strong> Price: </strong> {props.price}
       </p>
-      <button onClick={() => props.deleteMenuItem(props.id)}> Delete </button>
+      {/* <button onClick={() => props.deleteMenuItem(props.id)}> Delete </button> */}
     </div>
   );
 };
