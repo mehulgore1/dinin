@@ -10,7 +10,11 @@ const App = () => {
     <BrowserRouter>
       <Switch>
         <Route exact path="/manager/:restaurant" component={MenuEditor} />
-        <Route exact path="/menu/:restaurant/:table" component={CustomerMenu} />
+        <Route
+          exact
+          path="/menu/:restaurant/:table/:seat"
+          component={CustomerMenu}
+        />
         <Route exact path="/orders/:restaurant" component={OrderQ} />
       </Switch>
     </BrowserRouter>
