@@ -99,12 +99,14 @@ const CustomerMenu = props => {
       title: title,
       notes: notes,
       category: category,
-      quantity: quantity
+      quantity: quantity,
+      status: ""
     };
     database
       .ref(tempRest)
       .child("tables")
       .child(table)
+      .child("seats")
       .child(seat)
       .child("items")
       .push(item);
@@ -200,7 +202,6 @@ const CustomerMenu = props => {
               <h1>
                 You are at table {table} seat {seat}
               </h1>
-              <WaiterRequest match={match} />
               <>
                 {Object.keys(menu[stage] || {}).map((category, i) => {
                   return (

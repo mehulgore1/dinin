@@ -10,12 +10,16 @@ const WaiterRequest = props => {
   };
 
   const handleSendRequest = () => {
+    const requestObj = {
+      request: request,
+      status: ""
+    };
     database
       .ref(props.match.params.restaurant)
       .child("tables")
       .child(props.match.params.table)
       .child("requests")
-      .push(request);
+      .push(requestObj);
   };
 
   return (
