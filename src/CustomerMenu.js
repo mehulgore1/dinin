@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { useHistory, generatePath } from "react-router-dom";
 import "./App.css";
 import * as firebase from "firebase";
@@ -135,7 +135,7 @@ const CustomerMenu = props => {
     //     console.log("user NOT signed in ");
     //   }
     // });
-    ui.start("#firebaseui-auth-container", uiConfig);
+    //ui.start("#firebaseui-auth-container", uiConfig);
     setRestaurant(tempRest);
     setTable(match.params.table);
     setSeat(match.params.seat);
@@ -202,13 +202,18 @@ const CustomerMenu = props => {
               <h1>
                 You are at table {table} seat {seat}
               </h1>
+              <button>
+                <a href={"/menu/" + tempRest + "/" + table}>
+                  Go to Table Dashboard
+                </a>
+              </button>
               <>
                 {Object.keys(menu[stage] || {}).map((category, i) => {
                   return (
-                    <>
+                    <Fragment key={category}>
                       <h1> {category} </h1>
                       {menu[stage][category].map(item => (
-                        <ul>
+                        <ul key={item.id}>
                           <MenuItem
                             key={item.id}
                             id={item.id}
@@ -221,7 +226,7 @@ const CustomerMenu = props => {
                           />
                         </ul>
                       ))}
-                    </>
+                    </Fragment>
                   );
                 })}
               </>
