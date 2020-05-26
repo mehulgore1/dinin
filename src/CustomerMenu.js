@@ -23,8 +23,10 @@ const MenuItem = props => {
         placeholder="notes"
         onChange={e => setNotes(e.target.value)}
       />
-      <button onClick={() => props.sendToWaiter(props.title, notes)}>
-        Send to Kitchen
+      <button
+        onClick={() => props.sendToWaiter(props.title, notes, props.category)}
+      >
+        Add to Table
       </button>
     </div>
   );
@@ -72,19 +74,29 @@ const CustomerMenu = props => {
     signInOptions: [firebase.auth.PhoneAuthProvider.PROVIDER_ID]
   };
 
-  const sendToWaiter = (title, notes) => {
-    var temp = {
+  const sendToWaiter = (title, notes, category) => {
+    var item = {
       title: title,
       notes: notes,
-      table: table
+      category: category
     };
     database
       .ref(tempRest)
-      .child("orders")
-      .push(temp);
+      .child("tables")
+      .child(table)
+      .child(seat)
+      .child("items")
+      .push(item);
   };
 
   useEffect(() => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log("user signed in ");
+      } else {
+        console.log("user NOT signed in ");
+      }
+    });
     ui.start("#firebaseui-auth-container", uiConfig);
     setRestaurant(tempRest);
     setTable(match.params.table);
@@ -115,7 +127,8 @@ const CustomerMenu = props => {
                     id: key,
                     title: item.title,
                     description: item.description,
-                    price: item.price
+                    price: item.price,
+                    category: item.category
                   };
                   finalMenu[category].push(tempItem);
                 }
@@ -159,6 +172,7 @@ const CustomerMenu = props => {
                           description={item.description}
                           price={item.price}
                           sendToWaiter={sendToWaiter}
+                          category={item.category}
                           //deleteMenuItem={deleteMenuItem}
                         />
                       </ul>
