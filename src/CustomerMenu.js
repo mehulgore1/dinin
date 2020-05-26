@@ -3,6 +3,7 @@ import { useHistory, generatePath } from "react-router-dom";
 import "./App.css";
 import * as firebase from "firebase";
 import * as firebaseui from "firebaseui";
+import WaiterRequest from "./WaiterRequest";
 
 const MenuItem = props => {
   const [notes, setNotes] = useState("");
@@ -199,6 +200,7 @@ const CustomerMenu = props => {
               <h1>
                 You are at table {table} seat {seat}
               </h1>
+              <WaiterRequest match={match} />
               <>
                 {Object.keys(menu[stage] || {}).map((category, i) => {
                   return (
