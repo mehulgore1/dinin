@@ -3,11 +3,14 @@ import { useHistory, generatePath } from "react-router-dom";
 import "./App.css";
 import * as firebase from "firebase";
 import * as firebaseui from "firebaseui";
-import { notStrictEqual } from "assert";
-import { cloneWithoutLoc } from "@babel/types";
 
 const MenuItem = props => {
   const [notes, setNotes] = useState("");
+  const [quantity, setQuantity] = useState(1);
+
+  const handleQuantityChange = event => {
+    setQuantity(event.target.value);
+  };
 
   return (
     <div>
@@ -24,8 +27,20 @@ const MenuItem = props => {
         placeholder="notes"
         onChange={e => setNotes(e.target.value)}
       />
+      <label>
+        Quantity
+        <select value={quantity} onChange={handleQuantityChange}>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </label>
       <button
-        onClick={() => props.sendToWaiter(props.title, notes, props.category)}
+        onClick={() =>
+          props.sendToWaiter(props.title, notes, props.category, quantity)
+        }
       >
         Add to Table
       </button>
@@ -78,11 +93,12 @@ const CustomerMenu = props => {
     signInOptions: [firebase.auth.PhoneAuthProvider.PROVIDER_ID]
   };
 
-  const sendToWaiter = (title, notes, category) => {
+  const sendToWaiter = (title, notes, category, quantity) => {
     var item = {
       title: title,
       notes: notes,
-      category: category
+      category: category,
+      quantity: quantity
     };
     database
       .ref(tempRest)
@@ -101,7 +117,6 @@ const CustomerMenu = props => {
       seat: seat,
       stage: nextStage
     });
-    console.log(nextStage);
     history.replace(path);
   };
 
@@ -110,13 +125,13 @@ const CustomerMenu = props => {
   }, [props.location]);
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        console.log("user signed in ");
-      } else {
-        console.log("user NOT signed in ");
-      }
-    });
+    // firebase.auth().onAuthStateChanged(function(user) {
+    //   if (user) {
+    //     console.log("user signed in ");
+    //   } else {
+    //     console.log("user NOT signed in ");
+    //   }
+    // });
     ui.start("#firebaseui-auth-container", uiConfig);
     setRestaurant(tempRest);
     setTable(match.params.table);
@@ -197,6 +212,8 @@ const CustomerMenu = props => {
                             title={item.title}
                             description={item.description}
                             price={item.price}
+                            sendToWaiter={sendToWaiter}
+                            category={item.category}
                             //deleteMenuItem={deleteMenuItem}
                           />
                         </ul>
