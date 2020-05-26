@@ -97,20 +97,26 @@ const MenuEditor = props => {
       .child("menu")
       .once("value")
       .then(function(snapshot) {
-        for (var category in snapshot.val()) {
-          if (!(category in finalMenu)) {
-            finalMenu[category] = [];
+        for (var stage in snapshot.val()) {
+          if (!(stage in finalMenu)) {
+            finalMenu[stage] = {};
           }
-          var categoryItems = snapshot.val()[category];
-          for (var key in categoryItems) {
-            var item = categoryItems[key];
-            var tempItem = {
-              id: key,
-              title: item.title,
-              description: item.description,
-              price: item.price
-            };
-            finalMenu[category].push(tempItem);
+          for (var category in snapshot.val()[stage]) {
+            if (!(category in finalMenu[stage])) {
+              finalMenu[stage][category] = [];
+            }
+            var categoryItems = snapshot.val()[stage][category];
+            for (var key in categoryItems) {
+              var item = categoryItems[key];
+              var tempItem = {
+                id: key,
+                title: item.title,
+                description: item.description,
+                price: item.price,
+                category: item.category
+              };
+              finalMenu[stage][category].push(tempItem);
+            }
           }
         }
         console.log(finalMenu);
@@ -128,22 +134,29 @@ const MenuEditor = props => {
       <h1>Manager dashboard for {restaurant} </h1>
       <FileUpload match={match} handleSetMenu={handleSetMenu} />
       {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
-      {Object.keys(menu).map((key, i) => {
+      {Object.keys(menu).map((stage, i) => {
         return (
           <>
-            <h1> {key} </h1>
-            {menu[key].map(item => (
-              <ul>
-                <MenuItem
-                  key={item.id}
-                  id={item.id}
-                  title={item.title}
-                  description={item.description}
-                  price={item.price}
-                  //deleteMenuItem={deleteMenuItem}
-                />
-              </ul>
-            ))}
+            <h1> {stage} </h1>
+            {Object.keys(menu[stage]).map((category, i) => {
+              return (
+                <>
+                  <h1> {category} </h1>
+                  {menu[stage][category].map(item => (
+                    <ul>
+                      <MenuItem
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        description={item.description}
+                        price={item.price}
+                        //deleteMenuItem={deleteMenuItem}
+                      />
+                    </ul>
+                  ))}
+                </>
+              );
+            })}
           </>
         );
       })}

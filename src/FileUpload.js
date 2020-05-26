@@ -14,8 +14,11 @@ const FileUpload = props => {
     var finalMenu = {};
     for (var itemArray of data) {
       var itemData = itemArray.data;
-      if (!(itemData[3] in finalMenu)) {
-        finalMenu[itemData[3]] = [];
+      if (!(itemData[4] in finalMenu)) {
+        finalMenu[itemData[4]] = {};
+      }
+      if (!([itemData[3]] in finalMenu[itemData[4]])) {
+        finalMenu[itemData[4]][itemData[3]] = [];
       }
       var tempItem = {
         title: itemData[0],
@@ -26,11 +29,14 @@ const FileUpload = props => {
       var key = database
         .ref(restaurant)
         .child("menu")
+        .child(itemData[4])
         .child(tempItem.category)
         .push(tempItem).key;
       tempItem.id = key;
-      finalMenu[itemData[3]].push(tempItem);
+      console.log(itemData[3] in finalMenu[itemData[4]]);
+      finalMenu[itemData[4]][itemData[3]].push(tempItem);
     }
+    console.log(finalMenu);
     props.handleSetMenu(finalMenu);
   };
 
