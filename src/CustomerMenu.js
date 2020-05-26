@@ -40,6 +40,7 @@ const CustomerMenu = props => {
   const [table, setTable] = useState("");
   const [isValid, setIsValid] = useState(true);
   const [seat, setSeat] = useState(0);
+  const [stage, setStage] = useState(0);
   const [signedIn, setSignedIn] = useState(true);
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -101,6 +102,7 @@ const CustomerMenu = props => {
     setRestaurant(tempRest);
     setTable(match.params.table);
     setSeat(match.params.seat);
+    setStage(match.params.stage);
     var finalMenu = {};
 
     database
@@ -164,31 +166,27 @@ const CustomerMenu = props => {
               <h1>
                 You are at table {table} seat {seat}
               </h1>
-              {Object.keys(menu).map((stage, i) => {
-                return (
-                  <>
-                    {Object.keys(menu[stage]).map((category, i) => {
-                      return (
-                        <>
-                          <h1> {category} </h1>
-                          {menu[stage][category].map(item => (
-                            <ul>
-                              <MenuItem
-                                key={item.id}
-                                id={item.id}
-                                title={item.title}
-                                description={item.description}
-                                price={item.price}
-                                //deleteMenuItem={deleteMenuItem}
-                              />
-                            </ul>
-                          ))}
-                        </>
-                      );
-                    })}
-                  </>
-                );
-              })}
+              <>
+                {Object.keys(menu[stage] || {}).map((category, i) => {
+                  return (
+                    <>
+                      <h1> {category} </h1>
+                      {menu[stage][category].map(item => (
+                        <ul>
+                          <MenuItem
+                            key={item.id}
+                            id={item.id}
+                            title={item.title}
+                            description={item.description}
+                            price={item.price}
+                            //deleteMenuItem={deleteMenuItem}
+                          />
+                        </ul>
+                      ))}
+                    </>
+                  );
+                })}
+              </>
             </>
           ) : (
             <h1>

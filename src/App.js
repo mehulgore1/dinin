@@ -12,7 +12,7 @@ const App = () => {
         <Route exact path="/manager/:restaurant" component={MenuEditor} />
         <Route
           exact
-          path="/menu/:restaurant/:table/:seat"
+          path="/menu/:restaurant/:table/:seat/:stage"
           component={CustomerMenu}
         />
         <Route exact path="/orders/:restaurant" component={OrderQ} />
