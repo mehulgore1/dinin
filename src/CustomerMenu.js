@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useHistory, generatePath } from "react-router-dom";
 import "./App.css";
 import * as firebase from "firebase";
 import * as firebaseui from "firebaseui";
@@ -49,6 +50,8 @@ const CustomerMenu = props => {
     firebaseui.auth.AuthUI.getInstance() ||
     new firebaseui.auth.AuthUI(firebase.auth());
 
+  const history = useHistory();
+
   const uiConfig = {
     callbacks: {
       signInSuccessWithAuthResult: function(authResult, redirectUrl) {
@@ -90,6 +93,22 @@ const CustomerMenu = props => {
       .push(item);
   };
 
+  const handleNextStageClick = () => {
+    var nextStage = parseInt(stage, 10) + 1;
+    const path = generatePath(match.path, {
+      restaurant: restaurant,
+      table: table,
+      seat: seat,
+      stage: nextStage
+    });
+    console.log(nextStage);
+    history.replace(path);
+  };
+
+  useEffect(() => {
+    setStage(match.params.stage);
+  }, [props.location]);
+
   useEffect(() => {
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
@@ -102,7 +121,6 @@ const CustomerMenu = props => {
     setRestaurant(tempRest);
     setTable(match.params.table);
     setSeat(match.params.seat);
-    setStage(match.params.stage);
     var finalMenu = {};
 
     database
@@ -187,6 +205,9 @@ const CustomerMenu = props => {
                   );
                 })}
               </>
+              {stage <= 3 ? (
+                <button onClick={handleNextStageClick}> Next Stage </button>
+              ) : null}
             </>
           ) : (
             <h1>
