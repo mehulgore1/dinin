@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import * as firebase from "firebase";
 
 const Order = props => {
@@ -20,64 +20,51 @@ const OrderQ = props => {
   const { match } = props;
   const tempRest = match.params.restaurant;
 
-  const completeOrder = id => {
-    database
-      .ref(tempRest)
-      .child("orders")
-      .child(id)
-      .remove();
-    setOrders(orders.filter(item => item.id !== id));
-  };
+  const completeOrder = id => {};
 
   useEffect(() => {
     setRestaurant(tempRest);
     database
       .ref(tempRest)
-      .child("orders")
+      .child("order_queue")
       .on("value", function(snapshot) {
-        var tempOrders = [...orders];
-        for (var key in snapshot.val()) {
-          var thisOrder = snapshot.val()[key];
-          var tempOrder = {
-            id: key,
-            title: thisOrder.title,
-            notes: thisOrder.notes,
-            table: thisOrder.table
-          };
-          tempOrders.push(tempOrder);
-        }
-        setOrders(tempOrders);
-      });
-
-    database
-      .ref(tempRest)
-      .child("orders")
-      .on("child_added", function(snapshot, irr) {
-        var tempOrders = [...orders];
-        var thisOrder = snapshot.val();
-        var tempOrder = {
-          id: snapshot.key,
-          title: thisOrder.title,
-          notes: thisOrder.notes
-        };
-        tempOrders.push(tempOrder);
-        setOrders(tempOrders);
+        console.log(snapshot.val());
+        setOrders(snapshot.val());
       });
   }, []);
 
   return (
     <>
       <h1> Orders for {restaurant} </h1>
-      {orders.map(order => (
-        <Order
-          key={order.id}
-          id={order.id}
-          title={order.title}
-          notes={order.notes}
-          completeOrder={completeOrder}
-          table={order.table}
-        />
-      ))}
+      {Object.keys(orders || {}).map((batch_key, index) => {
+        return (
+          <Fragment key={batch_key}>
+            <h2> Table {orders[batch_key]["table"]} </h2>
+            {Object.keys(orders[batch_key]["seat_data"] || {}).map(
+              (seat, i) => {
+                var items = orders[batch_key]["seat_data"][seat]["items"];
+                return (
+                  <Fragment key={seat}>
+                    <h3>Seat {seat}</h3>
+                    {Object.keys(items || {}).map((key, i) => {
+                      var item = items[key];
+                      return (
+                        <Fragment key={key}>
+                          <p>
+                            {" "}
+                            Category {item["category"]} Title {item["title"]}{" "}
+                            Quantity {item["quantity"]} Notes {item["notes"]}
+                          </p>
+                        </Fragment>
+                      );
+                    })}
+                  </Fragment>
+                );
+              }
+            )}
+          </Fragment>
+        );
+      })}
     </>
   );
 };
