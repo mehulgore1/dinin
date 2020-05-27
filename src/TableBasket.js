@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 import WaiterRequest from "./WaiterRequest";
 import { useHistory, generatePath } from "react-router-dom";
@@ -78,9 +79,11 @@ const TableBasket = props => {
                   <h2>
                     {" "}
                     Seat {seat}{" "}
-                    <button onClick={() => handleAddMoreItems(seat)}>
-                      {" "}
-                      Add more items{" "}
+                    <button
+                      class="btn btn-primary"
+                      onClick={() => handleAddMoreItems(seat)}
+                    >
+                      +
                     </button>{" "}
                   </h2>
                   {Object.keys(items || {}).map((key, i) => {

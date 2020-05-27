@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import MenuEditor from "./MenuEditor";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import CustomerMenu from "./CustomerMenu";
