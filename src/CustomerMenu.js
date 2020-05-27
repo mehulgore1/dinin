@@ -15,6 +15,7 @@ const CustomerMenu = props => {
   const [seat, setSeat] = useState(0);
   const [stage, setStage] = useState(0);
   const [signedIn, setSignedIn] = useState(false);
+  const [currentBatch, setCurrentBatch] = useState(1);
 
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -33,7 +34,9 @@ const CustomerMenu = props => {
       .ref(tempRest)
       .child("tables")
       .child(table)
-      .child("seats")
+      .child("batches")
+      .child(currentBatch)
+      .child("seat_data")
       .child(seat)
       .child("items")
       .push(item);
@@ -115,6 +118,37 @@ const CustomerMenu = props => {
         }
       })
       .catch(error => setIsValid(false));
+
+    database
+      .ref(tempRest)
+      .child("tables")
+      .child(match.params.table)
+      .child("batches")
+      .on("value", function(snapshot) {
+        if (!snapshot.exists()) {
+          // create first batch key
+          var batch_key = database
+            .ref(tempRest)
+            .child("tables")
+            .child(match.params.table)
+            .child("batches")
+            .push("").key;
+          setCurrentBatch(batch_key);
+        } else {
+          // get last batch key
+          database
+            .ref(tempRest)
+            .child("tables")
+            .child(match.params.table)
+            .child("batches")
+            .limitToLast(1)
+            .on("value", function(snapshot) {
+              snapshot.forEach(function(child) {
+                setCurrentBatch(child.key);
+              });
+            });
+        }
+      });
   }, []);
 
   const setSignedInTrue = () => {
