@@ -2,52 +2,8 @@ import React, { useState, useEffect, Fragment } from "react";
 import { useHistory, generatePath } from "react-router-dom";
 import "./App.css";
 import * as firebase from "firebase";
-import * as firebaseui from "firebaseui";
-import WaiterRequest from "./WaiterRequest";
-
-const MenuItem = props => {
-  const [notes, setNotes] = useState("");
-  const [quantity, setQuantity] = useState(1);
-
-  const handleQuantityChange = event => {
-    setQuantity(event.target.value);
-  };
-
-  return (
-    <div>
-      <p>
-        <strong> {props.title} </strong>
-      </p>
-      <p>{props.description} </p>
-      <p>
-        <strong> Price: </strong> {props.price}
-      </p>
-      <input
-        type="text"
-        value={notes}
-        placeholder="notes"
-        onChange={e => setNotes(e.target.value)}
-      />
-      <label>
-        Quantity
-        <select value={quantity} onChange={handleQuantityChange}>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
-      </label>
-      <button
-        onClick={() =>
-          props.sendToWaiter(props.title, notes, props.category, quantity)
-        }
-      >
-        Add to Table
-      </button>
-    </div>
-  );
-};
+import MenuItem from "./MenuItem";
+import LoginForm from "./LoginForm";
 
 const CustomerMenu = props => {
   var database = firebase.database();
@@ -58,41 +14,12 @@ const CustomerMenu = props => {
   const [isValid, setIsValid] = useState(true);
   const [seat, setSeat] = useState(0);
   const [stage, setStage] = useState(0);
-  const [signedIn, setSignedIn] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
+
   const { match } = props;
   const tempRest = match.params.restaurant;
 
-  const ui =
-    firebaseui.auth.AuthUI.getInstance() ||
-    new firebaseui.auth.AuthUI(firebase.auth());
-
   const history = useHistory();
-
-  const uiConfig = {
-    callbacks: {
-      signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-        // User successfully signed in.
-        // Return type determines whether we continue the redirect automatically
-        // or whether we leave that to developer to handle.
-        console.log(authResult.user.uid);
-        console.log(authResult.user.phoneNumber);
-        database
-          .ref("users")
-          .child(authResult.user.uid)
-          .child("phone_number")
-          .set(authResult.user.phoneNumber);
-        setSignedIn(true);
-        return true;
-      },
-      uiShown: function() {
-        // The widget is rendered.
-        // Hide the loader.
-      }
-    },
-    // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-    signInFlow: "popup",
-    signInOptions: [firebase.auth.PhoneAuthProvider.PROVIDER_ID]
-  };
 
   const sendToWaiter = (title, notes, category, quantity) => {
     var item = {
@@ -128,14 +55,14 @@ const CustomerMenu = props => {
   }, [props.location]);
 
   useEffect(() => {
-    // firebase.auth().onAuthStateChanged(function(user) {
-    //   if (user) {
-    //     console.log("user signed in ");
-    //   } else {
-    //     console.log("user NOT signed in ");
-    //   }
-    // });
-    //ui.start("#firebaseui-auth-container", uiConfig);
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log("user signed in ");
+        setSignedIn(true);
+      } else {
+        console.log("user NOT signed in ");
+      }
+    });
     setRestaurant(tempRest);
     setTable(match.params.table);
     setSeat(match.params.seat);
@@ -190,10 +117,14 @@ const CustomerMenu = props => {
       .catch(error => setIsValid(false));
   }, []);
 
+  const setSignedInTrue = () => {
+    setSignedIn(true);
+  };
+
   return (
     <>
       {!signedIn ? (
-        <div id="firebaseui-auth-container"></div>
+        <LoginForm setSignedInTrue={setSignedInTrue} />
       ) : (
         <>
           {isValid ? (
