@@ -101,7 +101,7 @@ const TableBasket = props => {
                     {" "}
                     Seat {seat}{" "}
                     <button
-                      class="btn btn-primary"
+                      className="btn btn-primary"
                       onClick={() => handleAddMoreItems(seat)}
                     >
                       +
