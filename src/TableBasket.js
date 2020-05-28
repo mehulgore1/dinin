@@ -45,6 +45,9 @@ const TableBasket = props => {
 
   const handleBatchOrder = () => {
     var batchObject = tableData["batches"][currentBatch];
+    if (batchObject == "") {
+      return;
+    }
     batchObject["table"] = match.params.table;
     database
       .ref(match.params.restaurant)
@@ -59,6 +62,24 @@ const TableBasket = props => {
       .child("batches")
       .push("").key;
     setCurrentBatch(batch_key);
+  };
+
+  const deleteItem = (batch_key, seat_num, item_key) => {
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .child(match.params.table)
+      .child("batches")
+      .child(batch_key)
+      .child("seat_data")
+      .child(seat_num)
+      .child("items")
+      .child(item_key)
+      .remove();
+
+    delete tableData["batches"][batch_key]["seat_data"][seat_num]["items"][
+      item_key
+    ];
   };
 
   return (
@@ -94,6 +115,12 @@ const TableBasket = props => {
                           {" "}
                           Title {item["title"]} Quantity {item["quantity"]}{" "}
                           Notes {item["notes"]} Status {item["status"]}{" "}
+                          <button
+                            onClick={() => deleteItem(batch_key, seat, key)}
+                          >
+                            {" "}
+                            Remove{" "}
+                          </button>
                         </p>
                       </Fragment>
                     );
