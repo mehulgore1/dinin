@@ -1,18 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import * as firebase from "firebase";
 
-const Order = props => {
-  return (
-    <div>
-      <strong> Item </strong>
-      {props.title}
-      <strong> Notes </strong> {props.notes}
-      <strong> Table </strong> {props.table}
-      <button onClick={() => props.completeOrder(props.id)}> Done </button>
-    </div>
-  );
-};
-
 const OrderQ = props => {
   var database = firebase.database();
   const [orders, setOrders] = useState([]);
@@ -20,7 +8,30 @@ const OrderQ = props => {
   const { match } = props;
   const tempRest = match.params.restaurant;
 
-  const completeOrder = id => {};
+  const sendStatus = (table, batch, seat_num, item_key, status) => {
+    database
+      .ref(tempRest)
+      .child("tables")
+      .child(table)
+      .child("batches")
+      .child(batch)
+      .child("seat_data")
+      .child(seat_num)
+      .child("items")
+      .child(item_key)
+      .child("status")
+      .set(status);
+  };
+
+  const completeBatch = batch_key => {
+    database
+      .ref(tempRest)
+      .child("order_queue")
+      .child(batch_key)
+      .remove();
+
+    delete orders[batch_key];
+  };
 
   useEffect(() => {
     setRestaurant(tempRest);
@@ -39,7 +50,14 @@ const OrderQ = props => {
       {Object.keys(orders || {}).map((batch_key, index) => {
         return (
           <Fragment key={batch_key}>
-            <h2> Table {orders[batch_key]["table"]} </h2>
+            <h2>
+              {" "}
+              Table {orders[batch_key]["table"]}{" "}
+              <button onClick={() => completeBatch(batch_key)}>
+                {" "}
+                Finish Table Round{" "}
+              </button>
+            </h2>
             {Object.keys(orders[batch_key]["seat_data"] || {}).map(
               (seat, i) => {
                 var items = orders[batch_key]["seat_data"][seat]["items"];
@@ -54,6 +72,34 @@ const OrderQ = props => {
                             {" "}
                             Category {item["category"]} Title {item["title"]}{" "}
                             Quantity {item["quantity"]} Notes {item["notes"]}
+                            <button
+                              onClick={() =>
+                                sendStatus(
+                                  orders[batch_key]["table"],
+                                  batch_key,
+                                  seat,
+                                  key,
+                                  "Order Submitted"
+                                )
+                              }
+                            >
+                              {" "}
+                              Complete{" "}
+                            </button>
+                            <button
+                              onClick={() =>
+                                sendStatus(
+                                  orders[batch_key]["table"],
+                                  batch_key,
+                                  seat,
+                                  key,
+                                  "Issue, Waiter Coming"
+                                )
+                              }
+                            >
+                              {" "}
+                              Waiter coming{" "}
+                            </button>
                           </p>
                         </Fragment>
                       );
