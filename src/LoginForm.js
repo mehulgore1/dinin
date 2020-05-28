@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import * as firebase from "firebase";
 import { isProperty } from "@babel/types";
@@ -63,23 +64,34 @@ const LoginForm = props => {
 
   return (
     <Fragment>
-      <input
-        type="text"
-        value={phoneNumber}
-        placeholder="Phone Number"
-        onChange={e => setPhoneNumber(e.target.value)}
-      />
-      <button onClick={sendVerificationCode}> Send Code </button>
-      <input
-        type="text"
-        value={authCode}
-        placeholder="6-digit Verification Code"
-        onChange={e => setAuthCode(e.target.value)}
-      />
-      <button id="sign-in-button" onClick={signInWithPhoneNumber}>
-        {" "}
-        Let's Go!{" "}
-      </button>
+      <div>
+        <input
+          type="text"
+          value={phoneNumber}
+          placeholder="Phone Number"
+          onChange={e => setPhoneNumber(e.target.value)}
+        />
+        <button className="btn btn-secondary" onClick={sendVerificationCode}>
+          {" "}
+          Send Code{" "}
+        </button>
+      </div>
+      <div>
+        <input
+          type="text"
+          value={authCode}
+          placeholder="6-digit Verification Code"
+          onChange={e => setAuthCode(e.target.value)}
+        />
+        <button
+          className="btn btn-primary"
+          id="sign-in-button"
+          onClick={signInWithPhoneNumber}
+        >
+          {" "}
+          Let's Go!{" "}
+        </button>
+      </div>
     </Fragment>
   );
 };
