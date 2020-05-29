@@ -18,6 +18,13 @@ const TableBasket = props => {
 
   useEffect(() => {
     if (isMounted()) {
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          console.log("user signed in ");
+        } else {
+          console.log("user NOT signed in ");
+        }
+      });
       database
         .ref(match.params.restaurant)
         .child("tables")

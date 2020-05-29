@@ -10,6 +10,7 @@ import Requests from "./Requests";
 
 const App = () => {
   return (
+    <Provider template={AlertTemplate} {...options}>
     <BrowserRouter>
       <Switch>
         <Route exact path="/:restaurant/manager/" component={MenuEditor} />
@@ -23,6 +24,7 @@ const App = () => {
         <Route exact path="/:restaurant/requests" component={Requests} />
       </Switch>
     </BrowserRouter>
+    </Provider>
   );
 };
 

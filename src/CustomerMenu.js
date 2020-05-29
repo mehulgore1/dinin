@@ -17,7 +17,7 @@ const CustomerMenu = props => {
   const [isValid, setIsValid] = useState(true);
   const [seat, setSeat] = useState(0);
   const [stage, setStage] = useState(0);
-  const [signedIn, setSignedIn] = useState(false);
+  const [signedIn, setSignedIn] = useState(true);
   const [currentBatch, setCurrentBatch] = useState(1);
 
   const { match } = props;
@@ -49,6 +49,20 @@ const CustomerMenu = props => {
 
   const handleNextStageClick = () => {
     var nextStage = parseInt(stage, 10) + 1;
+    const path = generatePath(match.path, {
+      restaurant: restaurant,
+      table: table,
+      seat: seat,
+      stage: nextStage
+    });
+    history.replace(path);
+  };
+
+  const handlePrevStageClick = () => {
+    var nextStage = parseInt(stage, 10) - 1;
+    if (nextStage < 1) {
+      nextStage = 1;
+    }
     const path = generatePath(match.path, {
       restaurant: restaurant,
       table: table,
@@ -170,7 +184,6 @@ const CustomerMenu = props => {
         <LoginForm setSignedInTrue={setSignedInTrue} />
       ) : (
         <Fragment>
-          <SignOutButton setSignedInFalse={setSignedInFalse} />
           {isValid ? (
             <Fragment>
               <div className="d-flex justify-content-center">
@@ -209,14 +222,46 @@ const CustomerMenu = props => {
                   );
                 })}
               </Fragment>
-              {stage <= 3 ? (
-                <button
-                  className="btn btn-primary btn-block"
-                  onClick={handleNextStageClick}
-                >
-                  {" "}
-                  Next Category{" "}
-                </button>
+              {stage == 1 ? (
+                <div className="d-flex justify-content-around">
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={handleNextStageClick}
+                  >
+                    {" "}
+                    Next Section{" "}
+                  </button>
+                </div>
+              ) : null}
+
+              {stage > 1 && stage < 4 ? (
+                <div className="d-flex justify-content-around">
+                  <button
+                    className="btn btn-primary"
+                    onClick={handlePrevStageClick}
+                  >
+                    {" "}
+                    Previous Section{" "}
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleNextStageClick}
+                  >
+                    {" "}
+                    Next Section{" "}
+                  </button>
+                </div>
+              ) : null}
+
+              {stage == 4 ? (
+                <div className="d-flex justify-content-around">
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={handlePrevStageClick}
+                  >
+                    Previous Section
+                  </button>
+                </div>
               ) : null}
             </Fragment>
           ) : (
