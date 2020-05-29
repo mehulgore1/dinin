@@ -88,6 +88,17 @@ const TableBasket = props => {
       }
     }
 
+    var today = new Date();
+    var time = today.getHours() + ":" + today.getMinutes();
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .child(match.params.table)
+      .child("batches")
+      .child(currentBatch)
+      .child("ordered_at")
+      .set(time);
+
     database
       .ref(match.params.restaurant)
       .child("order_queue")
@@ -151,7 +162,15 @@ const TableBasket = props => {
       {Object.keys(tableData["batches"] || {}).map((batch_key, index) => {
         return (
           <Fragment key={batch_key}>
-            <h1> Round {index + 1} </h1>
+            {tableData["batches"][batch_key] != "" &&
+            "ordered_at" in tableData["batches"][batch_key] ? (
+              <h1>
+                {" "}
+                Ordered at {tableData["batches"][batch_key]["ordered_at"]}{" "}
+              </h1>
+            ) : (
+              <h1> Pending Orders </h1>
+            )}
             {Object.keys(
               tableData["batches"][batch_key]["seat_data"] || {}
             ).map((seat, i) => {
