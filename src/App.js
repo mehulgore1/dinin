@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import CustomerMenu from "./CustomerMenu";
 import OrderQ from "./OrderQ";
 import TableBasket from "./TableBasket";
+import Requests from "./Requests";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         />
         <Route exact path="/menu/:restaurant/:table" component={TableBasket} />
         <Route exact path="/orders/:restaurant" component={OrderQ} />
+        <Route exact path="/requests/:restaurant" component={Requests} />
       </Switch>
     </BrowserRouter>
   );
