@@ -12,15 +12,15 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/manager/:restaurant" component={MenuEditor} />
+        <Route exact path="/:restaurant/manager/" component={MenuEditor} />
         <Route
           exact
-          path="/menu/:restaurant/:table/:seat/:stage"
+          path="/:restaurant/menu/:table/:seat/:stage"
           component={CustomerMenu}
         />
-        <Route exact path="/menu/:restaurant/:table" component={TableBasket} />
-        <Route exact path="/orders/:restaurant" component={OrderQ} />
-        <Route exact path="/requests/:restaurant" component={Requests} />
+        <Route exact path="/:restaurant/menu/:table" component={TableBasket} />
+        <Route exact path="/:restaurant/orders/" component={OrderQ} />
+        <Route exact path="/:restaurant/requests" component={Requests} />
       </Switch>
     </BrowserRouter>
   );

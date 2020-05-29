@@ -3,9 +3,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 import WaiterRequest from "./WaiterRequest";
 import { useHistory, generatePath } from "react-router-dom";
+import useIsMounted from "react-is-mounted-hook";
 
 const TableBasket = props => {
   var database = firebase.database();
+  const isMounted = useIsMounted();
   const [tableData, setTableData] = useState({});
   const [newTabledata, setNewTableData] = useState({});
   const [currentBatch, setCurrentBatch] = useState(1);
@@ -13,29 +15,31 @@ const TableBasket = props => {
   const history = useHistory();
 
   useEffect(() => {
-    database
-      .ref(match.params.restaurant)
-      .child("tables")
-      .child(match.params.table)
-      .on("value", function(snapshot) {
-        if (snapshot.val() != null) {
-          setTableData(snapshot.val());
-        } else {
-          setTableData({});
-        }
-      });
-
-    database
-      .ref(match.params.restaurant)
-      .child("tables")
-      .child(match.params.table)
-      .child("batches")
-      .limitToLast(1)
-      .on("value", function(snapshot) {
-        snapshot.forEach(function(child) {
-          setCurrentBatch(child.key);
+    if (isMounted()) {
+      database
+        .ref(match.params.restaurant)
+        .child("tables")
+        .child(match.params.table)
+        .on("value", function(snapshot) {
+          if (snapshot.val() != null) {
+            setTableData(snapshot.val());
+          } else {
+            setTableData({});
+          }
         });
-      });
+
+      database
+        .ref(match.params.restaurant)
+        .child("tables")
+        .child(match.params.table)
+        .child("batches")
+        .limitToLast(1)
+        .on("value", function(snapshot) {
+          snapshot.forEach(function(child) {
+            setCurrentBatch(child.key);
+          });
+        });
+    }
   }, []);
 
   const handleAddMoreItems = seat => {

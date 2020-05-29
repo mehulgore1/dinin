@@ -174,7 +174,7 @@ const CustomerMenu = props => {
                 You are at table {table} seat {seat}
               </h1>
 
-              <a href={"/menu/" + tempRest + "/" + table}>
+              <a href={"/" + tempRest + "/menu/" + table}>
                 <button className="btn btn-primary btn-block">
                   Go to Table Dashboard
                 </button>
