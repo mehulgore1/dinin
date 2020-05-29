@@ -18,7 +18,11 @@ const TableBasket = props => {
       .child("tables")
       .child(match.params.table)
       .on("value", function(snapshot) {
-        setTableData(snapshot.val());
+        if (snapshot.val() != null) {
+          setTableData(snapshot.val());
+        } else {
+          setTableData({});
+        }
       });
 
     database

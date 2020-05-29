@@ -16,10 +16,18 @@ const WaiterRequest = props => {
       request: request,
       status: ""
     };
+    var key = database
+      .ref(props.match.params.restaurant)
+      .child("tables")
+      .child(props.match.params.table)
+      .child("requests")
+      .push(requestObj).key;
+
     database
       .ref(props.match.params.restaurant)
       .child("requests")
-      .push(requestObj);
+      .child(key)
+      .set(requestObj);
   };
 
   return (
