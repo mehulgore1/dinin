@@ -35,14 +35,23 @@ const MenuItem = props => {
             <option value="5">5</option>
           </select>
         </label>
-        <button
-          className="btn btn-success"
-          onClick={() =>
-            props.sendToWaiter(props.title, notes, props.category, quantity)
+        <a
+          href={
+            "/" +
+            props.match.params.restaurant +
+            "/menu/" +
+            props.match.params.table
           }
         >
-          Add to Table
-        </button>
+          <button
+            className="btn btn-success"
+            onClick={() =>
+              props.sendToWaiter(props.title, notes, props.category, quantity)
+            }
+          >
+            Add to Table
+          </button>
+        </a>
       </div>
     </div>
   );

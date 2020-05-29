@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import "./App.css";
 import * as firebase from "firebase";
 import FileUpload from "./FileUpload";
@@ -136,14 +136,14 @@ const MenuEditor = props => {
       {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
       {Object.keys(menu).map((stage, i) => {
         return (
-          <>
+          <Fragment key={stage}>
             <h1> {stage} </h1>
             {Object.keys(menu[stage]).map((category, i) => {
               return (
-                <>
+                <Fragment key={category}>
                   <h1> {category} </h1>
                   {menu[stage][category].map(item => (
-                    <ul>
+                    <ul key={item}>
                       <MenuItem
                         key={item.id}
                         id={item.id}
@@ -154,10 +154,10 @@ const MenuEditor = props => {
                       />
                     </ul>
                   ))}
-                </>
+                </Fragment>
               );
             })}
-          </>
+          </Fragment>
         );
       })}
     </>

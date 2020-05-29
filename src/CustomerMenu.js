@@ -29,7 +29,7 @@ const CustomerMenu = props => {
       notes: notes,
       category: category,
       quantity: quantity,
-      status: ""
+      status: "Pending"
     };
     database
       .ref(tempRest)
@@ -195,6 +195,7 @@ const CustomerMenu = props => {
                             price={item.price}
                             sendToWaiter={sendToWaiter}
                             category={item.category}
+                            match={match}
                             //deleteMenuItem={deleteMenuItem}
                           />
                         </ul>
@@ -209,7 +210,7 @@ const CustomerMenu = props => {
                   onClick={handleNextStageClick}
                 >
                   {" "}
-                  Next Stage{" "}
+                  Next Category{" "}
                 </button>
               ) : null}
             </>
