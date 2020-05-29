@@ -10,7 +10,7 @@ const SignOutButton = props => {
 
   return (
     <Fragment>
-      <button onClick={handleSignOut} className="btn btn-danger">
+      <button onClick={handleSignOut} className="btn btn-danger btn-block">
         {" "}
         Sign Out{" "}
       </button>

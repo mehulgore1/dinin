@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 
 const WaiterRequest = props => {
@@ -30,7 +31,10 @@ const WaiterRequest = props => {
           <option value="Waiter Needed"> Call waiter over </option>
         </select>
       </label>
-      <button onClick={handleSendRequest}> Send Request </button>
+      <button className="btn btn-primary" onClick={handleSendRequest}>
+        {" "}
+        Send Request{" "}
+      </button>
     </>
   );
 };

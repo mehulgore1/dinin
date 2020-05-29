@@ -116,6 +116,7 @@ const TableBasket = props => {
                           Title {item["title"]} Quantity {item["quantity"]}{" "}
                           Notes {item["notes"]} Status {item["status"]}{" "}
                           <button
+                            className="btn btn-danger"
                             onClick={() => deleteItem(batch_key, seat, key)}
                           >
                             {" "}
@@ -131,7 +132,10 @@ const TableBasket = props => {
           </Fragment>
         );
       })}
-      <button onClick={handleBatchOrder}> Order these items </button>
+      <button className="btn btn-dark btn-block" onClick={handleBatchOrder}>
+        {" "}
+        Order these items{" "}
+      </button>
       <h2> Requests </h2>
       {Object.keys(tableData["requests"] || {}).map((key, i) => {
         return (

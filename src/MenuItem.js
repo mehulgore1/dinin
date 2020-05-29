@@ -24,23 +24,26 @@ const MenuItem = props => {
         placeholder="notes"
         onChange={e => setNotes(e.target.value)}
       />
-      <label>
-        Quantity
-        <select value={quantity} onChange={handleQuantityChange}>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
-      </label>
-      <button
-        onClick={() =>
-          props.sendToWaiter(props.title, notes, props.category, quantity)
-        }
-      >
-        Add to Table
-      </button>
+      <div>
+        <label>
+          Quantity
+          <select value={quantity} onChange={handleQuantityChange}>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </label>
+        <button
+          className="btn btn-success"
+          onClick={() =>
+            props.sendToWaiter(props.title, notes, props.category, quantity)
+          }
+        >
+          Add to Table
+        </button>
+      </div>
     </div>
   );
 };

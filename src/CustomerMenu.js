@@ -173,11 +173,13 @@ const CustomerMenu = props => {
               <h1>
                 You are at table {table} seat {seat}
               </h1>
-              <button>
-                <a href={"/menu/" + tempRest + "/" + table}>
+
+              <a href={"/menu/" + tempRest + "/" + table}>
+                <button className="btn btn-primary btn-block">
                   Go to Table Dashboard
-                </a>
-              </button>
+                </button>
+              </a>
+
               <>
                 {Object.keys(menu[stage] || {}).map((category, i) => {
                   return (
@@ -202,7 +204,13 @@ const CustomerMenu = props => {
                 })}
               </>
               {stage <= 3 ? (
-                <button onClick={handleNextStageClick}> Next Stage </button>
+                <button
+                  className="btn btn-primary btn-block"
+                  onClick={handleNextStageClick}
+                >
+                  {" "}
+                  Next Stage{" "}
+                </button>
               ) : null}
             </>
           ) : (
