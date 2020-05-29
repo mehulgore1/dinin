@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 
 const WaiterRequest = props => {
   var database = firebase.database();
-  const [request, setRequest] = useState("Get water");
+  //const [request, setRequest] = useState("Get water");
 
-  const handleRequestChange = event => {
-    setRequest(event.target.value);
-  };
+  //   const handleRequestChange = event => {
+  //     setRequest(event.target.value);
+  //   };
 
-  const handleSendRequest = () => {
+  const handleSendRequest = request => {
     const requestObj = {
       table: props.match.params.table,
       request: request,
@@ -31,8 +31,33 @@ const WaiterRequest = props => {
   };
 
   return (
-    <>
-      <label>
+    <Fragment>
+      <div className="container">
+        <div className="d-flex justify-content-around">
+          <button
+            className="btn btn-primary"
+            onClick={() => handleSendRequest("Water Requested")}
+          >
+            {" "}
+            Water{" "}
+          </button>
+          <button
+            className="btn btn-warning"
+            onClick={() => handleSendRequest("Waitstaff Requested")}
+          >
+            {" "}
+            Call Waitstaff{" "}
+          </button>
+          <button
+            className="btn btn-success"
+            onClick={() => handleSendRequest("Check Requested")}
+          >
+            {" "}
+            Get Check{" "}
+          </button>
+        </div>
+      </div>
+      {/* <label>
         Request
         <select value={request} onChange={handleRequestChange}>
           <option value="Get water"> Get/refill water </option>
@@ -42,8 +67,8 @@ const WaiterRequest = props => {
       <button className="btn btn-primary" onClick={handleSendRequest}>
         {" "}
         Send Request{" "}
-      </button>
-    </>
+      </button> */}
+    </Fragment>
   );
 };
 

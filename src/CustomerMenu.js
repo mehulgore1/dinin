@@ -161,26 +161,27 @@ const CustomerMenu = props => {
   };
 
   return (
-    <>
+    <Fragment>
       {!signedIn ? (
         <LoginForm setSignedInTrue={setSignedInTrue} />
       ) : (
         <Fragment>
           <SignOutButton setSignedInFalse={setSignedInFalse} />
           {isValid ? (
-            <>
-              <h1> Welcome to {restaurant}</h1>
-              <h1>
-                You are at table {table} seat {seat}
-              </h1>
-
+            <Fragment>
+              <div className="d-flex justify-content-center">
+                <h1>
+                  {" "}
+                  {restaurant} Seat {seat}
+                </h1>
+              </div>
               <a href={"/" + tempRest + "/menu/" + table}>
                 <button className="btn btn-primary btn-block">
                   Go to Table Dashboard
                 </button>
               </a>
 
-              <>
+              <Fragment>
                 {Object.keys(menu[stage] || {}).map((category, i) => {
                   return (
                     <Fragment key={category}>
@@ -203,7 +204,7 @@ const CustomerMenu = props => {
                     </Fragment>
                   );
                 })}
-              </>
+              </Fragment>
               {stage <= 3 ? (
                 <button
                   className="btn btn-primary btn-block"
@@ -213,7 +214,7 @@ const CustomerMenu = props => {
                   Next Category{" "}
                 </button>
               ) : null}
-            </>
+            </Fragment>
           ) : (
             <h1>
               {" "}
@@ -222,7 +223,7 @@ const CustomerMenu = props => {
           )}
         </Fragment>
       )}
-    </>
+    </Fragment>
   );
 };
 

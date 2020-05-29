@@ -9,49 +9,85 @@ const MenuItem = props => {
     setQuantity(event.target.value);
   };
 
+  const incQuantity = () => {
+    var newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+  };
+
+  const decQuantity = () => {
+    var newQuantity = quantity - 1;
+    if (newQuantity < 1) {
+      newQuantity = 1;
+    }
+    setQuantity(newQuantity);
+  };
+
   return (
     <div>
-      <p>
-        <strong> {props.title} </strong>
-      </p>
-      <p>{props.description} </p>
-      <p>
-        <strong> Price: </strong> {props.price}
-      </p>
-      <input
-        type="text"
-        value={notes}
-        placeholder="notes"
-        onChange={e => setNotes(e.target.value)}
-      />
-      <div>
-        <label>
-          Quantity
-          <select value={quantity} onChange={handleQuantityChange}>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-        </label>
-        <a
-          href={
-            "/" +
-            props.match.params.restaurant +
-            "/menu/" +
-            props.match.params.table
-          }
-        >
-          <button
-            className="btn btn-success"
-            onClick={() =>
-              props.sendToWaiter(props.title, notes, props.category, quantity)
-            }
-          >
-            Add to Table
-          </button>
-        </a>
+      <div className="container">
+        <div className="row">
+          <div className="col-8">
+            <div>
+              {" "}
+              <strong>{props.title}</strong>
+            </div>
+            <div>{props.description}</div>
+            <div>
+              <strong> $</strong> {props.price}
+            </div>
+            <div>
+              <input
+                type="text"
+                value={notes}
+                placeholder="Add Notes"
+                onChange={e => setNotes(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="col-4">
+            <div>
+              <div className="d-flex justify-content-around">
+                <button
+                  onClick={() => decQuantity()}
+                  className="btn btn-primary btn-sm"
+                >
+                  {" "}
+                  -{" "}
+                </button>
+                <div className="align-self-center"> {quantity} </div>
+                <button
+                  onClick={() => incQuantity()}
+                  className="btn btn-primary btn-sm"
+                >
+                  {" "}
+                  +{" "}
+                </button>
+              </div>
+            </div>
+            <a
+              href={
+                "/" +
+                props.match.params.restaurant +
+                "/menu/" +
+                props.match.params.table
+              }
+            >
+              <button
+                className="btn btn-success"
+                onClick={() =>
+                  props.sendToWaiter(
+                    props.title,
+                    notes,
+                    props.category,
+                    quantity
+                  )
+                }
+              >
+                Add
+              </button>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

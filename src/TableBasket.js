@@ -91,13 +91,15 @@ const TableBasket = props => {
   };
 
   return (
-    <>
-      <h1> Dashboard for table {match.params.table} </h1>
+    <Fragment>
+      <div className="d-flex justify-content-center">
+        <h1> Your Table: </h1>
+      </div>
       <WaiterRequest match={match} />
       {Object.keys(tableData["batches"] || {}).map((batch_key, index) => {
         return (
           <Fragment key={batch_key}>
-            <h1> Batch {index + 1} </h1>
+            <h1> Round {index + 1} </h1>
             {Object.keys(
               tableData["batches"][batch_key]["seat_data"] || {}
             ).map((seat, i) => {
@@ -119,18 +121,29 @@ const TableBasket = props => {
                     var item = items[key];
                     return (
                       <Fragment key={key}>
-                        <p>
-                          {" "}
-                          Title {item["title"]} Quantity {item["quantity"]}{" "}
-                          Notes {item["notes"]} Status {item["status"]}{" "}
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => deleteItem(batch_key, seat, key)}
-                          >
-                            {" "}
-                            Remove{" "}
-                          </button>
-                        </p>
+                        <div className="container">
+                          <div className="row">
+                            <div className="col"> {item["quantity"]} </div>
+                            <div className="col-8">
+                              <div>
+                                {" "}
+                                <strong>{item["title"]}</strong>
+                              </div>
+                              <div>{item["notes"]}</div>
+                              <div>
+                                <strong>Status </strong> {item["status"]}{" "}
+                              </div>
+                            </div>
+                            <div className="col">
+                              <button
+                                className="btn btn-danger"
+                                onClick={() => deleteItem(batch_key, seat, key)}
+                              >
+                                x
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </Fragment>
                     );
                   })}
@@ -148,15 +161,16 @@ const TableBasket = props => {
       {Object.keys(tableData["requests"] || {}).map((key, i) => {
         return (
           <React.Fragment key={key}>
-            <p>
-              {" "}
-              Request {tableData["requests"][key]["request"]} Status
-              {tableData["requests"][key]["status"]}
-            </p>
+            <div className="container">
+              <div className="row">
+                <strong> {tableData["requests"][key]["request"]} </strong> :
+                {tableData["requests"][key]["status"]}
+              </div>
+            </div>
           </React.Fragment>
         );
       })}
-    </>
+    </Fragment>
   );
 };
 
