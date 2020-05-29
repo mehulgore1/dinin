@@ -20,8 +20,7 @@ const OrderQ = props => {
       .child(seat_num)
       .child("items")
       .child(item_key)
-      .child("status")
-      .set(status);
+      .update({ status: status });
   };
 
   const completeBatch = batch_key => {

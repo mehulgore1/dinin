@@ -68,7 +68,7 @@ const MenuItem = props => {
               <button
                 className="btn btn-success"
                 onClick={() =>
-                  props.sendToWaiter(
+                  props.sendToTable(
                     props.title,
                     notes,
                     props.category,

@@ -25,13 +25,14 @@ const CustomerMenu = props => {
 
   const history = useHistory();
 
-  const sendToWaiter = (title, notes, category, quantity) => {
+  const sendToTable = (title, notes, category, quantity) => {
     var item = {
       title: title,
       notes: notes,
       category: category,
       quantity: quantity,
-      status: "Pending"
+      status: "Pending",
+      ordered: false
     };
     database
       .ref(tempRest)
@@ -211,7 +212,7 @@ const CustomerMenu = props => {
                             title={item.title}
                             description={item.description}
                             price={item.price}
-                            sendToWaiter={sendToWaiter}
+                            sendToTable={sendToTable}
                             category={item.category}
                             match={match}
                             //deleteMenuItem={deleteMenuItem}

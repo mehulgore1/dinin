@@ -66,6 +66,28 @@ const TableBasket = props => {
       return;
     }
     batchObject["table"] = match.params.table;
+
+    for (var seat in tableData["batches"][currentBatch]["seat_data"]) {
+      for (var item_key in tableData["batches"][currentBatch]["seat_data"][
+        seat
+      ]["items"]) {
+        tableData["batches"][currentBatch]["seat_data"][seat]["items"][
+          item_key
+        ]["ordered"] = true;
+        database
+          .ref(match.params.restaurant)
+          .child("tables")
+          .child(match.params.table)
+          .child("batches")
+          .child(currentBatch)
+          .child("seat_data")
+          .child(seat)
+          .child("items")
+          .child(item_key)
+          .update({ ordered: true });
+      }
+    }
+
     database
       .ref(match.params.restaurant)
       .child("order_queue")
@@ -84,6 +106,7 @@ const TableBasket = props => {
   };
 
   const deleteItem = (batch_key, seat_num, item_key) => {
+    const batch_key_param = batch_key;
     database
       .ref(match.params.restaurant)
       .child("tables")
@@ -99,6 +122,24 @@ const TableBasket = props => {
     delete tableData["batches"][batch_key]["seat_data"][seat_num]["items"][
       item_key
     ];
+    // removed only item, old batch key does not exist
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .child(match.params.table)
+      .child("batches")
+      .once("value", function(snapshot) {
+        console.log(batch_key_param);
+        if (!snapshot.hasChild(batch_key_param)) {
+          var batch_key_new = database
+            .ref(match.params.restaurant)
+            .child("tables")
+            .child(match.params.table)
+            .child("batches")
+            .push("").key;
+          setCurrentBatch(batch_key_new);
+        }
+      });
   };
 
   return (
@@ -146,12 +187,16 @@ const TableBasket = props => {
                               </div>
                             </div>
                             <div className="col">
-                              <button
-                                className="btn btn-danger"
-                                onClick={() => deleteItem(batch_key, seat, key)}
-                              >
-                                x
-                              </button>
+                              {!item["ordered"] ? (
+                                <button
+                                  className="btn btn-danger"
+                                  onClick={() =>
+                                    deleteItem(batch_key, seat, key)
+                                  }
+                                >
+                                  x
+                                </button>
+                              ) : null}
                             </div>
                           </div>
                         </div>
