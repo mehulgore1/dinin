@@ -64,14 +64,7 @@ const MenuItem = props => {
                 </button>
               </div>
             </div>
-            <a
-              href={
-                "/" +
-                props.match.params.restaurant +
-                "/menu/" +
-                props.match.params.table
-              }
-            >
+            <div className="d-flex justify-content-around">
               <button
                 className="btn btn-success"
                 onClick={() =>
@@ -85,7 +78,7 @@ const MenuItem = props => {
               >
                 Add
               </button>
-            </a>
+            </div>
           </div>
         </div>
       </div>

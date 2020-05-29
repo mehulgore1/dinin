@@ -4,8 +4,10 @@ import * as firebase from "firebase";
 import WaiterRequest from "./WaiterRequest";
 import { useHistory, generatePath } from "react-router-dom";
 import useIsMounted from "react-is-mounted-hook";
+import { useAlert } from "react-alert";
 
 const TableBasket = props => {
+  const alert = useAlert();
   var database = firebase.database();
   const isMounted = useIsMounted();
   const [tableData, setTableData] = useState({});
@@ -70,6 +72,8 @@ const TableBasket = props => {
       .child("batches")
       .push("").key;
     setCurrentBatch(batch_key);
+
+    alert.show("Items Ordered, Awaiting Status");
   };
 
   const deleteItem = (batch_key, seat_num, item_key) => {

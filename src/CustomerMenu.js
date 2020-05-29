@@ -5,8 +5,10 @@ import * as firebase from "firebase";
 import MenuItem from "./MenuItem";
 import LoginForm from "./LoginForm";
 import SignOutButton from "./SignOutButton";
+import { useAlert } from "react-alert";
 
 const CustomerMenu = props => {
+  const alert = useAlert();
   var database = firebase.database();
   const [val, setVal] = useState(2);
   const [menu, setMenu] = useState([]);
@@ -41,6 +43,8 @@ const CustomerMenu = props => {
       .child(seat)
       .child("items")
       .push(item);
+
+    alert.success("Item Added!");
   };
 
   const handleNextStageClick = () => {
