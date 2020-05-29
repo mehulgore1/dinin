@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 
 const OrderQ = props => {
@@ -53,7 +54,10 @@ const OrderQ = props => {
             <h2>
               {" "}
               Table {orders[batch_key]["table"]}{" "}
-              <button onClick={() => completeBatch(batch_key)}>
+              <button
+                className="btn btn-danger"
+                onClick={() => completeBatch(batch_key)}
+              >
                 {" "}
                 Finish Table Round{" "}
               </button>
@@ -73,6 +77,7 @@ const OrderQ = props => {
                             Category {item["category"]} Title {item["title"]}{" "}
                             Quantity {item["quantity"]} Notes {item["notes"]}
                             <button
+                              className="btn btn-success"
                               onClick={() =>
                                 sendStatus(
                                   orders[batch_key]["table"],
@@ -87,6 +92,7 @@ const OrderQ = props => {
                               Complete{" "}
                             </button>
                             <button
+                              className="btn btn-warning"
                               onClick={() =>
                                 sendStatus(
                                   orders[batch_key]["table"],
