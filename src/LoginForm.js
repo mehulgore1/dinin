@@ -1,10 +1,9 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
 import * as firebase from "firebase";
-import { isProperty } from "@babel/types";
 
 const LoginForm = props => {
+  const database = firebase.database();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [authCode, setAuthCode] = useState("");
   const [confResult, setConfResult] = useState({});
@@ -43,7 +42,11 @@ const LoginForm = props => {
         // User signed in successfully.
         props.setSignedInTrue();
         var user = result.user;
-        console.log(user);
+        database
+          .ref("users")
+          .child(user.uid)
+          .child("phone_number")
+          .set(user.phoneNumber);
       })
       .catch(function(error) {
         console.log(error);

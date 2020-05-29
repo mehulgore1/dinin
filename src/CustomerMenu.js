@@ -4,6 +4,7 @@ import "./App.css";
 import * as firebase from "firebase";
 import MenuItem from "./MenuItem";
 import LoginForm from "./LoginForm";
+import SignOutButton from "./SignOutButton";
 
 const CustomerMenu = props => {
   var database = firebase.database();
@@ -155,12 +156,17 @@ const CustomerMenu = props => {
     setSignedIn(true);
   };
 
+  const setSignedInFalse = () => {
+    setSignedIn(false);
+  };
+
   return (
     <>
       {!signedIn ? (
         <LoginForm setSignedInTrue={setSignedInTrue} />
       ) : (
-        <>
+        <Fragment>
+          <SignOutButton setSignedInFalse={setSignedInFalse} />
           {isValid ? (
             <>
               <h1> Welcome to {restaurant}</h1>
@@ -205,7 +211,7 @@ const CustomerMenu = props => {
               Whoops! You've reached an invalid URL. Try a different link!{" "}
             </h1>
           )}
-        </>
+        </Fragment>
       )}
     </>
   );
