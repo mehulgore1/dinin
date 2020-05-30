@@ -1,8 +1,10 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
+import { useAlert } from "react-alert";
 
 const OrderQ = props => {
+  const alert = useAlert();
   var database = firebase.database();
   const [orders, setOrders] = useState([]);
   const [restaurant, setRestaurant] = useState("");
@@ -21,6 +23,8 @@ const OrderQ = props => {
       .child("items")
       .child(item_key)
       .update({ status: status });
+
+    alert.show("Table Notified");
   };
 
   const completeBatch = batch_key => {
@@ -58,8 +62,9 @@ const OrderQ = props => {
                 onClick={() => completeBatch(batch_key)}
               >
                 {" "}
-                Finish Table Round{" "}
+                Finish Order{" "}
               </button>
+              <button className="btn btn-success">Complete All</button>
             </h2>
             {Object.keys(orders[batch_key]["seat_data"] || {}).map(
               (seat, i) => {
@@ -73,8 +78,8 @@ const OrderQ = props => {
                         <Fragment key={key}>
                           <p>
                             {" "}
-                            Category {item["category"]} Title {item["title"]}{" "}
-                            Quantity {item["quantity"]} Notes {item["notes"]}
+                            {item["category"]} -- {item["quantity"]},{" "}
+                            {item["title"]} -- {item["notes"]}
                             <button
                               className="btn btn-success"
                               onClick={() =>

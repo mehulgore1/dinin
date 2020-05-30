@@ -1,8 +1,10 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
+import { useAlert } from "react-alert";
 
 const Requests = props => {
+  const alert = useAlert();
   const [requests, setRequests] = useState({});
   var database = firebase.database();
   const { match } = props;
@@ -44,6 +46,8 @@ const Requests = props => {
       .child(request_key)
       .child("status")
       .set("Acknowledged");
+
+    alert.show("Table Notified");
   };
 
   return (
