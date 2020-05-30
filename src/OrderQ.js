@@ -27,7 +27,7 @@ const OrderQ = props => {
     alert.show("Table Notified");
   };
 
-  const completeBatch = batch_key => {
+  const removeBatchOrder = batch_key => {
     database
       .ref(tempRest)
       .child("order_queue")
@@ -35,6 +35,26 @@ const OrderQ = props => {
       .remove();
 
     delete orders[batch_key];
+  };
+
+  const completeBatch = (table, batch_key) => {
+    for (var seat in orders[batch_key]["seat_data"]) {
+      for (var item_key in orders[batch_key]["seat_data"][seat]["items"]) {
+        database
+          .ref(tempRest)
+          .child("tables")
+          .child(table)
+          .child("batches")
+          .child(batch_key)
+          .child("seat_data")
+          .child(seat)
+          .child("items")
+          .child(item_key)
+          .update({ status: "Order Submitted" });
+      }
+    }
+
+    alert.show("Table Notified. Click Finish Order to Remove");
   };
 
   useEffect(() => {
@@ -59,12 +79,19 @@ const OrderQ = props => {
               Table {orders[batch_key]["table"]}{" "}
               <button
                 className="btn btn-danger"
-                onClick={() => completeBatch(batch_key)}
+                onClick={() => removeBatchOrder(batch_key)}
               >
                 {" "}
                 Finish Order{" "}
               </button>
-              <button className="btn btn-success">Complete All</button>
+              <button
+                className="btn btn-success"
+                onClick={() =>
+                  completeBatch(orders[batch_key]["table"], batch_key)
+                }
+              >
+                Complete All
+              </button>
             </h2>
             {Object.keys(orders[batch_key]["seat_data"] || {}).map(
               (seat, i) => {
