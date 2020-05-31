@@ -60,6 +60,17 @@ const TableBasket = props => {
     history.replace(path + pathExtra);
   };
 
+  const formatAMPM = date => {
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    var strTime = hours + ":" + minutes + " " + ampm;
+    return strTime;
+  };
+
   const handleBatchOrder = () => {
     var batchObject = tableData["batches"][currentBatch];
     if (batchObject == "") {
@@ -88,8 +99,7 @@ const TableBasket = props => {
       }
     }
 
-    var today = new Date();
-    var time = today.getHours() + ":" + today.getMinutes();
+    var time = formatAMPM(new Date());
     database
       .ref(match.params.restaurant)
       .child("tables")
@@ -161,7 +171,7 @@ const TableBasket = props => {
       <WaiterRequest match={match} />
       {Object.keys(tableData["batches"] || {}).map((batch_key, index) => {
         return (
-          <Fragment key={batch_key}>
+          <div className="ml-2" key={batch_key}>
             {tableData["batches"][batch_key] != "" &&
             "ordered_at" in tableData["batches"][batch_key] ? (
               <h1>
@@ -225,7 +235,7 @@ const TableBasket = props => {
                 </Fragment>
               );
             })}
-          </Fragment>
+          </div>
         );
       })}
       <div className="d-flex justify-content-center">
@@ -234,14 +244,26 @@ const TableBasket = props => {
           Order these items{" "}
         </button>
       </div>
-      <h2> Requests </h2>
+      <div className="ml-2">
+        {" "}
+        <h1> Requests </h1>{" "}
+      </div>
       {Object.keys(tableData["requests"] || {}).map((key, i) => {
         return (
           <React.Fragment key={key}>
-            <div className="container">
+            <div className="container ml-3">
               <div className="row">
-                <strong> {tableData["requests"][key]["request"]} </strong> :
-                {tableData["requests"][key]["status"]}
+                <div>
+                  {" "}
+                  <h5> {tableData["requests"][key]["requestedAt"]}</h5>{" "}
+                </div>
+              </div>
+              <div className="row">
+                {" "}
+                <h6>
+                  <strong>{tableData["requests"][key]["request"]} : </strong>
+                  {tableData["requests"][key]["status"]}
+                </h6>
               </div>
             </div>
           </React.Fragment>

@@ -45,7 +45,7 @@ const Requests = props => {
       .child("requests")
       .child(request_key)
       .child("status")
-      .set("Acknowledged");
+      .set("Seen");
 
     alert.show("Table Notified");
   };
