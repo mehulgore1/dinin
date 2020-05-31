@@ -56,9 +56,9 @@ const Requests = props => {
       {Object.keys(requests || {}).map((request_key, index) => {
         return (
           <Fragment key={request_key}>
-            <div>
-              Request {requests[request_key]["request"]}
-              Table {requests[request_key]["table"]}
+            <div className="d-flex justify-content-around">
+              Table {requests[request_key]["table"]} --{" "}
+              {requests[request_key]["request"]}
               <button
                 onClick={() => ackRequest(request_key)}
                 className="btn btn-primary"

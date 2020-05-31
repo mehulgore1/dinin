@@ -69,30 +69,17 @@ const OrderQ = props => {
   }, []);
 
   return (
-    <>
-      <h1> Orders for {restaurant} </h1>
+    <Fragment>
+      <div className="d-flex justify-content-around">
+        {" "}
+        <h1> Orders for {restaurant} </h1>{" "}
+      </div>
       {Object.keys(orders || {}).map((batch_key, index) => {
         return (
           <Fragment key={batch_key}>
-            <h2>
-              {" "}
-              Table {orders[batch_key]["table"]}{" "}
-              <button
-                className="btn btn-danger"
-                onClick={() => removeBatchOrder(batch_key)}
-              >
-                {" "}
-                Finish Order{" "}
-              </button>
-              <button
-                className="btn btn-success"
-                onClick={() =>
-                  completeBatch(orders[batch_key]["table"], batch_key)
-                }
-              >
-                Complete All
-              </button>
-            </h2>
+            <div className="d-flex justify-content-around">
+              <h2> Table {orders[batch_key]["table"]} </h2>{" "}
+            </div>
             {Object.keys(orders[batch_key]["seat_data"] || {}).map(
               (seat, i) => {
                 var items = orders[batch_key]["seat_data"][seat]["items"];
@@ -103,10 +90,21 @@ const OrderQ = props => {
                       var item = items[key];
                       return (
                         <Fragment key={key}>
-                          <p>
+                          <div>
+                            <h4>
+                              {" "}
+                              <strong> {item["category"]} </strong>{" "}
+                              {item["quantity"]} {item["title"]}
+                            </h4>{" "}
+                          </div>{" "}
+                          <div>
                             {" "}
-                            {item["category"]} -- {item["quantity"]},{" "}
-                            {item["title"]} -- {item["notes"]}
+                            <h4>
+                              {" "}
+                              <strong>Notes</strong> {item["notes"]}{" "}
+                            </h4>
+                          </div>{" "}
+                          <div className="d-flex justify-content-around">
                             <button
                               className="btn btn-success"
                               onClick={() =>
@@ -134,13 +132,31 @@ const OrderQ = props => {
                                 )
                               }
                             >
-                              {" "}
-                              Waiter coming{" "}
+                              Issue
                             </button>
-                          </p>
+                          </div>
                         </Fragment>
                       );
                     })}
+                    <hr />
+                    <div className="d-flex justify-content-around">
+                      <button
+                        className="btn btn-success"
+                        onClick={() =>
+                          completeBatch(orders[batch_key]["table"], batch_key)
+                        }
+                      >
+                        Complete All
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => removeBatchOrder(batch_key)}
+                      >
+                        {" "}
+                        Finish Order{" "}
+                      </button>
+                    </div>
+                    <hr />
                   </Fragment>
                 );
               }
@@ -148,7 +164,7 @@ const OrderQ = props => {
           </Fragment>
         );
       })}
-    </>
+    </Fragment>
   );
 };
 
