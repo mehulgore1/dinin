@@ -228,10 +228,12 @@ const TableBasket = props => {
           </Fragment>
         );
       })}
-      <button className="btn btn-dark btn-block" onClick={handleBatchOrder}>
-        {" "}
-        Order these items{" "}
-      </button>
+      <div className="d-flex justify-content-center">
+        <button className="btn btn-dark btn-lg" onClick={handleBatchOrder}>
+          {" "}
+          Order these items{" "}
+        </button>
+      </div>
       <h2> Requests </h2>
       {Object.keys(tableData["requests"] || {}).map((key, i) => {
         return (

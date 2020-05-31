@@ -42,18 +42,25 @@ const WaiterRequest = props => {
             Water{" "}
           </button>
           <button
-            className="btn btn-warning"
-            onClick={() => handleSendRequest("Waitstaff Requested")}
-          >
-            {" "}
-            Call Waitstaff{" "}
-          </button>
-          <button
             className="btn btn-success"
             onClick={() => handleSendRequest("Check Requested")}
           >
             {" "}
             Get Check{" "}
+          </button>
+          <button
+            className="btn btn-success btn-danger"
+            onClick={() => handleSendRequest("Plate Removal Requested")}
+          >
+            {" "}
+            Remove Plates{" "}
+          </button>
+          <button
+            className="btn btn-warning"
+            onClick={() => handleSendRequest("Waitstaff Requested")}
+          >
+            {" "}
+            Call Waitstaff{" "}
           </button>
         </div>
       </div>
