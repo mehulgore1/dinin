@@ -59,15 +59,11 @@ const LoginForm = props => {
             .child(props.match.params.table)
             .child("seats")
             .child(props.match.params.seat)
-            .update({ name: name });
-
-          database
-            .ref(props.match.params.restaurant)
-            .child("tables")
-            .child(props.match.params.table)
-            .child("seats")
-            .child(props.match.params.seat)
-            .update({ waterOrdered: false });
+            .update({
+              user_id: user.uid,
+              name: name,
+              waterOrdered: false
+            });
         })
         .catch(function(error) {
           console.log(error);
