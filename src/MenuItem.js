@@ -49,15 +49,18 @@ const MenuItem = props => {
               <div className="d-flex justify-content-around">
                 <button
                   onClick={() => decQuantity()}
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-dark mr-3"
                 >
                   {" "}
                   -{" "}
                 </button>
-                <div className="align-self-center"> {quantity} </div>
+                <div className="align-self-center">
+                  {" "}
+                  <h3> {quantity} </h3>
+                </div>
                 <button
                   onClick={() => incQuantity()}
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-dark ml-3"
                 >
                   {" "}
                   +{" "}
@@ -66,7 +69,7 @@ const MenuItem = props => {
             </div>
             <div className="d-flex justify-content-around">
               <button
-                className="btn btn-success"
+                className="btn btn-success btn-lg mt-3"
                 onClick={() =>
                   props.sendToTable(
                     props.title,

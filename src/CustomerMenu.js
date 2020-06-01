@@ -186,7 +186,7 @@ const CustomerMenu = props => {
         <LoginForm setSignedInTrue={setSignedInTrue} match={match} />
       ) : (
         <Fragment>
-          <SignOutButton setSignedInFalse={setSignedInFalse} />
+          {/* <SignOutButton setSignedInFalse={setSignedInFalse} /> */}
           {isValid ? (
             <Fragment>
               <WaiterRequest match={match} />
@@ -196,11 +196,13 @@ const CustomerMenu = props => {
                   {restaurant} Seat {seat}
                 </h1>
               </div>
-              <a href={"/" + tempRest + "/menu/" + table}>
-                <button className="btn btn-primary btn-block">
-                  Go to Table Dashboard
-                </button>
-              </a>
+              <div className="d-flex justify-content-center">
+                <a href={"/" + tempRest + "/menu/" + table}>
+                  <button className="btn btn-dark btn-lg">
+                    Go to Table Dashboard
+                  </button>
+                </a>
+              </div>
 
               <Fragment>
                 {Object.keys(menu[stage] || {}).map((category, i) => {
@@ -229,7 +231,7 @@ const CustomerMenu = props => {
               {stage == 1 ? (
                 <div className="d-flex justify-content-around">
                   <button
-                    className="btn btn-primary btn-block"
+                    className="btn btn-dark btn-lg"
                     onClick={handleNextStageClick}
                   >
                     {" "}
@@ -241,14 +243,14 @@ const CustomerMenu = props => {
               {stage > 1 && stage < 4 ? (
                 <div className="d-flex justify-content-around">
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-dark btn-lg"
                     onClick={handlePrevStageClick}
                   >
                     {" "}
                     Previous Section{" "}
                   </button>
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-dark btn-lg"
                     onClick={handleNextStageClick}
                   >
                     {" "}
@@ -260,7 +262,7 @@ const CustomerMenu = props => {
               {stage == 4 ? (
                 <div className="d-flex justify-content-around">
                   <button
-                    className="btn btn-primary btn-block"
+                    className="btn btn-primary btn-dark btn-lg"
                     onClick={handlePrevStageClick}
                   >
                     Previous Section
