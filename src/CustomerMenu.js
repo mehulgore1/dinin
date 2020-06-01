@@ -5,6 +5,7 @@ import * as firebase from "firebase";
 import MenuItem from "./MenuItem";
 import LoginForm from "./LoginForm";
 import SignOutButton from "./SignOutButton";
+import WaiterRequest from "./WaiterRequest";
 import { useAlert } from "react-alert";
 
 const CustomerMenu = props => {
@@ -188,6 +189,7 @@ const CustomerMenu = props => {
           <SignOutButton setSignedInFalse={setSignedInFalse} />
           {isValid ? (
             <Fragment>
+              <WaiterRequest match={match} />
               <div className="d-flex justify-content-center">
                 <h1>
                   {" "}

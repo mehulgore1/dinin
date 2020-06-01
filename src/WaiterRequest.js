@@ -98,38 +98,17 @@ const WaiterRequest = props => {
   }, []);
 
   return (
-    <Fragment>
-      <div className="container">
-        <div className="d-flex justify-content-around">
-          <button className="btn btn-primary" onClick={getWater}>
-            {" "}
-            Water{" "}
-          </button>
-          <button
-            className="btn btn-success"
-            onClick={() => handleSendRequest("Check Requested")}
-          >
-            {" "}
-            Get Check{" "}
-          </button>
-          <button className="btn btn-warning" onClick={showInputConfirmAlert}>
-            {" "}
-            Call Waitstaff{" "}
-          </button>
-        </div>
-      </div>
-      {/* <label>
-        Request
-        <select value={request} onChange={handleRequestChange}>
-          <option value="Get water"> Get/refill water </option>
-          <option value="Waiter Needed"> Call waiter over </option>
-        </select>
-      </label>
-      <button className="btn btn-primary" onClick={handleSendRequest}>
-        {" "}
-        Send Request{" "}
-      </button> */}
-    </Fragment>
+    <div className="d-flex justify-content-around">
+      <button className="btn btn-primary btn-lg" onClick={getWater}>
+        Water
+      </button>
+      <button
+        className="btn btn-warning btn-lg"
+        onClick={showInputConfirmAlert}
+      >
+        Call Waitstaff
+      </button>
+    </div>
   );
 };
 
