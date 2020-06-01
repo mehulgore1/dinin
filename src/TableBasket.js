@@ -15,6 +15,7 @@ const TableBasket = props => {
   const [reverseBatches, setReverseBatches] = useState([]);
   const [reverseRequests, setReverseRequests] = useState([]);
   const [currentBatch, setCurrentBatch] = useState(1);
+  const [userId, setUserId] = useState("");
   const { match } = props;
   const history = useHistory();
 
@@ -40,6 +41,7 @@ const TableBasket = props => {
       firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
           console.log("user signed in ");
+          setUserId(user.uid);
         } else {
           console.log("user NOT signed in ");
         }
@@ -142,6 +144,29 @@ const TableBasket = props => {
       .child("order_queue")
       .child(currentBatch)
       .set(batchObject);
+
+    var userSeat = "";
+    for (seat in tableData["seats"]) {
+      if (tableData["seats"][seat]["user_id"] == userId) {
+        userSeat = seat;
+      }
+    }
+    var seat_data = tableData["batches"][currentBatch]["seat_data"];
+    var userItems = [];
+    for (seat in seat_data) {
+      if (seat == userSeat) {
+        userItems = seat_data[seat]["items"];
+      }
+    }
+
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .child(match.params.table)
+      .child("seats")
+      .child(userSeat)
+      .child("items")
+      .push(userItems);
 
     var batch_key = database
       .ref(match.params.restaurant)
