@@ -179,7 +179,7 @@ const TableBasket = props => {
                 Ordered at {tableData["batches"][batch_key]["ordered_at"]}{" "}
               </h1>
             ) : (
-              <h1> Pending Orders </h1>
+              <h1> Future Orders </h1>
             )}
             {Object.keys(
               tableData["batches"][batch_key]["seat_data"] || {}
@@ -211,9 +211,13 @@ const TableBasket = props => {
                                 <strong>{item["title"]}</strong>
                               </div>
                               <div>{item["notes"]}</div>
-                              <div>
-                                <strong>Status </strong> {item["status"]}{" "}
-                              </div>
+                              {tableData["batches"][batch_key] != "" &&
+                              "ordered_at" in
+                                tableData["batches"][batch_key] ? (
+                                <div>
+                                  <strong>Status </strong> {item["status"]}{" "}
+                                </div>
+                              ) : null}
                             </div>
                             <div className="col">
                               {!item["ordered"] ? (
