@@ -71,6 +71,15 @@ const TableBasket = props => {
     return strTime;
   };
 
+  const showConfirmAlert = () => {
+    var confirmOrder = window.confirm(
+      "Are you sure you want to order these items?"
+    );
+    if (confirmOrder) {
+      handleBatchOrder();
+    }
+  };
+
   const handleBatchOrder = () => {
     var batchObject = tableData["batches"][currentBatch];
     if (batchObject == "") {
@@ -174,12 +183,12 @@ const TableBasket = props => {
           <div className="ml-2" key={batch_key}>
             {tableData["batches"][batch_key] != "" &&
             "ordered_at" in tableData["batches"][batch_key] ? (
-              <h1>
+              <h2>
                 {" "}
                 Ordered at {tableData["batches"][batch_key]["ordered_at"]}{" "}
-              </h1>
+              </h2>
             ) : (
-              <h1> Future Orders </h1>
+              <h1> Cart: </h1>
             )}
             {Object.keys(
               tableData["batches"][batch_key]["seat_data"] || {}
@@ -188,7 +197,7 @@ const TableBasket = props => {
                 tableData["batches"][batch_key]["seat_data"][seat]["items"];
               return (
                 <Fragment key={seat}>
-                  <h2>
+                  <h3>
                     {" "}
                     Seat {seat}{" "}
                     <button
@@ -197,7 +206,7 @@ const TableBasket = props => {
                     >
                       +
                     </button>{" "}
-                  </h2>
+                  </h3>
                   {Object.keys(items || {}).map((key, i) => {
                     var item = items[key];
                     return (
@@ -243,7 +252,7 @@ const TableBasket = props => {
         );
       })}
       <div className="d-flex justify-content-center">
-        <button className="btn btn-dark btn-lg" onClick={handleBatchOrder}>
+        <button className="btn btn-dark btn-lg" onClick={showConfirmAlert}>
           {" "}
           Order these items{" "}
         </button>
