@@ -11,10 +11,20 @@ const TableBasket = props => {
   var database = firebase.database();
   const isMounted = useIsMounted();
   const [tableData, setTableData] = useState({});
-  const [newTabledata, setNewTableData] = useState({});
+  const [reverseBatches, setReverseBatches] = useState([]);
   const [currentBatch, setCurrentBatch] = useState(1);
   const { match } = props;
   const history = useHistory();
+
+  useEffect(() => {
+    if ("batches" in tableData) {
+      const arr = [];
+      Object.keys(tableData["batches"]).forEach(key => {
+        arr.push({ [key]: tableData["batches"][key] });
+      });
+      setReverseBatches(arr.slice(0).reverse());
+    }
+  }, [tableData]);
 
   useEffect(() => {
     if (isMounted()) {
@@ -178,85 +188,105 @@ const TableBasket = props => {
         <h1> Your Table: </h1>
       </div>
       <WaiterRequest match={match} />
-      {Object.keys(tableData["batches"] || {}).map((batch_key, index) => {
+      {reverseBatches.map((batch_obj, index) => {
         return (
-          <div className="ml-2" key={batch_key}>
-            {tableData["batches"][batch_key] != "" &&
-            "ordered_at" in tableData["batches"][batch_key] ? (
-              <h2>
-                {" "}
-                Ordered at {tableData["batches"][batch_key]["ordered_at"]}{" "}
-              </h2>
-            ) : (
-              <h1> Cart: </h1>
-            )}
-            {Object.keys(
-              tableData["batches"][batch_key]["seat_data"] || {}
-            ).map((seat, i) => {
-              var items =
-                tableData["batches"][batch_key]["seat_data"][seat]["items"];
-              return (
-                <Fragment key={seat}>
-                  <h3>
-                    {" "}
-                    Seat {seat}{" "}
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => handleAddMoreItems(seat)}
-                    >
-                      +
-                    </button>{" "}
-                  </h3>
-                  {Object.keys(items || {}).map((key, i) => {
-                    var item = items[key];
-                    return (
-                      <Fragment key={key}>
-                        <div className="container">
-                          <div className="row">
-                            <div className="col"> {item["quantity"]} </div>
-                            <div className="col-8">
-                              <div>
-                                {" "}
-                                <strong>{item["title"]}</strong>
-                              </div>
-                              <div>{item["notes"]}</div>
-                              {tableData["batches"][batch_key] != "" &&
-                              "ordered_at" in
-                                tableData["batches"][batch_key] ? (
-                                <div>
-                                  <strong>Status </strong> {item["status"]}{" "}
+          <Fragment>
+            {Object.keys(reverseBatches[index] || {}).map(
+              (batch_key, index) => {
+                return (
+                  <div className="ml-2" key={batch_key}>
+                    {tableData["batches"][batch_key] != "" &&
+                    "ordered_at" in tableData["batches"][batch_key] ? (
+                      <h2>
+                        {" "}
+                        Ordered at{" "}
+                        {tableData["batches"][batch_key]["ordered_at"]}{" "}
+                      </h2>
+                    ) : (
+                      <h1> Yet to Order: </h1>
+                    )}
+                    {Object.keys(
+                      tableData["batches"][batch_key]["seat_data"] || {}
+                    ).map((seat, i) => {
+                      var items =
+                        tableData["batches"][batch_key]["seat_data"][seat][
+                          "items"
+                        ];
+                      return (
+                        <Fragment key={seat}>
+                          <h3>
+                            {" "}
+                            Seat {seat}{" "}
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => handleAddMoreItems(seat)}
+                            >
+                              +
+                            </button>{" "}
+                          </h3>
+                          {Object.keys(items || {}).map((key, i) => {
+                            var item = items[key];
+                            return (
+                              <Fragment key={key}>
+                                <div className="container">
+                                  <div className="row">
+                                    <div className="col">
+                                      {" "}
+                                      {item["quantity"]}{" "}
+                                    </div>
+                                    <div className="col-8">
+                                      <div>
+                                        {" "}
+                                        <strong>{item["title"]}</strong>
+                                      </div>
+                                      <div>{item["notes"]}</div>
+                                      {tableData["batches"][batch_key] != "" &&
+                                      "ordered_at" in
+                                        tableData["batches"][batch_key] ? (
+                                        <div>
+                                          <strong>Status </strong>{" "}
+                                          {item["status"]}{" "}
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                    <div className="col">
+                                      {!item["ordered"] ? (
+                                        <button
+                                          className="btn btn-danger"
+                                          onClick={() =>
+                                            deleteItem(batch_key, seat, key)
+                                          }
+                                        >
+                                          x
+                                        </button>
+                                      ) : null}
+                                    </div>
+                                  </div>
                                 </div>
-                              ) : null}
-                            </div>
-                            <div className="col">
-                              {!item["ordered"] ? (
-                                <button
-                                  className="btn btn-danger"
-                                  onClick={() =>
-                                    deleteItem(batch_key, seat, key)
-                                  }
-                                >
-                                  x
-                                </button>
-                              ) : null}
-                            </div>
-                          </div>
-                        </div>
-                      </Fragment>
-                    );
-                  })}
-                </Fragment>
-              );
-            })}
-          </div>
+                              </Fragment>
+                            );
+                          })}
+                        </Fragment>
+                      );
+                    })}
+                  </div>
+                );
+              }
+            )}
+            {index == 0 ? (
+              <div className="d-flex justify-content-center">
+                <button
+                  className="btn btn-dark btn-lg"
+                  onClick={showConfirmAlert}
+                >
+                  {" "}
+                  Order these items{" "}
+                </button>
+              </div>
+            ) : null}
+          </Fragment>
         );
       })}
-      <div className="d-flex justify-content-center">
-        <button className="btn btn-dark btn-lg" onClick={showConfirmAlert}>
-          {" "}
-          Order these items{" "}
-        </button>
-      </div>
       <div className="ml-2">
         {" "}
         <h1> Requests </h1>{" "}
