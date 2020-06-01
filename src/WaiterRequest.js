@@ -47,6 +47,13 @@ const WaiterRequest = props => {
     alert.show("Waitstaff Notified");
   };
 
+  const showInputConfirmAlert = () => {
+    var notes = window.prompt("Enter message to waitstaff");
+    if (notes != null) {
+      handleSendRequest(notes);
+    }
+  };
+
   return (
     <Fragment>
       <div className="container">
@@ -65,17 +72,7 @@ const WaiterRequest = props => {
             {" "}
             Get Check{" "}
           </button>
-          <button
-            className="btn btn-success btn-danger"
-            onClick={() => handleSendRequest("Plate Removal Requested")}
-          >
-            {" "}
-            Remove Plates{" "}
-          </button>
-          <button
-            className="btn btn-warning"
-            onClick={() => handleSendRequest("Waitstaff Requested")}
-          >
+          <button className="btn btn-warning" onClick={showInputConfirmAlert}>
             {" "}
             Call Waitstaff{" "}
           </button>
