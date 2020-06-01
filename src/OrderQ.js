@@ -27,34 +27,37 @@ const OrderQ = props => {
     alert.show("Table Notified");
   };
 
-  const removeBatchOrder = batch_key => {
-    database
-      .ref(tempRest)
-      .child("order_queue")
-      .child(batch_key)
-      .remove();
-
-    delete orders[batch_key];
-  };
+  const removeBatchOrder = batch_key => {};
 
   const completeBatch = (table, batch_key) => {
-    for (var seat in orders[batch_key]["seat_data"]) {
-      for (var item_key in orders[batch_key]["seat_data"][seat]["items"]) {
-        database
-          .ref(tempRest)
-          .child("tables")
-          .child(table)
-          .child("batches")
-          .child(batch_key)
-          .child("seat_data")
-          .child(seat)
-          .child("items")
-          .child(item_key)
-          .update({ status: "Order Submitted" });
+    var confirm = window.confirm("Are you sure all items are in?");
+    if (confirm) {
+      for (var seat in orders[batch_key]["seat_data"]) {
+        for (var item_key in orders[batch_key]["seat_data"][seat]["items"]) {
+          database
+            .ref(tempRest)
+            .child("tables")
+            .child(table)
+            .child("batches")
+            .child(batch_key)
+            .child("seat_data")
+            .child(seat)
+            .child("items")
+            .child(item_key)
+            .update({ status: "Order Submitted" });
+        }
       }
-    }
 
-    alert.show("Table Notified. Click Finish Order to Remove");
+      database
+        .ref(tempRest)
+        .child("order_queue")
+        .child(batch_key)
+        .remove();
+
+      delete orders[batch_key];
+
+      alert.show("Removed From Queue, Table Notified");
+    }
   };
 
   useEffect(() => {
@@ -132,13 +135,6 @@ const OrderQ = props => {
                         }
                       >
                         Complete All
-                      </button>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => removeBatchOrder(batch_key)}
-                      >
-                        {" "}
-                        Finish Order{" "}
                       </button>
                     </div>
                     <hr />
