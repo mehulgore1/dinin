@@ -12,6 +12,7 @@ const TableBasket = props => {
   const isMounted = useIsMounted();
   const [tableData, setTableData] = useState({});
   const [reverseBatches, setReverseBatches] = useState([]);
+  const [reverseRequests, setReverseRequests] = useState([]);
   const [currentBatch, setCurrentBatch] = useState(1);
   const { match } = props;
   const history = useHistory();
@@ -23,6 +24,13 @@ const TableBasket = props => {
         arr.push({ [key]: tableData["batches"][key] });
       });
       setReverseBatches(arr.slice(0).reverse());
+    }
+    if ("requests" in tableData) {
+      const arr = [];
+      Object.keys(tableData["requests"]).forEach(key => {
+        arr.push({ [key]: tableData["requests"][key] });
+      });
+      setReverseRequests(arr.slice(0).reverse());
     }
   }, [tableData]);
 
@@ -291,25 +299,36 @@ const TableBasket = props => {
         {" "}
         <h1> Requests </h1>{" "}
       </div>
-      {Object.keys(tableData["requests"] || {}).map((key, i) => {
+      {reverseRequests.map((request_obj, index) => {
         return (
-          <React.Fragment key={key}>
-            <div className="container ml-3">
-              <div className="row">
-                <div>
-                  {" "}
-                  <h5> {tableData["requests"][key]["requestedAt"]}</h5>{" "}
-                </div>
-              </div>
-              <div className="row">
-                {" "}
-                <h6>
-                  <strong>{tableData["requests"][key]["request"]} : </strong>
-                  {tableData["requests"][key]["status"]}
-                </h6>
-              </div>
-            </div>
-          </React.Fragment>
+          <Fragment key={index}>
+            {Object.keys(reverseRequests[index] || {}).map((key, i) => {
+              return (
+                <Fragment key={key}>
+                  <div className="container ml-3">
+                    <div className="row">
+                      <div>
+                        {" "}
+                        <h5>
+                          {" "}
+                          {tableData["requests"][key]["requestedAt"]}
+                        </h5>{" "}
+                      </div>
+                    </div>
+                    <div className="row">
+                      {" "}
+                      <h6>
+                        <strong>
+                          {tableData["requests"][key]["request"]} :{" "}
+                        </strong>
+                        {tableData["requests"][key]["status"]}
+                      </h6>
+                    </div>
+                  </div>
+                </Fragment>
+              );
+            })}
+          </Fragment>
         );
       })}
     </Fragment>
