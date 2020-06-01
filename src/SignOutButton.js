@@ -10,10 +10,12 @@ const SignOutButton = props => {
 
   return (
     <Fragment>
-      <button onClick={handleSignOut} className="btn btn-danger btn-block">
-        {" "}
-        Sign Out{" "}
-      </button>
+      <div className="d-flex justify-content-center">
+        <button onClick={handleSignOut} className="btn btn-danger btn-lg">
+          {" "}
+          Sign Out{" "}
+        </button>
+      </div>
     </Fragment>
   );
 };

@@ -17,7 +17,7 @@ const CustomerMenu = props => {
   const [isValid, setIsValid] = useState(true);
   const [seat, setSeat] = useState(0);
   const [stage, setStage] = useState(0);
-  const [signedIn, setSignedIn] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
   const [currentBatch, setCurrentBatch] = useState(1);
 
   const { match } = props;
@@ -182,9 +182,10 @@ const CustomerMenu = props => {
   return (
     <Fragment>
       {!signedIn ? (
-        <LoginForm setSignedInTrue={setSignedInTrue} />
+        <LoginForm setSignedInTrue={setSignedInTrue} match={match} />
       ) : (
         <Fragment>
+          <SignOutButton setSignedInFalse={setSignedInFalse} />
           {isValid ? (
             <Fragment>
               <div className="d-flex justify-content-center">

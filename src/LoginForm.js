@@ -7,6 +7,7 @@ const LoginForm = props => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [authCode, setAuthCode] = useState("");
   const [confResult, setConfResult] = useState({});
+  const [name, setName] = useState("");
 
   const onPhoneNumberChange = event => {
     setPhoneNumber(event.target.value);
@@ -34,23 +35,44 @@ const LoginForm = props => {
   };
 
   const signInWithPhoneNumber = () => {
-    console.log(confResult);
-    console.log(authCode);
-    confResult
-      .confirm(authCode)
-      .then(function(result) {
-        // User signed in successfully.
-        props.setSignedInTrue();
-        var user = result.user;
-        database
-          .ref("users")
-          .child(user.uid)
-          .child("phone_number")
-          .set(user.phoneNumber);
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
+    if (Object.keys(confResult).length !== 0) {
+      confResult
+        .confirm(authCode)
+        .then(function(result) {
+          // User signed in successfully.
+          props.setSignedInTrue();
+          var user = result.user;
+          database
+            .ref("users")
+            .child(user.uid)
+            .child("phone_number")
+            .set(user.phoneNumber);
+
+          database
+            .ref("users")
+            .child(user.uid)
+            .update({ name: name });
+
+          database
+            .ref(props.match.params.restaurant)
+            .child("tables")
+            .child(props.match.params.table)
+            .child("users")
+            .child(user.uid)
+            .update({ waterOrdered: false });
+
+          database
+            .ref(props.match.params.restaurant)
+            .child("tables")
+            .child(props.match.params.table)
+            .child("users")
+            .child(user.uid)
+            .update({ seat: props.match.params.seat });
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    }
   };
 
   useEffect(() => {
@@ -59,7 +81,7 @@ const LoginForm = props => {
       {
         size: "invisible",
         callback: function(response) {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
+          sendVerificationCode();
         }
       }
     );
@@ -67,34 +89,52 @@ const LoginForm = props => {
 
   return (
     <Fragment>
-      <div>
+      <div className="d-flex justify-content-center mt-5">
+        <h2> Welcome to Dinin at {props.match.params.restaurant}</h2>
+      </div>
+      <div className="form-group">
         <input
+          className="form-control mt-2"
           type="text"
           value={phoneNumber}
           placeholder="Phone Number"
           onChange={e => setPhoneNumber(e.target.value)}
         />
-        <button className="btn btn-secondary" onClick={sendVerificationCode}>
-          {" "}
-          Send Code{" "}
-        </button>
-      </div>
-      <div>
+        <div className="d-flex justify-content-center mt-2">
+          <button
+            className="btn btn-secondary btn-lg"
+            onClick={sendVerificationCode}
+          >
+            {" "}
+            Send Code{" "}
+          </button>
+        </div>
         <input
+          className="form-control mt-2"
           type="text"
           value={authCode}
           placeholder="6-digit Verification Code"
           onChange={e => setAuthCode(e.target.value)}
         />
-        <button
-          className="btn btn-primary"
-          id="sign-in-button"
-          onClick={signInWithPhoneNumber}
-        >
-          {" "}
-          Let's Go!{" "}
-        </button>
+        <input
+          className="form-control mt-2"
+          type="text"
+          value={name}
+          placeholder="Enter your Name for the Table"
+          onChange={e => setName(e.target.value)}
+        />
+        <div className="d-flex justify-content-center mt-2">
+          <button
+            className="btn btn-primary btn-lg"
+            id="sign-in-button"
+            onClick={signInWithPhoneNumber}
+          >
+            {" "}
+            Let's Go!{" "}
+          </button>
+        </div>
       </div>
+      <div></div>
     </Fragment>
   );
 };
