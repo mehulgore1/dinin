@@ -126,22 +126,22 @@ const OrderQ = props => {
                         </Fragment>
                       );
                     })}
-                    <hr />
-                    <div className="d-flex justify-content-around">
-                      <button
-                        className="btn btn-success"
-                        onClick={() =>
-                          completeBatch(orders[batch_key]["table"], batch_key)
-                        }
-                      >
-                        Complete All
-                      </button>
-                    </div>
-                    <hr />
                   </Fragment>
                 );
               }
             )}
+            <hr />
+            <div className="d-flex justify-content-around">
+              <button
+                className="btn btn-success btn-lg btn-block"
+                onClick={() =>
+                  completeBatch(orders[batch_key]["table"], batch_key)
+                }
+              >
+                Finish Table {orders[batch_key]["table"]}
+              </button>
+            </div>
+            <hr />
           </Fragment>
         );
       })}
