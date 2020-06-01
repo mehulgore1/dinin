@@ -5,6 +5,7 @@ import WaiterRequest from "./WaiterRequest";
 import { useHistory, generatePath } from "react-router-dom";
 import useIsMounted from "react-is-mounted-hook";
 import { useAlert } from "react-alert";
+import { isEmptyStatement } from "@babel/types";
 
 const TableBasket = props => {
   const alert = useAlert();
@@ -190,6 +191,33 @@ const TableBasket = props => {
       });
   };
 
+  const hasBeenOrdered = batch_key => {
+    return (
+      tableData["batches"][batch_key] != "" &&
+      "ordered_at" in tableData["batches"][batch_key]
+    );
+  };
+
+  const emptyOrder = batch_key => {
+    return tableData["batches"][batch_key] == "";
+  };
+
+  const showBatchText = batch_key => {
+    if (!emptyOrder(batch_key) && hasBeenOrdered(batch_key)) {
+      // item ordered, show time
+      return <h1> {tableData["batches"][batch_key]["ordered_at"]} </h1>;
+    } else if (!emptyOrder(batch_key) && !hasBeenOrdered(batch_key)) {
+      // pending order, show "yet to order"
+      return <h1> Yet To Order </h1>;
+    } else {
+      return null;
+    }
+  };
+
+  const showOrderButton = batch_key => {
+    return !emptyOrder(batch_key) && !hasBeenOrdered(batch_key);
+  };
+
   return (
     <Fragment>
       <div className="d-flex justify-content-center">
@@ -203,16 +231,7 @@ const TableBasket = props => {
               (batch_key, index) => {
                 return (
                   <div className="ml-2" key={batch_key}>
-                    {tableData["batches"][batch_key] != "" &&
-                    "ordered_at" in tableData["batches"][batch_key] ? (
-                      <h2>
-                        {" "}
-                        Ordered at{" "}
-                        {tableData["batches"][batch_key]["ordered_at"]}{" "}
-                      </h2>
-                    ) : (
-                      <h1> Yet to Order: </h1>
-                    )}
+                    {showBatchText(batch_key)}
                     {Object.keys(
                       tableData["batches"][batch_key]["seat_data"] || {}
                     ).map((seat, i) => {
@@ -276,21 +295,21 @@ const TableBasket = props => {
                         </Fragment>
                       );
                     })}
+                    {showOrderButton(batch_key) ? (
+                      <div className="d-flex justify-content-center">
+                        <button
+                          className="btn btn-dark btn-lg"
+                          onClick={showConfirmAlert}
+                        >
+                          {" "}
+                          Order these items{" "}
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 );
               }
             )}
-            {index == 0 ? (
-              <div className="d-flex justify-content-center">
-                <button
-                  className="btn btn-dark btn-lg"
-                  onClick={showConfirmAlert}
-                >
-                  {" "}
-                  Order these items{" "}
-                </button>
-              </div>
-            ) : null}
           </Fragment>
         );
       })}
