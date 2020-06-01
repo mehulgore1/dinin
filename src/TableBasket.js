@@ -198,7 +198,7 @@ const TableBasket = props => {
       <WaiterRequest match={match} />
       {reverseBatches.map((batch_obj, index) => {
         return (
-          <Fragment>
+          <Fragment key={index}>
             {Object.keys(reverseBatches[index] || {}).map(
               (batch_key, index) => {
                 return (

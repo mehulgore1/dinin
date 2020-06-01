@@ -6,6 +6,8 @@ import { useAlert } from "react-alert";
 const WaiterRequest = props => {
   const alert = useAlert();
   var database = firebase.database();
+  const [userId, setUserId] = useState({});
+  const [seats, setSeats] = useState({});
   //const [request, setRequest] = useState("Get water");
 
   //   const handleRequestChange = event => {
@@ -54,14 +56,52 @@ const WaiterRequest = props => {
     }
   };
 
+  const getWater = () => {
+    for (var seat in seats) {
+      if (seats[seat] != null && seats[seat]["user_id"] == userId) {
+        if (seats[seat]["waterOrdered"]) {
+          // has already ordered water, refill
+          handleSendRequest("Water Refill Requested");
+        } else {
+          // hasn't ordered water get 1 glass
+          handleSendRequest("1 New Glass of Water Requested");
+          database
+            .ref(props.match.params.restaurant)
+            .child("tables")
+            .child(props.match.params.table)
+            .child("seats")
+            .child(seat)
+            .child("waterOrdered")
+            .set(true);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    database
+      .ref(props.match.params.restaurant)
+      .child("tables")
+      .child(props.match.params.table)
+      .child("seats")
+      .on("value", function(snapshot) {
+        setSeats(snapshot.val());
+      });
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log("user signed in ");
+        setUserId(user.uid);
+      } else {
+        console.log("user NOT signed in ");
+      }
+    });
+  }, []);
+
   return (
     <Fragment>
       <div className="container">
         <div className="d-flex justify-content-around">
-          <button
-            className="btn btn-primary"
-            onClick={() => handleSendRequest("Water Requested")}
-          >
+          <button className="btn btn-primary" onClick={getWater}>
             {" "}
             Water{" "}
           </button>
