@@ -97,29 +97,14 @@ const OrderQ = props => {
                               {item["quantity"]} {item["title"]}
                             </h4>{" "}
                           </div>{" "}
-                          <div>
-                            {" "}
-                            <h4>
-                              {" "}
-                              <strong>Notes</strong> {item["notes"]}{" "}
-                            </h4>
-                          </div>{" "}
+                          {item["notes"] != "" ? (
+                            <div>
+                              <h4>
+                                <strong>Notes</strong> {item["notes"]}
+                              </h4>
+                            </div>
+                          ) : null}
                           <div className="d-flex justify-content-around">
-                            <button
-                              className="btn btn-success"
-                              onClick={() =>
-                                sendStatus(
-                                  orders[batch_key]["table"],
-                                  batch_key,
-                                  seat,
-                                  key,
-                                  "Order Submitted"
-                                )
-                              }
-                            >
-                              {" "}
-                              Complete{" "}
-                            </button>
                             <button
                               className="btn btn-warning"
                               onClick={() =>
