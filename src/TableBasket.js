@@ -223,10 +223,9 @@ const TableBasket = props => {
                       return (
                         <Fragment key={seat}>
                           <h3>
-                            {" "}
-                            Seat {seat}{" "}
+                            {tableData["seats"][1]["name"]}
                             <button
-                              className="btn btn-primary"
+                              className="btn btn-primary ml-3"
                               onClick={() => handleAddMoreItems(seat)}
                             >
                               +
