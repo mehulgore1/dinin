@@ -180,19 +180,22 @@ const TableBasket = props => {
       .once("value", function(snapshot) {
         console.log(batch_key_param);
         if (!snapshot.hasChild(batch_key_param)) {
-          var batch_key_new = database
+          // set to same batch key
+          database
             .ref(match.params.restaurant)
             .child("tables")
             .child(match.params.table)
             .child("batches")
-            .push("").key;
-          setCurrentBatch(batch_key_new);
+            .child(batch_key_param)
+            .set("");
         }
       });
   };
 
   const hasBeenOrdered = batch_key => {
     return (
+      tableData["batches"] != null &&
+      tableData["batches"][batch_key] != null &&
       tableData["batches"][batch_key] != "" &&
       "ordered_at" in tableData["batches"][batch_key]
     );
@@ -205,7 +208,7 @@ const TableBasket = props => {
   const showBatchText = batch_key => {
     if (!emptyOrder(batch_key) && hasBeenOrdered(batch_key)) {
       // item ordered, show time
-      return <h1> {tableData["batches"][batch_key]["ordered_at"]} </h1>;
+      return <h3> {tableData["batches"][batch_key]["ordered_at"]} </h3>;
     } else if (!emptyOrder(batch_key) && !hasBeenOrdered(batch_key)) {
       // pending order, show "yet to order"
       return <h1> Yet To Order </h1>;
@@ -232,6 +235,7 @@ const TableBasket = props => {
                 return (
                   <div className="ml-2" key={batch_key}>
                     {showBatchText(batch_key)}
+                    {console.log(reverseBatches[batch_key])}
                     {Object.keys(
                       tableData["batches"][batch_key]["seat_data"] || {}
                     ).map((seat, i) => {
