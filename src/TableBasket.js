@@ -264,7 +264,7 @@ const TableBasket = props => {
       <WaiterRequest match={match} />
       <div className="d-flex justify-content-around mt-3">
         <button
-          className="btn btn-success btn-block mb-3"
+          className="btn btn-dark btn-lg mb-3"
           onClick={() => handleAddMoreItems()}
         >
           Add More Items
@@ -287,7 +287,7 @@ const TableBasket = props => {
                         ];
                       return (
                         <Fragment key={seat}>
-                          <h3>{getUserNameForSeat(seat)}</h3>
+                          <h3 className="ml-3">{getUserNameForSeat(seat)}</h3>
                           {Object.keys(items || {}).map((key, i) => {
                             var item = items[key];
                             return (

@@ -108,7 +108,7 @@ const WaiterRequest = props => {
       >
         Call Waitstaff
       </button>
-      <a
+      {/* <a
         href={
           "/" +
           props.match.params.restaurant +
@@ -118,7 +118,7 @@ const WaiterRequest = props => {
         }
       >
         <button className="btn btn-dark btn-lg">Your Items</button>{" "}
-      </a>
+      </a> */}
     </div>
   );
 };

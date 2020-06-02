@@ -230,7 +230,7 @@ const CustomerMenu = props => {
               <div className="d-flex justify-content-center">
                 <a href={"/" + tempRest + "/menu/" + table}>
                   <button className="btn btn-dark btn-lg">
-                    Go to Table Dashboard
+                    Table Dashboard
                   </button>
                 </a>
               </div>
