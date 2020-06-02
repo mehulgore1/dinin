@@ -204,7 +204,7 @@ const CustomerMenu = props => {
   }, []);
 
   return (
-    <Fragment>
+    <div className="container mt-3 mb-5">
       {!signedIn ? (
         <LoginForm match={match} />
       ) : (
@@ -233,7 +233,7 @@ const CustomerMenu = props => {
                     <Fragment key={category}>
                       <h1> {category} </h1>
                       {menu[stage][category].map(item => (
-                        <ul key={item.id}>
+                        <ul key={item.id} className="pl-0">
                           <MenuItem
                             key={item.id}
                             id={item.id}
@@ -301,7 +301,7 @@ const CustomerMenu = props => {
           )}
         </Fragment>
       )}
-    </Fragment>
+    </div>
   );
 };
 

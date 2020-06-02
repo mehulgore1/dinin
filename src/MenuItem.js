@@ -26,7 +26,7 @@ const MenuItem = props => {
     <div>
       <div className="container">
         <div className="row">
-          <div className="col-8">
+          <div className="col">
             <div>
               {" "}
               <strong>{props.title}</strong>
@@ -37,6 +37,7 @@ const MenuItem = props => {
             </div>
             <div>
               <input
+                className="form-control mt-2"
                 type="text"
                 value={notes}
                 placeholder="Add Notes"
@@ -44,45 +45,47 @@ const MenuItem = props => {
               />
             </div>
           </div>
-          <div className="col-4">
-            <div>
+          <div className="row">
+            <div className="col">
+              <div>
+                <div className="d-flex justify-content-around">
+                  <button
+                    onClick={() => decQuantity()}
+                    className="btn btn-dark mr-3"
+                  >
+                    {" "}
+                    -{" "}
+                  </button>
+                  <div className="align-self-center">
+                    {" "}
+                    <h3> {quantity} </h3>
+                  </div>
+                  <button
+                    onClick={() => incQuantity()}
+                    className="btn btn-dark ml-3"
+                  >
+                    {" "}
+                    +{" "}
+                  </button>
+                </div>
+              </div>
               <div className="d-flex justify-content-around">
                 <button
-                  onClick={() => decQuantity()}
-                  className="btn btn-dark mr-3"
+                  className="btn btn-success btn-lg mt-3"
+                  onClick={() =>
+                    props.sendToTable(
+                      props.id,
+                      props.title,
+                      notes,
+                      props.category,
+                      quantity,
+                      props.price
+                    )
+                  }
                 >
-                  {" "}
-                  -{" "}
-                </button>
-                <div className="align-self-center">
-                  {" "}
-                  <h3> {quantity} </h3>
-                </div>
-                <button
-                  onClick={() => incQuantity()}
-                  className="btn btn-dark ml-3"
-                >
-                  {" "}
-                  +{" "}
+                  Add
                 </button>
               </div>
-            </div>
-            <div className="d-flex justify-content-around">
-              <button
-                className="btn btn-success btn-lg mt-3"
-                onClick={() =>
-                  props.sendToTable(
-                    props.id,
-                    props.title,
-                    notes,
-                    props.category,
-                    quantity,
-                    props.price
-                  )
-                }
-              >
-                Add
-              </button>
             </div>
           </div>
         </div>
