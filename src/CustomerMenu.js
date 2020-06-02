@@ -7,6 +7,7 @@ import LoginForm from "./LoginForm";
 import SignOutButton from "./SignOutButton";
 import WaiterRequest from "./WaiterRequest";
 import { useAlert } from "react-alert";
+import useIsMounted from "react-is-mounted-hook";
 
 const CustomerMenu = props => {
   const alert = useAlert();
@@ -22,6 +23,7 @@ const CustomerMenu = props => {
   const [currentBatch, setCurrentBatch] = useState(1);
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState("");
+  const isMounted = useIsMounted();
 
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -110,16 +112,32 @@ const CustomerMenu = props => {
   }, [props.location]);
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        console.log("user signed in ");
-        setSignedIn(true);
-        setUserId(user.uid);
-      } else {
-        console.log("user NOT signed in ");
-        setSignedIn(false);
-      }
-    });
+    if (isMounted) {
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          console.log("user signed in ");
+          setSignedIn(true);
+          setUserId(user.uid);
+        } else {
+          console.log("user NOT signed in ");
+          setSignedIn(false);
+          database
+            .ref(tempRest)
+            .child("tables")
+            .child(match.params.table)
+            .child("users")
+            .once("value")
+            .then(function(snapshot) {
+              var userMap = snapshot.val();
+              for (var user_id in userMap) {
+                if (match.params.seat == userMap[user_id]["seat"]) {
+                  window.alert("Someone is sitting here! Scan another seat");
+                }
+              }
+            });
+        }
+      });
+    }
     setRestaurant(tempRest);
     setTable(match.params.table);
     setSeat(match.params.seat);
