@@ -257,7 +257,7 @@ const TableBasket = props => {
   };
 
   return (
-    <Fragment>
+    <div className="container mt-3 mb-5">
       <div className="d-flex justify-content-center">
         <h1> Your Table: </h1>
       </div>
@@ -387,7 +387,7 @@ const TableBasket = props => {
           </Fragment>
         );
       })}
-    </Fragment>
+    </div>
   );
 };
 

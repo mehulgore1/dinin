@@ -11,7 +11,7 @@ import { useAlert } from "react-alert";
 const CustomerMenu = props => {
   const alert = useAlert();
   var database = firebase.database();
-  const [val, setVal] = useState(2);
+  const [totalStages, setTotalStages] = useState(4);
   const [menu, setMenu] = useState([]);
   const [restaurant, setRestaurant] = useState("");
   const [table, setTable] = useState("");
@@ -164,6 +164,7 @@ const CustomerMenu = props => {
             .then(menu => {
               setMenu(menu);
               setIsValid(true);
+              setTotalStages(Object.keys(menu).length);
             });
         } else {
           setIsValid(false);
@@ -263,7 +264,7 @@ const CustomerMenu = props => {
                 </div>
               ) : null}
 
-              {stage > 1 && stage < 4 ? (
+              {stage > 1 && stage < totalStages ? (
                 <div className="d-flex justify-content-around">
                   <button
                     className="btn btn-dark btn-lg"
@@ -282,7 +283,7 @@ const CustomerMenu = props => {
                 </div>
               ) : null}
 
-              {stage == 4 ? (
+              {stage == totalStages ? (
                 <div className="d-flex justify-content-around">
                   <button
                     className="btn btn-primary btn-dark btn-lg"
