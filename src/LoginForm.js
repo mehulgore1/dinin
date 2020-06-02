@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "./App.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 import { Form } from "react-bootstrap";
 
