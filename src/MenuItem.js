@@ -72,6 +72,7 @@ const MenuItem = props => {
                 className="btn btn-success btn-lg mt-3"
                 onClick={() =>
                   props.sendToTable(
+                    props.id,
                     props.title,
                     notes,
                     props.category,

@@ -27,7 +27,8 @@ const CustomerMenu = props => {
 
   const history = useHistory();
 
-  const sendToTable = (title, notes, category, quantity, price) => {
+  const sendToTable = (item_id, title, notes, category, quantity, price) => {
+    const id = item_id;
     var item = {
       title: title,
       notes: notes,
@@ -46,8 +47,8 @@ const CustomerMenu = props => {
       .child("seat_data")
       .child(seat)
       .child("items")
-      .push(item);
-
+      .child(id)
+      .update(item);
     alert.success("Item Added!");
   };
 
@@ -85,7 +86,6 @@ const CustomerMenu = props => {
         .child("name")
         .once("value")
         .then(function(snapshot) {
-          console.log(snapshot.val());
           return snapshot.val();
         })
         .then(name => {
