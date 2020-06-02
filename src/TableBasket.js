@@ -145,24 +145,22 @@ const TableBasket = props => {
       .child("order_queue")
       .child(currentBatch)
       .set(batchObject);
-
     var userSeat = tableData["users"][userId]["seat"];
     var seat_data = tableData["batches"][currentBatch]["seat_data"];
-    var userItems = [];
-    for (seat in seat_data) {
-      if (seat === userSeat) {
-        userItems = seat_data[seat]["items"];
-      }
-    }
 
-    database
-      .ref(match.params.restaurant)
-      .child("tables")
-      .child(match.params.table)
-      .child("users")
-      .child(userId)
-      .child("items")
-      .update(userItems);
+    for (var seat in seat_data) {
+      var user_id = getUserIdForSeat(seat);
+      var userItems = seat_data[seat]["items"];
+
+      database
+        .ref(match.params.restaurant)
+        .child("tables")
+        .child(match.params.table)
+        .child("users")
+        .child(user_id)
+        .child("items")
+        .update(userItems);
+    }
 
     var batch_key = database
       .ref(match.params.restaurant)
@@ -242,10 +240,18 @@ const TableBasket = props => {
     return !emptyOrder(batch_key) && !hasBeenOrdered(batch_key);
   };
 
-  const getUserForSeat = this_seat => {
+  const getUserNameForSeat = this_seat => {
     for (var user in tableData["users"]) {
       if (tableData["users"][user]["seat"] == this_seat) {
         return tableData["users"][user]["name"];
+      }
+    }
+  };
+
+  const getUserIdForSeat = this_seat => {
+    for (var user_id in tableData["users"]) {
+      if (tableData["users"][user_id]["seat"] == this_seat) {
+        return user_id;
       }
     }
   };
@@ -281,7 +287,7 @@ const TableBasket = props => {
                         ];
                       return (
                         <Fragment key={seat}>
-                          <h3>{getUserForSeat(seat)}</h3>
+                          <h3>{getUserNameForSeat(seat)}</h3>
                           {Object.keys(items || {}).map((key, i) => {
                             var item = items[key];
                             return (
