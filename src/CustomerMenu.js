@@ -20,6 +20,7 @@ const CustomerMenu = props => {
   const [stage, setStage] = useState(0);
   const [signedIn, setSignedIn] = useState(false);
   const [currentBatch, setCurrentBatch] = useState(1);
+  const [userId, setUserId] = useState(null);
 
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -76,6 +77,34 @@ const CustomerMenu = props => {
   };
 
   useEffect(() => {
+    const name = "";
+    if (userId != null) {
+      database
+        .ref("users")
+        .child(userId)
+        .child("name")
+        .once("value")
+        .then(function(snapshot) {
+          console.log(snapshot.val());
+          return snapshot.val();
+        })
+        .then(name => {
+          database
+            .ref(match.params.restaurant)
+            .child("tables")
+            .child(match.params.table)
+            .child("users")
+            .child(userId)
+            .update({
+              name: name,
+              seat: props.match.params.seat,
+              water_ordered: false
+            });
+        });
+    }
+  }, [userId]);
+
+  useEffect(() => {
     setStage(match.params.stage);
   }, [props.location]);
 
@@ -84,6 +113,7 @@ const CustomerMenu = props => {
       if (user) {
         console.log("user signed in ");
         setSignedIn(true);
+        setUserId(user.uid);
       } else {
         console.log("user NOT signed in ");
       }

@@ -108,6 +108,17 @@ const WaiterRequest = props => {
       >
         Call Waitstaff
       </button>
+      <a
+        href={
+          "/" +
+          props.match.params.restaurant +
+          "/" +
+          props.match.params.table +
+          "/receipt"
+        }
+      >
+        <button className="btn btn-dark btn-lg">Your Items</button>{" "}
+      </a>
     </div>
   );
 };

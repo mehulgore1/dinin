@@ -66,6 +66,11 @@ const Receipt = props => {
           </Fragment>
         );
       })}
+      <div className="d-flex justify-content-center">
+        <a href={"/" + match.params.restaurant + "/menu/" + match.params.table}>
+          <button className="btn btn-dark btn-lg">Go to Table Dashboard</button>
+        </a>
+      </div>
     </Fragment>
   );
 };
