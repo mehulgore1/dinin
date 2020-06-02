@@ -21,6 +21,7 @@ const CustomerMenu = props => {
   const [signedIn, setSignedIn] = useState(false);
   const [currentBatch, setCurrentBatch] = useState(1);
   const [userId, setUserId] = useState(null);
+  const [userName, setUserName] = useState("");
 
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -88,6 +89,7 @@ const CustomerMenu = props => {
           return snapshot.val();
         })
         .then(name => {
+          setUserName(name);
           database
             .ref(match.params.restaurant)
             .child("tables")
@@ -214,11 +216,10 @@ const CustomerMenu = props => {
           {isValid ? (
             <Fragment>
               <WaiterRequest match={match} />
-              <div className="d-flex justify-content-center">
-                <h1>
-                  {" "}
-                  {restaurant} Seat {seat}
-                </h1>
+              <div className="d-flex align-items-center justify-content-center">
+                <h2>
+                  Seat {seat}: {userName}
+                </h2>
               </div>
               <div className="d-flex justify-content-center">
                 <a href={"/" + tempRest + "/menu/" + table}>
