@@ -10,6 +10,7 @@ const LoginForm = props => {
   const [confResult, setConfResult] = useState({});
   const [name, setName] = useState("");
   const [anonName, setAnonName] = useState("");
+  const [offersChecked, setOffersChecked] = useState(false);
 
   const onPhoneNumberChange = event => {
     setPhoneNumber(event.target.value);
@@ -54,8 +55,16 @@ const LoginForm = props => {
           database
             .ref("users")
             .child(user.uid)
-            .child("phone_number")
-            .set(user.phoneNumber);
+            .update({
+              phone_number: user.phoneNumber
+            });
+
+          database
+            .ref("users")
+            .child(user.uid)
+            .child("restaurants")
+            .child(props.match.params.restaurant)
+            .update({ offers: offersChecked });
           addUserToDb(user.uid, name);
         })
         .catch(function(error) {
@@ -69,9 +78,7 @@ const LoginForm = props => {
       "sign-in-button",
       {
         size: "invisible",
-        callback: function(response) {
-          sendVerificationCode();
-        }
+        callback: function(response) {}
       }
     );
   }, []);
@@ -152,7 +159,12 @@ const LoginForm = props => {
         />
         <div className="d-flex justify-content-center mt-2">
           <Form.Group controlId="formBasicCheckbox">
-            <Form.Check type="checkbox" label="Text me Discounts" />
+            <Form.Check
+              checked={offersChecked}
+              onChange={e => setOffersChecked(e.target.checked)}
+              type="checkbox"
+              label="Text me Discounts"
+            />
           </Form.Group>
         </div>
         <div className="d-flex justify-content-center mt-2">
