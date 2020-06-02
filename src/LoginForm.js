@@ -61,7 +61,8 @@ const LoginForm = props => {
             .child(user.uid)
             .update({
               name: name,
-              seat: props.match.params.seat
+              seat: props.match.params.seat,
+              water_ordered: false
             });
         })
         .catch(function(error) {

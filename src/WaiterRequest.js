@@ -7,7 +7,7 @@ const WaiterRequest = props => {
   const alert = useAlert();
   var database = firebase.database();
   const [userId, setUserId] = useState({});
-  const [seats, setSeats] = useState({});
+  const [users, setUsers] = useState({});
   //const [request, setRequest] = useState("Get water");
 
   //   const handleRequestChange = event => {
@@ -57,9 +57,9 @@ const WaiterRequest = props => {
   };
 
   const getWater = () => {
-    for (var seat in seats) {
-      if (seats[seat] != null && seats[seat]["user_id"] == userId) {
-        if (seats[seat]["waterOrdered"]) {
+    for (var user in users) {
+      if (users[user] != null) {
+        if (users[user]["water_ordered"]) {
           // has already ordered water, refill
           handleSendRequest("Water Refill Requested");
         } else {
@@ -69,9 +69,9 @@ const WaiterRequest = props => {
             .ref(props.match.params.restaurant)
             .child("tables")
             .child(props.match.params.table)
-            .child("seats")
-            .child(seat)
-            .child("waterOrdered")
+            .child("users")
+            .child(userId)
+            .child("water_ordered")
             .set(true);
         }
       }
@@ -79,14 +79,6 @@ const WaiterRequest = props => {
   };
 
   useEffect(() => {
-    database
-      .ref(props.match.params.restaurant)
-      .child("tables")
-      .child(props.match.params.table)
-      .child("seats")
-      .on("value", function(snapshot) {
-        setSeats(snapshot.val());
-      });
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
         console.log("user signed in ");
@@ -95,6 +87,14 @@ const WaiterRequest = props => {
         console.log("user NOT signed in ");
       }
     });
+    database
+      .ref(props.match.params.restaurant)
+      .child("tables")
+      .child(props.match.params.table)
+      .child("users")
+      .on("value", function(snapshot) {
+        setUsers(snapshot.val());
+      });
   }, []);
 
   return (
