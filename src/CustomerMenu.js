@@ -23,6 +23,7 @@ const CustomerMenu = props => {
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState("");
   const isMounted = useIsMounted();
+  const [seatTaken, setSeatTaken] = useState(false);
 
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -130,6 +131,7 @@ const CustomerMenu = props => {
               var userMap = snapshot.val();
               for (var user_id in userMap) {
                 if (match.params.seat == userMap[user_id]["seat"]) {
+                  setSeatTaken(true);
                   window.alert("Someone is sitting here! Scan another seat");
                 }
               }
@@ -238,7 +240,7 @@ const CustomerMenu = props => {
   return (
     <div className="container mt-3 mb-5">
       {!signedIn ? (
-        <LoginForm match={match} />
+        <LoginForm seatTaken={seatTaken} match={match} />
       ) : (
         <Fragment>
           <div className="d-flex justify-content-center">

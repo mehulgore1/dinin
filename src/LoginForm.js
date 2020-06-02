@@ -126,6 +126,11 @@ const LoginForm = props => {
           Welcome to {props.match.params.restaurant}
         </h2>
       </div>
+      {props.seatTaken ? (
+        <div className="d-flex justify-content-center">
+          <h2 style={{ color: "red" }}> Seat Taken! </h2>{" "}
+        </div>
+      ) : null}
       <div className="d-flex justify-content-center">
         <h2> Sign In With Phone </h2>
       </div>
@@ -192,10 +197,12 @@ const LoginForm = props => {
           placeholder="Enter your Name"
           onChange={e => setAnonName(e.target.value)}
         />
-        <div className="d-flex justify-content-center mt-2">
+        <div
+          onClick={function() {}}
+          className="d-flex justify-content-center mt-2"
+        >
           <button
-            style={{ cursor: "pointer" }}
-            className="btn btn-secondary btn-lg"
+            className="clickable btn btn-secondary btn-lg"
             onClick={signInAsGuest}
           >
             Sign in As Guest
