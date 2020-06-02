@@ -72,7 +72,8 @@ const TableBasket = props => {
     }
   }, []);
 
-  const handleAddMoreItems = seat => {
+  const handleAddMoreItems = () => {
+    var seat = tableData["users"][userId]["seat"];
     const path = generatePath(match.path, {
       restaurant: match.params.restaurant,
       table: match.params.table
@@ -241,12 +242,28 @@ const TableBasket = props => {
     return !emptyOrder(batch_key) && !hasBeenOrdered(batch_key);
   };
 
+  const getUserForSeat = this_seat => {
+    for (var user in tableData["users"]) {
+      if (tableData["users"][user]["seat"] == this_seat) {
+        return tableData["users"][user]["name"];
+      }
+    }
+  };
+
   return (
     <Fragment>
       <div className="d-flex justify-content-center">
         <h1> Your Table: </h1>
       </div>
       <WaiterRequest match={match} />
+      <div className="d-flex justify-content-around mt-3">
+        <button
+          className="btn btn-success btn-block mb-3"
+          onClick={() => handleAddMoreItems()}
+        >
+          Add More Items
+        </button>
+      </div>
       {reverseBatches.map((batch_obj, index) => {
         return (
           <Fragment key={index}>
@@ -255,7 +272,6 @@ const TableBasket = props => {
                 return (
                   <div className="ml-2" key={batch_key}>
                     {showBatchText(batch_key)}
-                    {console.log(reverseBatches[batch_key])}
                     {Object.keys(
                       tableData["batches"][batch_key]["seat_data"] || {}
                     ).map((seat, i) => {
@@ -265,15 +281,7 @@ const TableBasket = props => {
                         ];
                       return (
                         <Fragment key={seat}>
-                          <h3>
-                            {tableData["users"][userId]["name"]}
-                            <button
-                              className="btn btn-primary ml-3"
-                              onClick={() => handleAddMoreItems(seat)}
-                            >
-                              +
-                            </button>{" "}
-                          </h3>
+                          <h3>{getUserForSeat(seat)}</h3>
                           {Object.keys(items || {}).map((key, i) => {
                             var item = items[key];
                             return (
