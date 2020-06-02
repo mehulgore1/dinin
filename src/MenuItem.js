@@ -75,7 +75,8 @@ const MenuItem = props => {
                     props.title,
                     notes,
                     props.category,
-                    quantity
+                    quantity,
+                    props.price
                   )
                 }
               >

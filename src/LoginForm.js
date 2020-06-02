@@ -57,12 +57,11 @@ const LoginForm = props => {
             .ref(props.match.params.restaurant)
             .child("tables")
             .child(props.match.params.table)
-            .child("seats")
-            .child(props.match.params.seat)
+            .child("users")
+            .child(user.uid)
             .update({
-              user_id: user.uid,
               name: name,
-              waterOrdered: false
+              seat: props.match.params.seat
             });
         })
         .catch(function(error) {

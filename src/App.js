@@ -7,6 +7,7 @@ import CustomerMenu from "./CustomerMenu";
 import OrderQ from "./OrderQ";
 import TableBasket from "./TableBasket";
 import Requests from "./Requests";
+import Receipt from "./Receipt";
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route exact path="/:restaurant/menu/:table" component={TableBasket} />
         <Route exact path="/:restaurant/orders/" component={OrderQ} />
         <Route exact path="/:restaurant/requests" component={Requests} />
+        <Route exact path="/:restaurant/:table/receipt" component={Receipt} />
       </Switch>
     </BrowserRouter>
   );

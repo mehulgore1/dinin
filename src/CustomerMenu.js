@@ -26,14 +26,15 @@ const CustomerMenu = props => {
 
   const history = useHistory();
 
-  const sendToTable = (title, notes, category, quantity) => {
+  const sendToTable = (title, notes, category, quantity, price) => {
     var item = {
       title: title,
       notes: notes,
       category: category,
       quantity: quantity,
       status: "Pending",
-      ordered: false
+      ordered: false,
+      price: price
     };
     database
       .ref(tempRest)
@@ -186,7 +187,7 @@ const CustomerMenu = props => {
         <LoginForm setSignedInTrue={setSignedInTrue} match={match} />
       ) : (
         <Fragment>
-          {/* <SignOutButton setSignedInFalse={setSignedInFalse} /> */}
+          <SignOutButton setSignedInFalse={setSignedInFalse} />
           {isValid ? (
             <Fragment>
               <WaiterRequest match={match} />

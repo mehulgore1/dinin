@@ -145,16 +145,11 @@ const TableBasket = props => {
       .child(currentBatch)
       .set(batchObject);
 
-    var userSeat = "";
-    for (seat in tableData["seats"]) {
-      if (tableData["seats"][seat]["user_id"] == userId) {
-        userSeat = seat;
-      }
-    }
+    var userSeat = tableData["users"][userId]["seat"];
     var seat_data = tableData["batches"][currentBatch]["seat_data"];
     var userItems = [];
     for (seat in seat_data) {
-      if (seat == userSeat) {
+      if (seat === userSeat) {
         userItems = seat_data[seat]["items"];
       }
     }
@@ -163,10 +158,10 @@ const TableBasket = props => {
       .ref(match.params.restaurant)
       .child("tables")
       .child(match.params.table)
-      .child("seats")
-      .child(userSeat)
+      .child("users")
+      .child(userId)
       .child("items")
-      .push(userItems);
+      .update(userItems);
 
     var batch_key = database
       .ref(match.params.restaurant)
@@ -271,7 +266,7 @@ const TableBasket = props => {
                       return (
                         <Fragment key={seat}>
                           <h3>
-                            {tableData["seats"][1]["name"]}
+                            {tableData["users"][userId]["name"]}
                             <button
                               className="btn btn-primary ml-3"
                               onClick={() => handleAddMoreItems(seat)}
