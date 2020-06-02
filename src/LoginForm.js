@@ -8,6 +8,7 @@ const LoginForm = props => {
   const [authCode, setAuthCode] = useState("");
   const [confResult, setConfResult] = useState({});
   const [name, setName] = useState("");
+  const [anonName, setAnonName] = useState("");
 
   const onPhoneNumberChange = event => {
     setPhoneNumber(event.target.value);
@@ -18,6 +19,10 @@ const LoginForm = props => {
   };
 
   const sendVerificationCode = () => {
+    if (phoneNumber == "") {
+      window.alert("Number is Empty!");
+      return;
+    }
     var appVerifier = window.recaptchaVerifier;
     firebase
       .auth()
@@ -35,35 +40,22 @@ const LoginForm = props => {
   };
 
   const signInWithPhoneNumber = () => {
+    if (name == "") {
+      window.alert("Name is Empty!");
+      return;
+    }
     if (Object.keys(confResult).length !== 0) {
       confResult
         .confirm(authCode)
         .then(function(result) {
           // User signed in successfully.
-          props.setSignedInTrue();
           var user = result.user;
           database
             .ref("users")
             .child(user.uid)
             .child("phone_number")
             .set(user.phoneNumber);
-
-          database
-            .ref("users")
-            .child(user.uid)
-            .update({ name: name });
-
-          database
-            .ref(props.match.params.restaurant)
-            .child("tables")
-            .child(props.match.params.table)
-            .child("users")
-            .child(user.uid)
-            .update({
-              name: name,
-              seat: props.match.params.seat,
-              water_ordered: false
-            });
+          addUserToDb(user.uid, name);
         })
         .catch(function(error) {
           console.log(error);
@@ -83,10 +75,48 @@ const LoginForm = props => {
     );
   }, []);
 
+  const signInAsGuest = () => {
+    if (anonName != "") {
+      firebase
+        .auth()
+        .signInAnonymously()
+        .then(result => {
+          addUserToDb(result.user.uid, anonName);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    } else {
+      window.alert("Name is Empty!");
+    }
+  };
+
+  const addUserToDb = (uid, thisName) => {
+    database
+      .ref("users")
+      .child(uid)
+      .update({ name: thisName });
+
+    database
+      .ref(props.match.params.restaurant)
+      .child("tables")
+      .child(props.match.params.table)
+      .child("users")
+      .child(uid)
+      .update({
+        name: thisName,
+        seat: props.match.params.seat,
+        water_ordered: false
+      });
+  };
+
   return (
     <Fragment>
       <div className="d-flex justify-content-center mt-5">
-        <h2> Welcome to Dinin at {props.match.params.restaurant}</h2>
+        <h2> Welcome to {props.match.params.restaurant}</h2>
+      </div>
+      <div className="d-flex justify-content-center">
+        <h2> Sign In With Phone </h2>
       </div>
       <div className="form-group">
         <input
@@ -98,7 +128,7 @@ const LoginForm = props => {
         />
         <div className="d-flex justify-content-center mt-2">
           <button
-            className="btn btn-secondary btn-lg"
+            className="btn btn-primary btn-lg"
             onClick={sendVerificationCode}
           >
             {" "}
@@ -116,7 +146,7 @@ const LoginForm = props => {
           className="form-control mt-2"
           type="text"
           value={name}
-          placeholder="Enter your Name for the Table"
+          placeholder="Enter your Name"
           onChange={e => setName(e.target.value)}
         />
         <div className="d-flex justify-content-center mt-2">
@@ -130,7 +160,23 @@ const LoginForm = props => {
           </button>
         </div>
       </div>
-      <div></div>
+      <div className="d-flex justify-content-center">
+        <h2> Sign In As Guest </h2>
+      </div>
+      <div className="form-group">
+        <input
+          className="form-control mt-2"
+          type="text"
+          value={anonName}
+          placeholder="Enter your Name"
+          onChange={e => setAnonName(e.target.value)}
+        />
+        <div className="d-flex justify-content-center mt-2">
+          <button className="btn btn-secondary btn-lg" onClick={signInAsGuest}>
+            Sign in As Guest
+          </button>
+        </div>
+      </div>
     </Fragment>
   );
 };

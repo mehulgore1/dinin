@@ -78,7 +78,6 @@ const CustomerMenu = props => {
   };
 
   useEffect(() => {
-    const name = "";
     if (userId != null) {
       database
         .ref("users")
@@ -116,6 +115,7 @@ const CustomerMenu = props => {
         setUserId(user.uid);
       } else {
         console.log("user NOT signed in ");
+        setSignedIn(false);
       }
     });
     setRestaurant(tempRest);
@@ -203,21 +203,13 @@ const CustomerMenu = props => {
       });
   }, []);
 
-  const setSignedInTrue = () => {
-    setSignedIn(true);
-  };
-
-  const setSignedInFalse = () => {
-    setSignedIn(false);
-  };
-
   return (
     <Fragment>
       {!signedIn ? (
-        <LoginForm setSignedInTrue={setSignedInTrue} match={match} />
+        <LoginForm match={match} />
       ) : (
         <Fragment>
-          <SignOutButton setSignedInFalse={setSignedInFalse} />
+          <SignOutButton />
           {isValid ? (
             <Fragment>
               <WaiterRequest match={match} />

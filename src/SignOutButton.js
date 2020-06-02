@@ -4,7 +4,6 @@ import * as firebase from "firebase";
 
 const SignOutButton = props => {
   const handleSignOut = () => {
-    props.setSignedInFalse();
     firebase.auth().signOut();
   };
 
