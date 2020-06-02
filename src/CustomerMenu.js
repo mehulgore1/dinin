@@ -4,7 +4,6 @@ import "./App.css";
 import * as firebase from "firebase";
 import MenuItem from "./MenuItem";
 import LoginForm from "./LoginForm";
-import SignOutButton from "./SignOutButton";
 import WaiterRequest from "./WaiterRequest";
 import { useAlert } from "react-alert";
 import useIsMounted from "react-is-mounted-hook";
@@ -224,13 +223,30 @@ const CustomerMenu = props => {
       });
   }, []);
 
+  const handleSignOut = () => {
+    // remove user from table
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .child(match.params.table)
+      .child("users")
+      .child(userId)
+      .remove();
+    firebase.auth().signOut();
+  };
+
   return (
     <div className="container mt-3 mb-5">
       {!signedIn ? (
         <LoginForm match={match} />
       ) : (
         <Fragment>
-          <SignOutButton />
+          <div className="d-flex justify-content-center">
+            <button onClick={handleSignOut} className="btn btn-danger btn-lg">
+              {" "}
+              Sign Out{" "}
+            </button>
+          </div>
           {isValid ? (
             <Fragment>
               <WaiterRequest match={match} />

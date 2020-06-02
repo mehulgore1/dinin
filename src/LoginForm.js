@@ -121,7 +121,10 @@ const LoginForm = props => {
   return (
     <Fragment>
       <div className="d-flex justify-content-center mt-5">
-        <h2> Welcome to {props.match.params.restaurant}</h2>
+        <h2 className="text-capitalize">
+          {" "}
+          Welcome to {props.match.params.restaurant}
+        </h2>
       </div>
       <div className="d-flex justify-content-center">
         <h2> Sign In With Phone </h2>
