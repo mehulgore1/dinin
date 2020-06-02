@@ -202,7 +202,7 @@ const LoginForm = props => {
           className="d-flex justify-content-center mt-2"
         >
           <button
-            className="clickable btn btn-secondary btn-lg"
+            className="clickable btn btn-dark btn-lg"
             onClick={signInAsGuest}
           >
             Sign in As Guest
