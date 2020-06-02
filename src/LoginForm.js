@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
+import { Form } from "react-bootstrap";
 
 const LoginForm = props => {
   const database = firebase.database();
@@ -149,6 +150,11 @@ const LoginForm = props => {
           placeholder="Enter your Name"
           onChange={e => setName(e.target.value)}
         />
+        <div className="d-flex justify-content-center mt-2">
+          <Form.Group controlId="formBasicCheckbox">
+            <Form.Check type="checkbox" label="Text me Discounts" />
+          </Form.Group>
+        </div>
         <div className="d-flex justify-content-center mt-2">
           <button
             className="btn btn-primary btn-lg"
