@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
+import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 import { Form } from "react-bootstrap";
@@ -193,10 +194,7 @@ const LoginForm = props => {
           onChange={e => setAnonName(e.target.value)}
         />
         <div className="d-flex justify-content-center mt-2">
-          <button
-            className="btn btn-secondary btn-lg"
-            onTouchStart={signInAsGuest}
-          >
+          <button className="btn btn-secondary btn-lg" onClick={signInAsGuest}>
             Sign in As Guest
           </button>
         </div>
