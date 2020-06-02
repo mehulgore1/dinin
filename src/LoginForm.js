@@ -193,7 +193,10 @@ const LoginForm = props => {
           onChange={e => setAnonName(e.target.value)}
         />
         <div className="d-flex justify-content-center mt-2">
-          <button className="btn btn-secondary btn-lg" onClick={signInAsGuest}>
+          <button
+            className="btn btn-secondary btn-lg"
+            onTouchStart={signInAsGuest}
+          >
             Sign in As Guest
           </button>
         </div>
