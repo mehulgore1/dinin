@@ -57,23 +57,21 @@ const WaiterRequest = props => {
   };
 
   const getWater = () => {
-    for (var user in users) {
-      if (users[user] != null) {
-        if (users[user]["water_ordered"]) {
-          // has already ordered water, refill
-          handleSendRequest("Water Refill Requested");
-        } else {
-          // hasn't ordered water get 1 glass
-          handleSendRequest("1 New Glass of Water Requested");
-          database
-            .ref(props.match.params.restaurant)
-            .child("tables")
-            .child(props.match.params.table)
-            .child("users")
-            .child(userId)
-            .child("water_ordered")
-            .set(true);
-        }
+    if (users[userId] != null) {
+      if (users[userId]["water_ordered"]) {
+        // has already ordered water, refill
+        handleSendRequest("Water Refill Requested");
+      } else {
+        // hasn't ordered water get 1 glass
+        handleSendRequest("1 New Glass of Water Requested");
+        database
+          .ref(props.match.params.restaurant)
+          .child("tables")
+          .child(props.match.params.table)
+          .child("users")
+          .child(userId)
+          .child("water_ordered")
+          .set(true);
       }
     }
   };
