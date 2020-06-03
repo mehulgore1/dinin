@@ -24,6 +24,7 @@ const CustomerMenu = props => {
   const [userName, setUserName] = useState("");
   const isMounted = useIsMounted();
   const [seatTaken, setSeatTaken] = useState(false);
+  const [stageNames, setStageNames] = useState({});
 
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -162,6 +163,13 @@ const CustomerMenu = props => {
                   finalMenu[stage] = {};
                 }
                 for (var category in snapshot.val()[stage]) {
+                  if (category == "stage_name") {
+                    var temp = stageNames;
+                    console.log(snapshot.val()[stage]["stage_name"]);
+                    temp[stage] = snapshot.val()[stage]["stage_name"];
+                    setStageNames(temp);
+                    continue;
+                  }
                   if (!(category in finalMenu[stage])) {
                     finalMenu[stage][category] = [];
                   }
@@ -179,7 +187,9 @@ const CustomerMenu = props => {
                   }
                 }
               }
+              console.log(stageNames);
               console.log(finalMenu);
+              console.log(snapshot.val().slice(1));
               return finalMenu;
             })
             .then(menu => {

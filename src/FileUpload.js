@@ -1,7 +1,6 @@
 import { CSVReader } from "react-papaparse";
 import React, { useState, useEffect } from "react";
 import * as firebase from "firebase";
-import { isProperty } from "@babel/types";
 
 const FileUpload = props => {
   const restaurant = props.match.params.restaurant;
@@ -32,9 +31,15 @@ const FileUpload = props => {
         .child(itemData[4])
         .child(tempItem.category)
         .push(tempItem).key;
+      database
+        .ref(restaurant)
+        .child("menu")
+        .child(itemData[4])
+        .update({ stage_name: itemData[5] });
       tempItem.id = key;
       console.log(itemData[3] in finalMenu[itemData[4]]);
       finalMenu[itemData[4]][itemData[3]].push(tempItem);
+      finalMenu[itemData[4]]["stage_name"] = itemData[5];
     }
     console.log(finalMenu);
     props.handleSetMenu(finalMenu);

@@ -26,6 +26,8 @@ const Tables = props => {
       .child("tables")
       .child(tableNum)
       .remove();
+
+    window.alert("Table is Empty Now");
   };
 
   const showConfirmAlert = tableNum => {

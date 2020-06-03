@@ -130,7 +130,7 @@ const MenuEditor = props => {
   };
 
   return (
-    <>
+    <div className="container mt-5 mb-5">
       <h1>Manager dashboard for {restaurant} </h1>
       <FileUpload match={match} handleSetMenu={handleSetMenu} />
       {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
@@ -141,26 +141,30 @@ const MenuEditor = props => {
             {Object.keys(menu[stage]).map((category, i) => {
               return (
                 <Fragment key={category}>
-                  <h1> {category} </h1>
-                  {menu[stage][category].map(item => (
-                    <ul key={item}>
-                      <MenuItem
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        description={item.description}
-                        price={item.price}
-                        //deleteMenuItem={deleteMenuItem}
-                      />
-                    </ul>
-                  ))}
+                  {category != "stage_name" ? (
+                    <Fragment key={category}>
+                      <h1> {category} </h1>
+                      {menu[stage][category].map(item => (
+                        <ul key={item}>
+                          <MenuItem
+                            key={item.id}
+                            id={item.id}
+                            title={item.title}
+                            description={item.description}
+                            price={item.price}
+                            //deleteMenuItem={deleteMenuItem}
+                          />
+                        </ul>
+                      ))}
+                    </Fragment>
+                  ) : null}
                 </Fragment>
               );
             })}
           </Fragment>
         );
       })}
-    </>
+    </div>
   );
 };
 
