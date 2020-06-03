@@ -58,25 +58,23 @@ const CustomerMenu = props => {
 
   const handleNextStageClick = () => {
     var nextStage = parseInt(stage, 10) + 1;
-    const path = generatePath(match.path, {
-      restaurant: restaurant,
-      table: table,
-      seat: seat,
-      stage: nextStage
-    });
-    history.replace(path);
+    routeToStage(nextStage);
   };
 
   const handlePrevStageClick = () => {
-    var nextStage = parseInt(stage, 10) - 1;
-    if (nextStage < 1) {
-      nextStage = 1;
+    var prevStage = parseInt(stage, 10) - 1;
+    if (prevStage < 1) {
+      prevStage = 1;
     }
+    routeToStage(prevStage);
+  };
+
+  const routeToStage = stage => {
     const path = generatePath(match.path, {
       restaurant: restaurant,
       table: table,
       seat: seat,
-      stage: nextStage
+      stage: stage
     });
     history.replace(path);
   };
@@ -165,7 +163,6 @@ const CustomerMenu = props => {
                 for (var category in snapshot.val()[stage]) {
                   if (category == "stage_name") {
                     var temp = stageNames;
-                    console.log(snapshot.val()[stage]["stage_name"]);
                     temp[stage] = snapshot.val()[stage]["stage_name"];
                     setStageNames(temp);
                     continue;
@@ -248,107 +245,83 @@ const CustomerMenu = props => {
   };
 
   return (
-    <div className="container mt-3 mb-5">
-      {!signedIn ? (
-        <LoginForm seatTaken={seatTaken} match={match} />
-      ) : (
-        <Fragment>
-          <div className="d-flex justify-content-center">
-            <button onClick={handleSignOut} className="btn btn-danger btn-lg">
-              {" "}
-              Sign Out{" "}
-            </button>
-          </div>
-          {isValid ? (
-            <Fragment>
-              <WaiterRequest match={match} />
-              <div className="d-flex align-items-center justify-content-center">
-                <h2>
-                  Seat {seat}: {userName}
-                </h2>
-              </div>
-              <div className="d-flex justify-content-center">
-                <a href={"/" + tempRest + "/menu/" + table}>
-                  <button className="btn btn-dark btn-lg">
-                    Table Dashboard
-                  </button>
-                </a>
-              </div>
-
+    <div>
+      <div className="container mt-3 mb-5">
+        {!signedIn ? (
+          <LoginForm seatTaken={seatTaken} match={match} />
+        ) : (
+          <Fragment>
+            <div className="d-flex justify-content-center">
+              <button onClick={handleSignOut} className="btn btn-danger btn-lg">
+                {" "}
+                Sign Out{" "}
+              </button>
+            </div>
+            {isValid ? (
               <Fragment>
-                {Object.keys(menu[stage] || {}).map((category, i) => {
-                  return (
-                    <Fragment key={category}>
-                      <h1> {category} </h1>
-                      {menu[stage][category].map(item => (
-                        <ul key={item.id} className="pl-0">
-                          <MenuItem
-                            key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            description={item.description}
-                            price={item.price}
-                            sendToTable={sendToTable}
-                            category={item.category}
-                            match={match}
-                            //deleteMenuItem={deleteMenuItem}
-                          />
-                        </ul>
-                      ))}
-                    </Fragment>
-                  );
-                })}
+                <WaiterRequest match={match} />
+                <div className="d-flex align-items-center justify-content-center">
+                  <h2>
+                    Seat {seat}: {userName}
+                  </h2>
+                </div>
+                <div className="d-flex justify-content-center">
+                  <a href={"/" + tempRest + "/menu/" + table}>
+                    <button className="btn btn-dark btn-lg">
+                      Table Dashboard
+                    </button>
+                  </a>
+                </div>
+
+                <div className="hs  ">
+                  {Object.keys(stageNames).map(thisStage => {
+                    var buttonClass =
+                      thisStage == stage ? "btn-dark" : "btn-outline-dark";
+                    return (
+                      <button
+                        onClick={() => routeToStage(thisStage)}
+                        className={"btn item " + buttonClass}
+                      >
+                        {stageNames[thisStage]}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <Fragment>
+                  {Object.keys(menu[stage] || {}).map((category, i) => {
+                    return (
+                      <Fragment key={category}>
+                        <h1> {category} </h1>
+                        {menu[stage][category].map(item => (
+                          <ul key={item.id} className="pl-0">
+                            <MenuItem
+                              key={item.id}
+                              id={item.id}
+                              title={item.title}
+                              description={item.description}
+                              price={item.price}
+                              sendToTable={sendToTable}
+                              category={item.category}
+                              match={match}
+                              //deleteMenuItem={deleteMenuItem}
+                            />
+                          </ul>
+                        ))}
+                      </Fragment>
+                    );
+                  })}
+                </Fragment>
               </Fragment>
-              {stage == 1 ? (
-                <div className="d-flex justify-content-around">
-                  <button
-                    className="btn btn-dark btn-lg"
-                    onClick={handleNextStageClick}
-                  >
-                    {" "}
-                    Next Section{" "}
-                  </button>
-                </div>
-              ) : null}
-
-              {stage > 1 && stage < totalStages ? (
-                <div className="d-flex justify-content-around">
-                  <button
-                    className="btn btn-dark btn-lg"
-                    onClick={handlePrevStageClick}
-                  >
-                    {" "}
-                    Previous Section{" "}
-                  </button>
-                  <button
-                    className="btn btn-dark btn-lg"
-                    onClick={handleNextStageClick}
-                  >
-                    {" "}
-                    Next Section{" "}
-                  </button>
-                </div>
-              ) : null}
-
-              {stage == totalStages ? (
-                <div className="d-flex justify-content-around">
-                  <button
-                    className="btn btn-primary btn-dark btn-lg"
-                    onClick={handlePrevStageClick}
-                  >
-                    Previous Section
-                  </button>
-                </div>
-              ) : null}
-            </Fragment>
-          ) : (
-            <h1>
-              {" "}
-              Whoops! You've reached an invalid URL. Try a different link!{" "}
-            </h1>
-          )}
-        </Fragment>
-      )}
+            ) : (
+              <h1>
+                {" "}
+                Whoops! You've reached an invalid URL. Try a different link!{" "}
+              </h1>
+            )}
+          </Fragment>
+        )}
+      </div>
     </div>
   );
 };
