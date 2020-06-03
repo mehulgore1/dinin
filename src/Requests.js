@@ -51,14 +51,27 @@ const Requests = props => {
   };
 
   return (
-    <Fragment>
+    <div className="container mt-5">
       <h1> Waiter requests for {match.params.restaurant} </h1>
+      <div className="d-flex justify-content-around">
+        <a href={"/" + match.params.restaurant + "/tables"}>
+          <button className="btn btn-dark btn-lg"> Manage Tables </button>{" "}
+        </a>
+        <a href={"/" + match.params.restaurant + "/orders"}>
+          <button className="btn btn-dark btn-lg"> View Orders </button>{" "}
+        </a>
+      </div>
       {Object.keys(requests || {}).map((request_key, index) => {
         return (
           <Fragment key={request_key}>
             <div className="d-flex justify-content-around">
-              Table {requests[request_key]["table"]} --{" "}
-              {requests[request_key]["request"]}
+              <h3>
+                {" "}
+                Table {requests[request_key]["table"]}:{" "}
+                {requests[request_key]["request"]}{" "}
+              </h3>
+            </div>{" "}
+            <div className="d-flex justify-content-around">
               <button
                 onClick={() => ackRequest(request_key)}
                 className="btn btn-primary"
@@ -77,7 +90,7 @@ const Requests = props => {
           </Fragment>
         );
       })}
-    </Fragment>
+    </div>
   );
 };
 

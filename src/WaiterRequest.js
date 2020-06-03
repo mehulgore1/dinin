@@ -63,7 +63,7 @@ const WaiterRequest = props => {
         handleSendRequest("Water Refill Requested");
       } else {
         // hasn't ordered water get 1 glass
-        handleSendRequest("1 New Glass of Water Requested");
+        handleSendRequest("One New Glass of Water Requested");
         database
           .ref(props.match.params.restaurant)
           .child("tables")

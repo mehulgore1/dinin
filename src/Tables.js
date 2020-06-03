@@ -42,10 +42,13 @@ const Tables = props => {
       <div className="d-flex justify-content-center">
         <h1> Table Management </h1>
       </div>
-      <div className="d-flex justify-content-center">
+      <div className="d-flex justify-content-around">
         <a href={"/" + match.params.restaurant + "/orders"}>
           {" "}
           <button className="btn btn-lg btn-dark">Orders</button>{" "}
+        </a>
+        <a href={"/" + match.params.restaurant + "/requests"}>
+          <button className="btn btn-dark btn-lg"> View Requests </button>{" "}
         </a>
       </div>
       {tables.map(tableNum => {

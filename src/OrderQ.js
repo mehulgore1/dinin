@@ -95,6 +95,9 @@ const OrderQ = props => {
         <a href={"/" + tempRest + "/tables"}>
           <button className="btn btn-dark btn-lg"> Manage Tables </button>{" "}
         </a>
+        <a href={"/" + tempRest + "/requests"}>
+          <button className="btn btn-dark btn-lg"> View Requests </button>{" "}
+        </a>
       </div>
       {Object.keys(orders || {}).map((batch_key, index) => {
         return (

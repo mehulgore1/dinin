@@ -52,7 +52,7 @@ const CustomerMenu = props => {
       .child("items")
       .child(id)
       .update(item);
-    alert.success("Item Added!");
+    alert.success("Success! Order items from Table Dashboard");
   };
 
   const handleNextStageClick = () => {
