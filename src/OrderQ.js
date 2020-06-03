@@ -30,23 +30,37 @@ const OrderQ = props => {
   const removeBatchOrder = batch_key => {};
 
   const completeBatch = (table, batch_key) => {
+    const thisTable = table;
     var confirm = window.confirm("Are you sure all items are in?");
     if (confirm) {
-      for (var seat in orders[batch_key]["seat_data"]) {
-        for (var item_key in orders[batch_key]["seat_data"][seat]["items"]) {
-          database
-            .ref(tempRest)
-            .child("tables")
-            .child(table)
-            .child("batches")
-            .child(batch_key)
-            .child("seat_data")
-            .child(seat)
-            .child("items")
-            .child(item_key)
-            .update({ status: "Order Submitted" });
-        }
-      }
+      database
+        .ref(tempRest)
+        .child("tables")
+        .once("value")
+        .then(function(snapshot) {
+          return snapshot.hasChild(thisTable);
+        })
+        .then(exists => {
+          if (exists) {
+            for (var seat in orders[batch_key]["seat_data"]) {
+              for (var item_key in orders[batch_key]["seat_data"][seat][
+                "items"
+              ]) {
+                database
+                  .ref(tempRest)
+                  .child("tables")
+                  .child(table)
+                  .child("batches")
+                  .child(batch_key)
+                  .child("seat_data")
+                  .child(seat)
+                  .child("items")
+                  .child(item_key)
+                  .update({ status: "Order Submitted" });
+              }
+            }
+          }
+        });
 
       database
         .ref(tempRest)
@@ -76,6 +90,11 @@ const OrderQ = props => {
       <div className="d-flex justify-content-around">
         {" "}
         <h1> Orders for {restaurant} </h1>{" "}
+      </div>
+      <div className="d-flex justify-content-around">
+        <a href={"/" + tempRest + "/tables"}>
+          <button className="btn btn-dark btn-lg"> Manage Tables </button>{" "}
+        </a>
       </div>
       {Object.keys(orders || {}).map((batch_key, index) => {
         return (
