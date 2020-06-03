@@ -86,7 +86,7 @@ const OrderQ = props => {
   }, []);
 
   return (
-    <Fragment>
+    <div className="container mt-5">
       <div className="d-flex justify-content-around">
         {" "}
         <h1> Orders for {restaurant} </h1>{" "}
@@ -164,7 +164,7 @@ const OrderQ = props => {
           </Fragment>
         );
       })}
-    </Fragment>
+    </div>
   );
 };
 

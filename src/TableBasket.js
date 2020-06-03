@@ -18,6 +18,7 @@ const TableBasket = props => {
   const [userId, setUserId] = useState("");
   const { match } = props;
   const history = useHistory();
+  const [tableDone, setTableDone] = useState(false);
 
   useEffect(() => {
     if ("batches" in tableData) {
@@ -49,25 +50,39 @@ const TableBasket = props => {
       database
         .ref(match.params.restaurant)
         .child("tables")
-        .child(match.params.table)
-        .on("value", function(snapshot) {
-          if (snapshot.val() != null) {
-            setTableData(snapshot.val());
-          } else {
-            setTableData({});
-          }
-        });
+        .once("value")
+        .then(function(snapshot) {
+          return snapshot.hasChild(match.params.table);
+        })
+        .then(exists => {
+          if (exists) {
+            database
+              .ref(match.params.restaurant)
+              .child("tables")
+              .child(match.params.table)
+              .on("value", function(snapshot) {
+                if (snapshot.val() != null) {
+                  setTableData(snapshot.val());
+                } else {
+                  setTableData({});
+                }
+              });
 
-      database
-        .ref(match.params.restaurant)
-        .child("tables")
-        .child(match.params.table)
-        .child("batches")
-        .limitToLast(1)
-        .on("value", function(snapshot) {
-          snapshot.forEach(function(child) {
-            setCurrentBatch(child.key);
-          });
+            database
+              .ref(match.params.restaurant)
+              .child("tables")
+              .child(match.params.table)
+              .child("batches")
+              .limitToLast(1)
+              .on("value", function(snapshot) {
+                snapshot.forEach(function(child) {
+                  setCurrentBatch(child.key);
+                });
+              });
+          } else {
+            window.alert("Error: Host Ended Your Session");
+            setTableDone(true);
+          }
         });
     }
   }, []);
@@ -221,7 +236,11 @@ const TableBasket = props => {
   };
 
   const emptyOrder = batch_key => {
-    return tableData["batches"][batch_key] == "";
+    return (
+      tableData["batches"] != null &&
+      tableData["batches"][batch_key] != null &&
+      tableData["batches"][batch_key] == ""
+    );
   };
 
   const showBatchText = batch_key => {
@@ -257,136 +276,145 @@ const TableBasket = props => {
   };
 
   return (
-    <div className="container mt-3 mb-5">
-      <div className="d-flex justify-content-center">
-        <h1> Your Table: </h1>
-      </div>
-      <WaiterRequest match={match} />
-      <div className="d-flex justify-content-around mt-3">
-        <button
-          className="btn btn-dark btn-lg mb-3"
-          onClick={() => handleAddMoreItems()}
-        >
-          Add More Items
-        </button>
-      </div>
-      {reverseBatches.map((batch_obj, index) => {
-        return (
-          <Fragment key={index}>
-            {Object.keys(reverseBatches[index] || {}).map(
-              (batch_key, index) => {
-                return (
-                  <div className="ml-2" key={batch_key}>
-                    {showBatchText(batch_key)}
-                    {Object.keys(
-                      tableData["batches"][batch_key]["seat_data"] || {}
-                    ).map((seat, i) => {
-                      var items =
-                        tableData["batches"][batch_key]["seat_data"][seat][
-                          "items"
-                        ];
-                      return (
-                        <Fragment key={seat}>
-                          <h3 className="ml-3">{getUserNameForSeat(seat)}</h3>
-                          {Object.keys(items || {}).map((key, i) => {
-                            var item = items[key];
-                            return (
-                              <Fragment key={key}>
-                                <div className="container">
-                                  <div className="row">
-                                    <div className="col">
-                                      {" "}
-                                      {item["quantity"]}{" "}
-                                    </div>
-                                    <div className="col-8">
-                                      <div>
-                                        {" "}
-                                        <strong>{item["title"]}</strong>
-                                      </div>
-                                      <div>{item["notes"]}</div>
-                                      {tableData["batches"][batch_key] != "" &&
-                                      "ordered_at" in
-                                        tableData["batches"][batch_key] ? (
-                                        <div>
-                                          <strong>Status </strong>{" "}
-                                          {item["status"]}{" "}
+    <div className="container">
+      {tableDone ? (
+        <h1> Host Ended Your Session. Thank You for Joing Us! </h1>
+      ) : (
+        <div className="container mt-3 mb-5">
+          <div className="d-flex justify-content-center">
+            <h1> Your Table: </h1>
+          </div>
+          <WaiterRequest match={match} />
+          <div className="d-flex justify-content-around mt-3">
+            <button
+              className="btn btn-dark btn-lg mb-3"
+              onClick={() => handleAddMoreItems()}
+            >
+              Add More Items
+            </button>
+          </div>
+          {reverseBatches.map((batch_obj, index) => {
+            return (
+              <Fragment key={index}>
+                {Object.keys(reverseBatches[index] || {}).map(
+                  (batch_key, index) => {
+                    return (
+                      <div className="ml-2" key={batch_key}>
+                        {showBatchText(batch_key)}
+                        {Object.keys(
+                          tableData["batches"][batch_key]["seat_data"] || {}
+                        ).map((seat, i) => {
+                          var items =
+                            tableData["batches"][batch_key]["seat_data"][seat][
+                              "items"
+                            ];
+                          return (
+                            <Fragment key={seat}>
+                              <h3 className="ml-3">
+                                {getUserNameForSeat(seat)}
+                              </h3>
+                              {Object.keys(items || {}).map((key, i) => {
+                                var item = items[key];
+                                return (
+                                  <Fragment key={key}>
+                                    <div className="container">
+                                      <div className="row">
+                                        <div className="col">
+                                          {" "}
+                                          {item["quantity"]}{" "}
                                         </div>
-                                      ) : null}
+                                        <div className="col-8">
+                                          <div>
+                                            {" "}
+                                            <strong>{item["title"]}</strong>
+                                          </div>
+                                          <div>{item["notes"]}</div>
+                                          {tableData["batches"][batch_key] !=
+                                            "" &&
+                                          "ordered_at" in
+                                            tableData["batches"][batch_key] ? (
+                                            <div>
+                                              <strong>Status </strong>{" "}
+                                              {item["status"]}{" "}
+                                            </div>
+                                          ) : null}
+                                        </div>
+                                        <div className="col">
+                                          {!item["ordered"] ? (
+                                            <button
+                                              className="btn btn-danger"
+                                              onClick={() =>
+                                                deleteItem(batch_key, seat, key)
+                                              }
+                                            >
+                                              x
+                                            </button>
+                                          ) : null}
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className="col">
-                                      {!item["ordered"] ? (
-                                        <button
-                                          className="btn btn-danger"
-                                          onClick={() =>
-                                            deleteItem(batch_key, seat, key)
-                                          }
-                                        >
-                                          x
-                                        </button>
-                                      ) : null}
-                                    </div>
-                                  </div>
-                                </div>
-                              </Fragment>
-                            );
-                          })}
-                        </Fragment>
-                      );
-                    })}
-                    {showOrderButton(batch_key) ? (
-                      <div className="d-flex justify-content-center">
-                        <button
-                          className="btn btn-dark btn-lg"
-                          onClick={showConfirmAlert}
-                        >
-                          {" "}
-                          Order these items{" "}
-                        </button>
+                                  </Fragment>
+                                );
+                              })}
+                            </Fragment>
+                          );
+                        })}
+                        {showOrderButton(batch_key) ? (
+                          <div className="d-flex justify-content-center">
+                            <button
+                              className="btn btn-dark btn-lg"
+                              onClick={showConfirmAlert}
+                            >
+                              {" "}
+                              Order these items{" "}
+                            </button>
+                          </div>
+                        ) : null}
                       </div>
-                    ) : null}
-                  </div>
-                );
-              }
-            )}
-          </Fragment>
-        );
-      })}
-      <div className="ml-2">
-        {" "}
-        <h1> Requests </h1>{" "}
-      </div>
-      {reverseRequests.map((request_obj, index) => {
-        return (
-          <Fragment key={index}>
-            {Object.keys(reverseRequests[index] || {}).map((key, i) => {
-              return (
-                <Fragment key={key}>
-                  <div className="container ml-3">
-                    <div className="row">
-                      <div>
-                        {" "}
-                        <h5>
+                    );
+                  }
+                )}
+              </Fragment>
+            );
+          })}
+          <div className="ml-2">
+            {" "}
+            <h1> Requests </h1>{" "}
+          </div>
+          {reverseRequests.map((request_obj, index) => {
+            return (
+              <Fragment key={index}>
+                {Object.keys(reverseRequests[index] || {}).map((key, i) => {
+                  return (
+                    <Fragment key={key}>
+                      <div className="container ml-3">
+                        <div className="row">
+                          <div>
+                            {" "}
+                            <h5>
+                              {" "}
+                              {tableData["requests"][key]["requestedAt"]}
+                            </h5>{" "}
+                          </div>
+                        </div>
+                        <div className="row">
                           {" "}
-                          {tableData["requests"][key]["requestedAt"]}
-                        </h5>{" "}
+                          <h6>
+                            <strong>
+                              {tableData["requests"][key]["request"]} :{" "}
+                            </strong>
+                            {tableData["requests"][key]["status"]}
+                          </h6>
+                        </div>
                       </div>
-                    </div>
-                    <div className="row">
-                      {" "}
-                      <h6>
-                        <strong>
-                          {tableData["requests"][key]["request"]} :{" "}
-                        </strong>
-                        {tableData["requests"][key]["status"]}
-                      </h6>
-                    </div>
-                  </div>
-                </Fragment>
-              );
-            })}
-          </Fragment>
-        );
-      })}
+                    </Fragment>
+                  );
+                })}
+              </Fragment>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
