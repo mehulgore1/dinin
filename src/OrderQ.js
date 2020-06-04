@@ -41,7 +41,11 @@ const OrderQ = props => {
           return snapshot.hasChild(thisTable);
         })
         .then(exists => {
-          if (exists) {
+          if (
+            exists &&
+            orders[batch_key] != null &&
+            orders[batch_key]["seat_data"] != null
+          ) {
             for (var seat in orders[batch_key]["seat_data"]) {
               for (var item_key in orders[batch_key]["seat_data"][seat][
                 "items"
@@ -60,17 +64,18 @@ const OrderQ = props => {
               }
             }
           }
+        })
+        .then(() => {
+          database
+            .ref(tempRest)
+            .child("order_queue")
+            .child(batch_key)
+            .remove();
+
+          delete orders[batch_key];
+
+          alert.show("Removed From Queue, Table Notified");
         });
-
-      database
-        .ref(tempRest)
-        .child("order_queue")
-        .child(batch_key)
-        .remove();
-
-      delete orders[batch_key];
-
-      alert.show("Removed From Queue, Table Notified");
     }
   };
 

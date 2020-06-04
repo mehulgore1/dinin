@@ -276,7 +276,7 @@ const TableBasket = props => {
   };
 
   return (
-    <div className="container">
+    <div className="">
       {tableDone ? (
         <h1> Host Ended Your Session. Thank You for Joing Us! </h1>
       ) : (
@@ -306,7 +306,7 @@ const TableBasket = props => {
                       return null;
                     }
                     return (
-                      <div className="ml-2" key={batch_key}>
+                      <div className="" key={batch_key}>
                         {showBatchText(batch_key)}
                         {Object.keys(
                           tableData["batches"][batch_key]["seat_data"] || {}
@@ -324,11 +324,12 @@ const TableBasket = props => {
                                 var item = items[key];
                                 return (
                                   <Fragment key={key}>
-                                    <div className="container">
-                                      <div className="row">
+                                    <div className="container h-100">
+                                      <div className="row align-items-center h-100">
                                         <div className="col">
-                                          {" "}
-                                          {item["quantity"]}{" "}
+                                          <h5 className="mt-2">
+                                            {item["quantity"]}
+                                          </h5>
                                         </div>
                                         <div className="col-8">
                                           <div>
@@ -360,6 +361,7 @@ const TableBasket = props => {
                                         </div>
                                       </div>
                                     </div>
+                                    <hr />
                                   </Fragment>
                                 );
                               })}
@@ -384,7 +386,7 @@ const TableBasket = props => {
               </Fragment>
             );
           })}
-          <div className="ml-2">
+          <div className="">
             {" "}
             <h1> Requests </h1>{" "}
           </div>
