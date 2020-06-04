@@ -290,7 +290,7 @@ const TableBasket = props => {
               className="btn btn-dark btn-lg mb-3"
               onClick={() => handleAddMoreItems()}
             >
-              Add More Items
+              + Add More Items
             </button>
           </div>
           {reverseBatches.map((batch_obj, index) => {

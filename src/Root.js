@@ -31,7 +31,7 @@ const Root = () => {
 
 function ErrorFallback({ error, componentStack, resetErrorBoundary }) {
   return (
-    <div role="alert">
+    <div className="d-flex justify-content-center" role="alert">
       <h3>
         Oops, something went wrong! Try clicking the button below, or scan the
         QR code for your seat.

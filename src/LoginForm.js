@@ -132,7 +132,14 @@ const LoginForm = props => {
         </div>
       ) : null}
       <div className="d-flex justify-content-center">
-        <h2> Sign In With Phone </h2>
+        <h2> Verify Seat With Phone </h2>
+      </div>
+      <div className="d-flex justify-content-center">
+        <p>
+          {" "}
+          This way, we can send you your receipts and discounts. You only have
+          to put this in once!{" "}
+        </p>
       </div>
       <div className="form-group">
         <input
@@ -186,8 +193,11 @@ const LoginForm = props => {
           </button>
         </div>
       </div>
+      <div className="d-flex justify-content-center mt-5">
+        <h4> Sign In As Guest </h4>
+      </div>
       <div className="d-flex justify-content-center">
-        <h2> Sign In As Guest </h2>
+        <p>Not Recommended - your data will be lost</p>
       </div>
       <div className="form-group">
         <input
@@ -202,10 +212,10 @@ const LoginForm = props => {
           className="d-flex justify-content-center mt-2"
         >
           <button
-            className="clickable btn btn-dark btn-lg"
+            className="btn btn-outline-secondary btn-sm"
             onClick={signInAsGuest}
           >
-            Sign in As Guest
+            Guest Login
           </button>
         </div>
       </div>

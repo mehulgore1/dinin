@@ -251,12 +251,6 @@ const CustomerMenu = props => {
           <LoginForm seatTaken={seatTaken} match={match} />
         ) : (
           <Fragment>
-            <div className="d-flex justify-content-center">
-              <button onClick={handleSignOut} className="btn btn-danger btn-lg">
-                {" "}
-                Sign Out{" "}
-              </button>
-            </div>
             {isValid ? (
               <Fragment>
                 <WaiterRequest match={match} />
@@ -273,7 +267,7 @@ const CustomerMenu = props => {
                   </a>
                 </div>
 
-                <div className="hs  ">
+                <div className="hs">
                   {Object.keys(stageNames).map(thisStage => {
                     var buttonClass =
                       thisStage == stage ? "btn-dark" : "btn-outline-dark";
@@ -311,6 +305,15 @@ const CustomerMenu = props => {
                       </Fragment>
                     );
                   })}
+                  <div className="d-flex justify-content-center">
+                    <button
+                      onClick={handleSignOut}
+                      className="btn btn-outline-secondary"
+                    >
+                      {" "}
+                      Sign Out{" "}
+                    </button>
+                  </div>
                 </Fragment>
               </Fragment>
             ) : (
