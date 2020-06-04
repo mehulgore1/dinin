@@ -33,8 +33,8 @@ function ErrorFallback({ error, componentStack, resetErrorBoundary }) {
   return (
     <div role="alert">
       <h3>
-        Your Table Has Disappeared! Try Scanning the QR code again, or ask the
-        host for help
+        Oops, something went wrong! Try clicking the button below, or scan the
+        QR code for your seat.
       </h3>
       <button className="btn btn-dark btn-lg" onClick={resetErrorBoundary}>
         Try again

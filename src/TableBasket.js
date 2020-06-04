@@ -298,6 +298,13 @@ const TableBasket = props => {
               <Fragment key={index}>
                 {Object.keys(reverseBatches[index] || {}).map(
                   (batch_key, index) => {
+                    if (
+                      tableData["batches"] == null ||
+                      tableData["batches"][batch_key] == null ||
+                      tableData["batches"][batch_key]["seat_data"] == null
+                    ) {
+                      return null;
+                    }
                     return (
                       <div className="ml-2" key={batch_key}>
                         {showBatchText(batch_key)}
@@ -385,6 +392,13 @@ const TableBasket = props => {
             return (
               <Fragment key={index}>
                 {Object.keys(reverseRequests[index] || {}).map((key, i) => {
+                  if (
+                    tableData["requests"] == null ||
+                    tableData["requests"][key] == null ||
+                    tableData["requests"][key]["requestedAt"] == null
+                  ) {
+                    return null;
+                  }
                   return (
                     <Fragment key={key}>
                       <div className="container ml-3">

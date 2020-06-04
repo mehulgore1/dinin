@@ -56,7 +56,7 @@ const OrderQ = props => {
                   .child(seat)
                   .child("items")
                   .child(item_key)
-                  .update({ status: "Order Submitted" });
+                  .update({ status: "Kitchen Preparing" });
               }
             }
           }
