@@ -10,6 +10,7 @@ const OrderQ = props => {
   const [restaurant, setRestaurant] = useState("");
   const { match } = props;
   const tempRest = match.params.restaurant;
+  const [numRequests, setNumRequests] = useState(0);
 
   const sendStatus = (table, batch, seat_num, item_key, status) => {
     database
@@ -85,8 +86,13 @@ const OrderQ = props => {
       .ref(tempRest)
       .child("order_queue")
       .on("value", function(snapshot) {
-        console.log(snapshot.val());
         setOrders(snapshot.val());
+      });
+    database
+      .ref(tempRest)
+      .child("requests")
+      .on("value", function(snapshot) {
+        setNumRequests(snapshot.numChildren());
       });
   }, []);
 
@@ -101,7 +107,9 @@ const OrderQ = props => {
           <button className="btn btn-dark btn-lg"> Manage Tables </button>{" "}
         </a>
         <a href={"/" + tempRest + "/requests"}>
-          <button className="btn btn-dark btn-lg"> View Requests </button>{" "}
+          <button className="btn btn-dark btn-lg">
+            Requests ({numRequests})
+          </button>{" "}
         </a>
       </div>
       {Object.keys(orders || {}).map((batch_key, index) => {

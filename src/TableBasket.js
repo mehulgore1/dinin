@@ -276,7 +276,11 @@ const TableBasket = props => {
   };
 
   const userInThisSeat = this_seat => {
-    return tableData["users"][userId]["seat"] == this_seat;
+    return (
+      tableData["users"] != null &&
+      tableData["users"][userId] != null &&
+      tableData["users"][userId]["seat"] == this_seat
+    );
   };
 
   return (

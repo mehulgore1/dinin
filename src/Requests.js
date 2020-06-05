@@ -8,6 +8,7 @@ const Requests = props => {
   const [requests, setRequests] = useState({});
   var database = firebase.database();
   const { match } = props;
+  const [numOrders, setNumOrders] = useState(0);
 
   useEffect(() => {
     database
@@ -15,6 +16,12 @@ const Requests = props => {
       .child("requests")
       .on("value", function(snapshot) {
         setRequests(snapshot.val());
+      });
+    database
+      .ref(match.params.restaurant)
+      .child("order_queue")
+      .on("value", function(snapshot) {
+        setNumOrders(snapshot.numChildren());
       });
   }, []);
 
@@ -58,7 +65,10 @@ const Requests = props => {
           <button className="btn btn-dark btn-lg"> Manage Tables </button>{" "}
         </a>
         <a href={"/" + match.params.restaurant + "/orders"}>
-          <button className="btn btn-dark btn-lg"> View Orders </button>{" "}
+          <button className="btn btn-dark btn-lg">
+            {" "}
+            Orders ({numOrders}){" "}
+          </button>{" "}
         </a>
       </div>
       {Object.keys(requests || {}).map((request_key, index) => {
