@@ -5,7 +5,7 @@ import App from "./App";
 import { ErrorBoundary } from "react-error-boundary";
 
 const options = {
-  timeout: 3000,
+  timeout: 5000,
   position: positions.BOTTOM_CENTER
 };
 

@@ -275,6 +275,10 @@ const TableBasket = props => {
     }
   };
 
+  const userInThisSeat = this_seat => {
+    return tableData["users"][userId]["seat"] == this_seat;
+  };
+
   return (
     <div className="">
       {tableDone ? (
@@ -348,15 +352,23 @@ const TableBasket = props => {
                                           ) : null}
                                         </div>
                                         <div className="col">
-                                          {!item["ordered"] ? (
-                                            <button
-                                              className="btn btn-danger"
-                                              onClick={() =>
-                                                deleteItem(batch_key, seat, key)
-                                              }
-                                            >
-                                              x
-                                            </button>
+                                          {userInThisSeat(seat) ? (
+                                            <div>
+                                              {!item["ordered"] ? (
+                                                <button
+                                                  className="btn btn-danger"
+                                                  onClick={() =>
+                                                    deleteItem(
+                                                      batch_key,
+                                                      seat,
+                                                      key
+                                                    )
+                                                  }
+                                                >
+                                                  x
+                                                </button>
+                                              ) : null}
+                                            </div>
                                           ) : null}
                                         </div>
                                       </div>
