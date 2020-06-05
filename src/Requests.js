@@ -54,13 +54,26 @@ const Requests = props => {
       .child("status")
       .set("Seen");
 
+    database
+      .ref(match.params.restaurant)
+      .child("requests")
+      .child(request_key)
+      .child("status")
+      .set("Seen");
+
     alert.show("Table Notified");
+  };
+
+  const requestSeen = request_key => {
+    return (
+      requests[request_key] != null && requests[request_key]["status"] == "Seen"
+    );
   };
 
   return (
     <div className="container mt-5">
       <h1> Waiter requests for {match.params.restaurant} </h1>
-      <div className="d-flex justify-content-around">
+      <div className="d-flex justify-content-around mb-3">
         <a href={"/" + match.params.restaurant + "/tables"}>
           <button className="btn btn-dark btn-lg"> Manage Tables </button>{" "}
         </a>
@@ -82,13 +95,17 @@ const Requests = props => {
               </h3>
             </div>{" "}
             <div className="d-flex justify-content-around">
-              <button
-                onClick={() => ackRequest(request_key)}
-                className="btn btn-primary"
-              >
-                {" "}
-                Acknowledge{" "}
-              </button>
+              {requestSeen(request_key) ? (
+                <h2> Seen ✓ </h2>
+              ) : (
+                <button
+                  onClick={() => ackRequest(request_key)}
+                  className="btn btn-primary"
+                >
+                  {" "}
+                  Acknowledge{" "}
+                </button>
+              )}
               <button
                 onClick={() => completeRequest(request_key)}
                 className="btn btn-success"

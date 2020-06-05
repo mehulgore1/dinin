@@ -102,7 +102,7 @@ const OrderQ = props => {
         {" "}
         <h1> Orders for {restaurant} </h1>{" "}
       </div>
-      <div className="d-flex justify-content-around">
+      <div className="d-flex justify-content-around mb-3">
         <a href={"/" + tempRest + "/tables"}>
           <button className="btn btn-dark btn-lg"> Manage Tables </button>{" "}
         </a>
