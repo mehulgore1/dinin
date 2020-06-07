@@ -40,7 +40,7 @@ const MenuItem = props => {
                 className="form-control mt-2"
                 type="text"
                 value={notes}
-                placeholder="Add Notes"
+                placeholder="Add Notes, Customize..."
                 onChange={e => setNotes(e.target.value)}
               />
             </div>
@@ -71,7 +71,7 @@ const MenuItem = props => {
               </div>
               <div className="d-flex justify-content-around">
                 <button
-                  className="btn btn-success btn-lg mt-3"
+                  className="btn btn-success mt-3"
                   onClick={() =>
                     props.sendToTable(
                       props.id,
@@ -83,7 +83,7 @@ const MenuItem = props => {
                     )
                   }
                 >
-                  Add
+                  Add to Cart
                 </button>
               </div>
             </div>
