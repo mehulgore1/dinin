@@ -87,7 +87,7 @@ const Requests = props => {
       {Object.keys(requests || {}).map((request_key, index) => {
         return (
           <Fragment key={request_key}>
-            <div className="d-flex justify-content-around">
+            <div className="d-flex justify-content-around mt-4">
               <h3>
                 {" "}
                 Table {requests[request_key]["table"]}:{" "}

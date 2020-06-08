@@ -265,7 +265,7 @@ const CustomerMenu = props => {
                   </a>
                 </div>
 
-                <div className="hs">
+                <div className="hs mb-3 mt-3">
                   {Object.keys(stageNames).map(thisStage => {
                     var buttonClass =
                       thisStage == stage ? "btn-dark" : "btn-outline-dark";

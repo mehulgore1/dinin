@@ -83,7 +83,7 @@ const MenuItem = props => {
                     )
                   }
                 >
-                  Add to Cart
+                  Add {quantity} to Cart
                 </button>
               </div>
             </div>
