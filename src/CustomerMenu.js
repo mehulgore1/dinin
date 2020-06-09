@@ -38,7 +38,7 @@ const CustomerMenu = props => {
       notes: notes,
       category: category,
       quantity: quantity,
-      status: "Pending",
+      status: "Order Sent",
       ordered: false,
       price: price
     };
