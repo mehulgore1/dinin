@@ -51,8 +51,7 @@ const CustomerMenu = props => {
       .child("seat_data")
       .child(seat)
       .child("items")
-      .child(id)
-      .update(item);
+      .push(item);
     alert.success("Success! Submit Order from the Cart");
   };
 

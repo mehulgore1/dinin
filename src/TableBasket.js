@@ -283,14 +283,6 @@ const TableBasket = props => {
     );
   };
 
-  const statusChange = status => {
-    if (status == "Kitchen Preparing") {
-      window.alert("Kitchen is now preparing your order. Coming soon!");
-      return status;
-    }
-    return status;
-  };
-
   return (
     <div className="">
       {tableDone ? (
@@ -359,7 +351,7 @@ const TableBasket = props => {
                                             tableData["batches"][batch_key] ? (
                                             <div>
                                               <strong>Status </strong>{" "}
-                                              {statusChange(item["status"])}{" "}
+                                              {item["status"]}{" "}
                                             </div>
                                           ) : null}
                                         </div>
