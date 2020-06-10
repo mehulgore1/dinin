@@ -11,6 +11,7 @@ const LoginForm = props => {
   const [name, setName] = useState("");
   const [anonName, setAnonName] = useState("");
   const [offersChecked, setOffersChecked] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
 
   const onPhoneNumberChange = event => {
     setPhoneNumber(event.target.value);
