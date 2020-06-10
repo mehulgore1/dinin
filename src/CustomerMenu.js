@@ -269,11 +269,6 @@ const CustomerMenu = props => {
                     Seat {seat}: {userName}
                   </h2>
                 </div>
-                <div className="d-flex justify-content-center">
-                  <a href={"/" + tempRest + "/menu/" + table}>
-                    <button className="btn btn-dark btn-lg">View Cart</button>
-                  </a>
-                </div>
 
                 <div className="hs mb-3 mt-3">
                   {Object.keys(stageNames).map(thisStage => {
@@ -322,6 +317,11 @@ const CustomerMenu = props => {
                 </Fragment>
               </Fragment>
             )}
+            <div className="fixed-bottom mb-3 d-flex justify-content-center">
+              <a href={"/" + tempRest + "/menu/" + table}>
+                <button className="btn btn-dark btn-lg">View Cart</button>
+              </a>
+            </div>
           </Fragment>
         )}
       </div>
