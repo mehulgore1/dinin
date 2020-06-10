@@ -7,8 +7,8 @@ const MenuItem = props => {
 
   return (
     <div>
-      <div className="container">
-        <div className="row">
+      <div className="card" onClick={() => setModalShow(true)}>
+        <div className="card-body">
           <div className="col">
             <div>
               {" "}
@@ -20,27 +20,21 @@ const MenuItem = props => {
             </div>
           </div>
           <div className="row">
-            <div className="col">
-              <div></div>
-              <div className="d-flex justify-content-around">
-                <button
-                  className="btn btn-success btn-block"
-                  onClick={() => setModalShow(true)}
-                >
-                  Add
-                </button>
-
-                <ItemDetailsModal
-                  id={props.id}
-                  title={props.title}
-                  category={props.category}
-                  price={props.price}
-                  show={modalShow}
-                  onHide={() => setModalShow(false)}
-                  description={props.description}
-                  sendToTable={props.sendToTable}
-                />
-              </div>
+            <div></div>
+            <div
+              onClick={e => e.stopPropagation()}
+              className="d-flex justify-content-around"
+            >
+              <ItemDetailsModal
+                id={props.id}
+                title={props.title}
+                category={props.category}
+                price={props.price}
+                show={modalShow}
+                onHide={() => setModalShow(false)}
+                description={props.description}
+                sendToTable={props.sendToTable}
+              />
             </div>
           </div>
         </div>
