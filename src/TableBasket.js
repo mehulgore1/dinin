@@ -3,19 +3,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 import WaiterRequest from "./WaiterRequest";
 import { useHistory, generatePath } from "react-router-dom";
-import useIsMounted from "react-is-mounted-hook";
 import { useAlert } from "react-alert";
 import TableDone from "./TableDone";
-import useTableStatus from "./App";
-import useUserId from "./App";
 
 const TableBasket = props => {
   const alert = useAlert();
-  const userId = useUserId();
   const history = useHistory();
 
   var database = firebase.database();
-  const isMounted = useIsMounted();
   const [tableData, setTableData] = useState({});
   const [reverseBatches, setReverseBatches] = useState([]);
   const [reverseRequests, setReverseRequests] = useState([]);
@@ -23,7 +18,13 @@ const TableBasket = props => {
 
   const { match } = props;
 
-  const tableDone = useTableStatus(match.params.restautant, match.params.table);
+  const [tableDone, setTableDone] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    initSignedInState();
+    initTableData();
+  }, []);
 
   useEffect(() => {
     if ("batches" in tableData) {
@@ -43,43 +44,81 @@ const TableBasket = props => {
   }, [tableData]);
 
   useEffect(() => {
-    if (isMounted()) {
-      database
-        .ref(match.params.restaurant)
-        .child("tables")
-        .once("value")
-        .then(function(snapshot) {
-          return snapshot.hasChild(match.params.table);
-        })
-        .then(exists => {
-          if (exists) {
-            database
-              .ref(match.params.restaurant)
-              .child("tables")
-              .child(match.params.table)
-              .on("value", function(snapshot) {
-                if (snapshot.val() != null) {
-                  setTableData(snapshot.val());
-                } else {
-                  setTableData({});
-                }
-              });
-
-            database
-              .ref(match.params.restaurant)
-              .child("tables")
-              .child(match.params.table)
-              .child("batches")
-              .limitToLast(1)
-              .on("value", function(snapshot) {
-                snapshot.forEach(function(child) {
-                  setCurrentBatch(child.key);
-                });
-              });
-          }
-        });
+    if (userId != null) {
+      initTableDone();
     }
-  }, []);
+  }, [userId]);
+
+  const initTableDone = () => {
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .child(match.params.table)
+      .on("value", function(snapshot) {
+        if (snapshot.hasChild("past_users")) {
+          database
+            .ref(match.params.restaurant)
+            .child("tables")
+            .child(match.params.table)
+            .child("past_users")
+            .on("value", function(snapshot) {
+              setTableDone(snapshot.hasChild(userId));
+            });
+        } else {
+          // previously unseen table, set to false
+          setTableDone(false);
+        }
+      });
+  };
+
+  const initSignedInState = () => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log("user signed in ");
+        setUserId(user.uid);
+      } else {
+        console.log("user NOT signed in ");
+        setUserId(null);
+      }
+    });
+  };
+
+  const initTableData = () => {
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .once("value")
+      .then(function(snapshot) {
+        return snapshot.hasChild(match.params.table);
+      })
+      .then(exists => {
+        if (exists) {
+          database
+            .ref(match.params.restaurant)
+            .child("tables")
+            .child(match.params.table)
+            .on("value", function(snapshot) {
+              if (snapshot.val() != null) {
+                setTableData(snapshot.val());
+              } else {
+                setTableData({});
+              }
+            });
+
+          database
+            .ref(match.params.restaurant)
+            .child("tables")
+            .child(match.params.table)
+            .child("batches")
+            .limitToLast(1)
+            .on("value", function(snapshot) {
+              snapshot.forEach(function(child) {
+                setCurrentBatch(child.key);
+              });
+            });
+        }
+      });
+  };
 
   const handleAddMoreItems = () => {
     var seat = tableData["users"][userId]["seat"];
@@ -243,7 +282,7 @@ const TableBasket = props => {
       return <h3> {tableData["batches"][batch_key]["ordered_at"]} </h3>;
     } else if (!emptyOrder(batch_key) && !hasBeenOrdered(batch_key)) {
       // pending order, show "yet to order"
-      return <h1> Yet To Order </h1>;
+      return <h1> Your Table's Cart </h1>;
     } else {
       return null;
     }
@@ -283,9 +322,6 @@ const TableBasket = props => {
         <TableDone />
       ) : (
         <div className="container mt-3 mb-5">
-          <div className="d-flex justify-content-center">
-            <h1> Your Table: </h1>
-          </div>
           <WaiterRequest match={match} />
           <div className="d-flex justify-content-around mt-3">
             <button
