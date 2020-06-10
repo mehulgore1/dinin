@@ -25,9 +25,42 @@ const Tables = props => {
       .ref(match.params.restaurant)
       .child("tables")
       .child(tableNum)
-      .remove();
+      .child("users")
+      .once("value")
+      .then(function(snapshot) {
+        return snapshot.val();
+      })
+      .then(users => {
+        database
+          .ref(match.params.restaurant)
+          .child("tables")
+          .child(tableNum)
+          .child("past_users")
+          .update(users);
+      })
+      .then(irr => {
+        database
+          .ref(match.params.restaurant)
+          .child("tables")
+          .child(tableNum)
+          .child("users")
+          .remove();
 
-    window.alert("Table is Empty Now");
+        database
+          .ref(match.params.restaurant)
+          .child("tables")
+          .child(tableNum)
+          .child("batches")
+          .remove();
+
+        database
+          .ref(match.params.restaurant)
+          .child("tables")
+          .child(tableNum)
+          .child("requests")
+          .remove();
+        window.alert("Table is Empty and Ready for Next Customer");
+      });
   };
 
   const showConfirmAlert = tableNum => {

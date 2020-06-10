@@ -164,7 +164,7 @@ const LoginForm = props => {
           value={authCode}
           placeholder="6-digit Verification Code"
           onChange={e => setAuthCode(e.target.value)}
-          autocomplete="one-time-code"
+          autoComplete="one-time-code"
         />
         <input
           className="form-control mt-2"

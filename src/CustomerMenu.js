@@ -6,7 +6,8 @@ import MenuItem from "./MenuItem";
 import LoginForm from "./LoginForm";
 import WaiterRequest from "./WaiterRequest";
 import { useAlert } from "react-alert";
-import useIsMounted from "react-is-mounted-hook";
+import TableDone from "./TableDone";
+import SignOutButton from "./SignOutButton";
 
 const CustomerMenu = props => {
   const alert = useAlert();
@@ -15,21 +16,67 @@ const CustomerMenu = props => {
   const [menu, setMenu] = useState([]);
   const [restaurant, setRestaurant] = useState("");
   const [table, setTable] = useState("");
-  const [isValid, setIsValid] = useState(true);
   const [seat, setSeat] = useState(0);
   const [stage, setStage] = useState(0);
   const [signedIn, setSignedIn] = useState(false);
   const [currentBatch, setCurrentBatch] = useState(1);
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState("");
-  const isMounted = useIsMounted();
   const [seatTaken, setSeatTaken] = useState(false);
   const [stageNames, setStageNames] = useState({});
+  const [tableDone, setTableDone] = useState(false);
 
   const { match } = props;
   const tempRest = match.params.restaurant;
 
   const history = useHistory();
+
+  useEffect(() => {
+    if (userId != null) {
+      initTableDone();
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (!tableDone && userId != null) {
+      addUserToSeat();
+    }
+  }, [tableDone, userId]);
+
+  useEffect(() => {
+    setStage(match.params.stage);
+  }, [props.location]);
+
+  useEffect(() => {
+    initSignedInState();
+    setRestaurant(tempRest);
+    setTable(match.params.table);
+    setSeat(match.params.seat);
+    initMenu();
+    initBatch();
+  }, []);
+
+  const initTableDone = () => {
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .child(match.params.table)
+      .on("value", function(snapshot) {
+        if (snapshot.hasChild("past_users")) {
+          database
+            .ref(match.params.restaurant)
+            .child("tables")
+            .child(match.params.table)
+            .child("past_users")
+            .on("value", function(snapshot) {
+              setTableDone(snapshot.hasChild(userId));
+            });
+        } else {
+          // previously unseen table, set to false
+          setTableDone(false);
+        }
+      });
+  };
 
   const sendToTable = (item_id, title, notes, category, quantity, price) => {
     const id = item_id;
@@ -55,19 +102,6 @@ const CustomerMenu = props => {
     alert.success("Success! Submit Order from the Cart");
   };
 
-  const handleNextStageClick = () => {
-    var nextStage = parseInt(stage, 10) + 1;
-    routeToStage(nextStage);
-  };
-
-  const handlePrevStageClick = () => {
-    var prevStage = parseInt(stage, 10) - 1;
-    if (prevStage < 1) {
-      prevStage = 1;
-    }
-    routeToStage(prevStage);
-  };
-
   const routeToStage = stage => {
     const path = generatePath(match.path, {
       restaurant: restaurant,
@@ -78,70 +112,61 @@ const CustomerMenu = props => {
     history.replace(path);
   };
 
-  useEffect(() => {
-    if (userId != null) {
-      database
-        .ref("users")
-        .child(userId)
-        .child("name")
-        .once("value")
-        .then(function(snapshot) {
-          return snapshot.val();
-        })
-        .then(name => {
-          setUserName(name);
-          database
-            .ref(match.params.restaurant)
-            .child("tables")
-            .child(match.params.table)
-            .child("users")
-            .child(userId)
-            .update({
-              name: name,
-              seat: props.match.params.seat,
-              water_ordered: false
-            });
-        });
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    setStage(match.params.stage);
-  }, [props.location]);
-
-  useEffect(() => {
-    if (isMounted) {
-      firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-          console.log("user signed in ");
-          setSignedIn(true);
-          setUserId(user.uid);
-        } else {
-          console.log("user NOT signed in ");
-          setSignedIn(false);
-          database
-            .ref(tempRest)
-            .child("tables")
-            .child(match.params.table)
-            .child("users")
-            .once("value")
-            .then(function(snapshot) {
-              var userMap = snapshot.val();
-              for (var user_id in userMap) {
-                if (match.params.seat == userMap[user_id]["seat"]) {
-                  setSeatTaken(true);
-                  window.alert("Someone is sitting here! Scan another seat");
-                }
-              }
-            });
-        }
+  const addUserToSeat = () => {
+    database
+      .ref("users")
+      .child(userId)
+      .child("name")
+      .once("value")
+      .then(function(snapshot) {
+        return snapshot.val();
+      })
+      .then(name => {
+        setUserName(name);
+        database
+          .ref(match.params.restaurant)
+          .child("tables")
+          .child(match.params.table)
+          .child("users")
+          .child(userId)
+          .update({
+            name: name,
+            seat: props.match.params.seat,
+            water_ordered: false
+          });
       });
-    }
-    setRestaurant(tempRest);
-    setTable(match.params.table);
-    setSeat(match.params.seat);
-    var finalMenu = {};
+  };
 
+  const initSignedInState = () => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log("user signed in ");
+        setSignedIn(true);
+        setUserId(user.uid);
+      } else {
+        console.log("user NOT signed in ");
+        setSignedIn(false);
+        database
+          .ref(tempRest)
+          .child("tables")
+          .child(match.params.table)
+          .child("users")
+          .once("value")
+          .then(function(snapshot) {
+            var userMap = snapshot.val();
+            for (var user_id in userMap) {
+              if (match.params.seat == userMap[user_id]["seat"]) {
+                setSeatTaken(true);
+                window.alert("Someone is sitting here! Scan another seat");
+              }
+            }
+          });
+      }
+    });
+  };
+
+  const initMenu = () => {
+    var finalMenu = {};
     database
       .ref(tempRest)
       .once("value")
@@ -183,22 +208,18 @@ const CustomerMenu = props => {
                   }
                 }
               }
-              console.log(stageNames);
-              console.log(finalMenu);
-              console.log(snapshot.val().slice(1));
               return finalMenu;
             })
             .then(menu => {
               setMenu(menu);
-              setIsValid(true);
               setTotalStages(Object.keys(menu).length);
             });
-        } else {
-          setIsValid(false);
         }
       })
-      .catch(error => setIsValid(false));
+      .catch(error => console.log(error));
+  };
 
+  const initBatch = () => {
     database
       .ref(tempRest)
       .child("tables")
@@ -229,18 +250,6 @@ const CustomerMenu = props => {
             });
         }
       });
-  }, []);
-
-  const handleSignOut = () => {
-    // remove user from table
-    database
-      .ref(match.params.restaurant)
-      .child("tables")
-      .child(match.params.table)
-      .child("users")
-      .child(userId)
-      .remove();
-    firebase.auth().signOut();
   };
 
   return (
@@ -250,7 +259,9 @@ const CustomerMenu = props => {
           <LoginForm seatTaken={seatTaken} match={match} />
         ) : (
           <Fragment>
-            {isValid ? (
+            {tableDone ? (
+              <TableDone />
+            ) : (
               <Fragment>
                 <WaiterRequest match={match} />
                 <div className="d-flex align-items-center justify-content-center">
@@ -270,6 +281,7 @@ const CustomerMenu = props => {
                       thisStage == stage ? "btn-dark" : "btn-outline-dark";
                     return (
                       <button
+                        key={thisStage}
                         onClick={() => routeToStage(thisStage)}
                         className={"btn item " + buttonClass}
                       >
@@ -302,22 +314,13 @@ const CustomerMenu = props => {
                       </Fragment>
                     );
                   })}
-                  <div className="d-flex justify-content-center">
-                    <button
-                      onClick={handleSignOut}
-                      className="btn btn-outline-secondary"
-                    >
-                      {" "}
-                      Sign Out{" "}
-                    </button>
-                  </div>
+                  <SignOutButton
+                    userId={userId}
+                    restaurant={match.params.restaurant}
+                    table={match.params.table}
+                  />
                 </Fragment>
               </Fragment>
-            ) : (
-              <h1>
-                {" "}
-                Whoops! You've reached an invalid URL. Try a different link!{" "}
-              </h1>
             )}
           </Fragment>
         )}

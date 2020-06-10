@@ -5,20 +5,25 @@ import WaiterRequest from "./WaiterRequest";
 import { useHistory, generatePath } from "react-router-dom";
 import useIsMounted from "react-is-mounted-hook";
 import { useAlert } from "react-alert";
-import { isEmptyStatement } from "@babel/types";
+import TableDone from "./TableDone";
+import useTableStatus from "./App";
+import useUserId from "./App";
 
 const TableBasket = props => {
   const alert = useAlert();
+  const userId = useUserId();
+  const history = useHistory();
+
   var database = firebase.database();
   const isMounted = useIsMounted();
   const [tableData, setTableData] = useState({});
   const [reverseBatches, setReverseBatches] = useState([]);
   const [reverseRequests, setReverseRequests] = useState([]);
   const [currentBatch, setCurrentBatch] = useState(1);
-  const [userId, setUserId] = useState("");
+
   const { match } = props;
-  const history = useHistory();
-  const [tableDone, setTableDone] = useState(false);
+
+  const tableDone = useTableStatus(match.params.restautant, match.params.table);
 
   useEffect(() => {
     if ("batches" in tableData) {
@@ -39,14 +44,6 @@ const TableBasket = props => {
 
   useEffect(() => {
     if (isMounted()) {
-      firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-          console.log("user signed in ");
-          setUserId(user.uid);
-        } else {
-          console.log("user NOT signed in ");
-        }
-      });
       database
         .ref(match.params.restaurant)
         .child("tables")
@@ -79,9 +76,6 @@ const TableBasket = props => {
                   setCurrentBatch(child.key);
                 });
               });
-          } else {
-            window.alert("Error: Host Ended Your Session");
-            setTableDone(true);
           }
         });
     }
@@ -286,7 +280,7 @@ const TableBasket = props => {
   return (
     <div className="">
       {tableDone ? (
-        <h1> Host Ended Your Session. Thank You for Joing Us! </h1>
+        <TableDone />
       ) : (
         <div className="container mt-3 mb-5">
           <div className="d-flex justify-content-center">
