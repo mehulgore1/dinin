@@ -6,6 +6,7 @@ import { useHistory, generatePath } from "react-router-dom";
 import { useAlert } from "react-alert";
 import TableDone from "./TableDone";
 import { Modal, Button } from "react-bootstrap";
+import { nullLiteral } from "@babel/types";
 
 const TableBasket = props => {
   const alert = useAlert();
@@ -22,6 +23,7 @@ const TableBasket = props => {
   const [tableDone, setTableDone] = useState(false);
   const [userId, setUserId] = useState(null);
   const [modalShow, setModalShow] = useState(false);
+  const [hidePastOrders, setHidePastOrders] = useState(false);
 
   useEffect(() => {
     initSignedInState();
@@ -329,11 +331,30 @@ const TableBasket = props => {
               + Add More Items
             </button>
           </div>
-          {reverseBatches.map((batch_obj, index) => {
+          {reverseBatches.map((batch_obj, batch_index) => {
             return (
-              <Fragment key={index}>
-                {Object.keys(reverseBatches[index] || {}).map(
+              <Fragment key={batch_index}>
+                {!hidePastOrders && batch_index == 1 ? (
+                  <button
+                    className="btn btn-lg btn-block btn-primary mb-3"
+                    onClick={() => setHidePastOrders(true)}
+                  >
+                    Hide Past Orders
+                  </button>
+                ) : null}
+                {hidePastOrders && batch_index == 1 ? (
+                  <button
+                    className="btn btn-lg btn-block btn-primary mb-3"
+                    onClick={() => setHidePastOrders(false)}
+                  >
+                    Show Past Orders
+                  </button>
+                ) : null}
+                {Object.keys(reverseBatches[batch_index] || {}).map(
                   (batch_key, index) => {
+                    if (hidePastOrders && hasBeenOrdered(batch_key)) {
+                      return null;
+                    }
                     if (
                       tableData["batches"] == null ||
                       tableData["batches"][batch_key] == null ||
