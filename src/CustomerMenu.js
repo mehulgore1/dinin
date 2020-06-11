@@ -294,30 +294,26 @@ const CustomerMenu = props => {
               <TableDone />
             ) : (
               <Fragment>
-                <WaiterRequest match={match} />
-                <div className="d-flex align-items-center justify-content-center">
-                  <h2>
-                    Seat {seat}: {userName}
-                  </h2>
+                <div className="fixed-top white-bg mb-1">
+                  <WaiterRequest match={match} />
+                  <div className="hs mb-3 mt-3">
+                    {Object.keys(stageNames).map(thisStage => {
+                      var buttonClass =
+                        thisStage == stage ? "btn-dark" : "btn-outline-dark";
+                      return (
+                        <button
+                          key={thisStage}
+                          onClick={() => routeToStage(thisStage)}
+                          className={"btn item " + buttonClass}
+                        >
+                          {stageNames[thisStage]}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                <div className="hs mb-3 mt-3">
-                  {Object.keys(stageNames).map(thisStage => {
-                    var buttonClass =
-                      thisStage == stage ? "btn-dark" : "btn-outline-dark";
-                    return (
-                      <button
-                        key={thisStage}
-                        onClick={() => routeToStage(thisStage)}
-                        className={"btn item " + buttonClass}
-                      >
-                        {stageNames[thisStage]}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <Fragment>
+                <div style={{ paddingTop: "130px" }}>
                   {Object.keys(menu[stage] || {}).map((category, i) => {
                     return (
                       <Fragment key={category}>
@@ -340,12 +336,12 @@ const CustomerMenu = props => {
                       </Fragment>
                     );
                   })}
-                  <SignOutButton
+                  {/* <SignOutButton
                     userId={userId}
                     restaurant={match.params.restaurant}
                     table={match.params.table}
-                  />
-                </Fragment>
+                  /> */}
+                </div>
               </Fragment>
             )}
             <div className="fixed-bottom mb-3 d-flex justify-content-center">

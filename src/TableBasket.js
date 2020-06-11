@@ -441,9 +441,9 @@ const TableBasket = props => {
                           );
                         })}
                         {showOrderButton(batch_key) ? (
-                          <div className="d-flex justify-content-center">
+                          <div className="d-flex justify-content-around mb-3">
                             <button
-                              className="btn btn-dark btn-lg"
+                              className="btn btn-lg btn-dark btn-block"
                               onClick={showConfirmAlert}
                             >
                               {" "}
