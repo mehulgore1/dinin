@@ -5,8 +5,7 @@ import WaiterRequest from "./WaiterRequest";
 import { useHistory, generatePath } from "react-router-dom";
 import { useAlert } from "react-alert";
 import TableDone from "./TableDone";
-import { Modal, Button } from "react-bootstrap";
-import { nullLiteral } from "@babel/types";
+import BasketItem from "./BasketItem";
 
 const TableBasket = props => {
   const alert = useAlert();
@@ -22,8 +21,7 @@ const TableBasket = props => {
 
   const [tableDone, setTableDone] = useState(false);
   const [userId, setUserId] = useState(null);
-  const [modalShow, setModalShow] = useState(false);
-  const [hidePastOrders, setHidePastOrders] = useState(false);
+  const [hidePastOrders, setHidePastOrders] = useState(true);
 
   useEffect(() => {
     initSignedInState();
@@ -222,7 +220,7 @@ const TableBasket = props => {
       .push("").key;
     setCurrentBatch(batch_key);
 
-    alert.show("Items Ordered, Awaiting Status");
+    alert.success("Order Sent, Awaiting Status");
   };
 
   const deleteItem = (batch_key, seat_num, item_key) => {
@@ -377,8 +375,8 @@ const TableBasket = props => {
                               <h3 className="ml-3">
                                 {getUserNameForSeat(seat)}
                               </h3>
-                              {Object.keys(items || {}).map((key, i) => {
-                                var item = items[key];
+                              {Object.keys(items || {}).map((item_key, i) => {
+                                var item = items[item_key];
                                 const itemRef = database
                                   .ref(match.params.restaurant)
                                   .child("tables")
@@ -388,74 +386,20 @@ const TableBasket = props => {
                                   .child("seat_data")
                                   .child(seat)
                                   .child("items")
-                                  .child(key);
+                                  .child(item_key);
+
                                 return (
-                                  <div key={key}>
-                                    <div className="container">
-                                      <div className="row align-items-center h-100">
-                                        <div className="col">
-                                          <h3>
-                                            <span className="badge badge-dark">
-                                              {item["quantity"]}
-                                            </span>
-                                          </h3>
-                                        </div>
-                                        <div className="col-8">
-                                          <div>
-                                            {" "}
-                                            <strong>{item["title"]}</strong>
-                                          </div>
-                                          <div>{item["notes"]}</div>
-                                          {tableData["batches"][batch_key] !=
-                                            "" &&
-                                          "ordered_at" in
-                                            tableData["batches"][batch_key] ? (
-                                            <div>
-                                              <strong>Status </strong>{" "}
-                                              {item["status"]}{" "}
-                                            </div>
-                                          ) : null}
-                                        </div>
-                                        <div className="col">
-                                          {userInThisSeat(seat) &&
-                                          !item["ordered"] ? (
-                                            <div
-                                              className="d-flex justify-content-around"
-                                              onClick={e => e.stopPropagation()}
-                                            >
-                                              <button
-                                                className="btn btn-warning mr-3"
-                                                onClick={() =>
-                                                  setModalShow(true)
-                                                }
-                                              >
-                                                Edit
-                                              </button>
-                                              <ItemDetailsModal
-                                                item_key={key}
-                                                batch_key={batch_key}
-                                                seat={seat}
-                                                title={item["title"]}
-                                                show={modalShow}
-                                                onHide={() =>
-                                                  setModalShow(false)
-                                                }
-                                                description={
-                                                  item["description"]
-                                                }
-                                                quantity={item["quantity"]}
-                                                notes={item["notes"]}
-                                                itemRef={itemRef}
-                                                setModalShow={setModalShow}
-                                                deleteItem={deleteItem}
-                                              />
-                                            </div>
-                                          ) : null}
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <hr />
-                                  </div>
+                                  <BasketItem
+                                    key={item_key}
+                                    item={item}
+                                    itemRef={itemRef}
+                                    item_key={item_key}
+                                    batch_key={batch_key}
+                                    seat={seat}
+                                    deleteItem={deleteItem}
+                                    tableData={tableData}
+                                    userInThisSeat={userInThisSeat}
+                                  />
                                 );
                               })}
                             </Fragment>
@@ -527,89 +471,5 @@ const TableBasket = props => {
     </div>
   );
 };
-
-function ItemDetailsModal(props) {
-  const [quantity, setQuantity] = useState(props.quantity);
-  const [notes, setNotes] = useState(props.notes);
-
-  const incQuantity = () => {
-    var newQuantity = quantity + 1;
-    setQuantity(newQuantity);
-  };
-
-  const decQuantity = () => {
-    var newQuantity = quantity - 1;
-    if (newQuantity < 1) {
-      newQuantity = 1;
-    }
-    setQuantity(newQuantity);
-  };
-
-  const updateItem = () => {
-    props.itemRef.child("quantity").set(quantity);
-    props.itemRef.child("notes").set(notes);
-  };
-
-  return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header>
-        <Modal.Title id="contained-modal-title-vcenter">
-          {props.title}
-          {"  "}
-          <button
-            onClick={() => {
-              props.setModalShow(false);
-              props.deleteItem(props.batch_key, props.seat, props.item_key);
-            }}
-            className="btn btn-danger"
-          >
-            Delete
-          </button>
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div>
-          <input
-            className="form-control mt-2"
-            type="text"
-            value={notes}
-            placeholder="Add Notes, Customize..."
-            onChange={e => setNotes(e.target.value)}
-          />
-        </div>
-        <div className="d-flex justify-content-center mt-3">
-          <button onClick={() => decQuantity()} className="btn btn-dark mr-3">
-            {" "}
-            -{" "}
-          </button>
-          <div className="align-self-center">
-            {" "}
-            <h3> {quantity} </h3>
-          </div>
-          <button onClick={() => incQuantity()} className="btn btn-dark ml-3">
-            {" "}
-            +{" "}
-          </button>
-        </div>
-        <div className="d-flex justify-content-around mt-3">
-          <button
-            className="btn btn-lg btn-success btn-block mt-3"
-            onClick={() => {
-              props.setModalShow(false);
-              updateItem();
-            }}
-          >
-            Save
-          </button>
-        </div>
-      </Modal.Body>
-    </Modal>
-  );
-}
 
 export default TableBasket;
