@@ -19,12 +19,13 @@ const CustomerMenu = props => {
   const [seat, setSeat] = useState(0);
   const [stage, setStage] = useState(0);
   const [signedIn, setSignedIn] = useState(false);
-  const [currentBatch, setCurrentBatch] = useState(1);
+  const [currentBatch, setCurrentBatch] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState("");
   const [seatTaken, setSeatTaken] = useState(false);
   const [stageNames, setStageNames] = useState({});
   const [tableDone, setTableDone] = useState(false);
+  const [cartSize, setCartSize] = useState(0);
 
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -55,6 +56,37 @@ const CustomerMenu = props => {
     initMenu();
     initBatch();
   }, []);
+
+  useEffect(() => {
+    if (currentBatch != null) {
+      initCartSize();
+    }
+  }, [currentBatch]);
+
+  const initCartSize = () => {
+    database
+      .ref(match.params.restaurant)
+      .child("tables")
+      .child(match.params.table)
+      .child("batches")
+      .child(currentBatch)
+      .on("value", function(snapshot) {
+        const val = snapshot.val();
+        if (
+          val &&
+          val["seat_data"] &&
+          val["seat_data"][match.params.seat] &&
+          val["seat_data"][match.params.seat]["items"]
+        ) {
+          var items = val["seat_data"][match.params.seat]["items"];
+          var size = 0;
+          for (var key in items) {
+            size += parseInt(items[key]["quantity"], 10);
+          }
+          setCartSize(size);
+        }
+      });
+  };
 
   const initTableDone = () => {
     database
@@ -99,7 +131,6 @@ const CustomerMenu = props => {
       .child(seat)
       .child("items")
       .push(item);
-    alert.success("Success! Submit Order from the Cart");
   };
 
   const routeToStage = stage => {
@@ -319,7 +350,10 @@ const CustomerMenu = props => {
             )}
             <div className="fixed-bottom mb-3 d-flex justify-content-center">
               <a href={"/" + tempRest + "/menu/" + table}>
-                <button className="btn btn-dark btn-lg">View Cart</button>
+                <button className="btn btn-dark btn-lg">
+                  View Cart{" "}
+                  <span className="badge badge-success"> {cartSize} </span>
+                </button>
               </a>
             </div>
           </Fragment>
