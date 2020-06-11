@@ -34,6 +34,7 @@ const MenuItem = props => {
                 onHide={() => setModalShow(false)}
                 description={props.description}
                 sendToTable={props.sendToTable}
+                setModalShow={setModalShow}
               />
             </div>
           </div>
@@ -103,7 +104,8 @@ function ItemDetailsModal(props) {
         <div className="d-flex justify-content-center mt-3">
           <button
             className="btn btn-lg btn-success mt-3"
-            onClick={() =>
+            onClick={() => {
+              props.setModalShow(false);
               props.sendToTable(
                 props.id,
                 props.title,
@@ -111,8 +113,8 @@ function ItemDetailsModal(props) {
                 props.category,
                 quantity,
                 props.price
-              )
-            }
+              );
+            }}
           >
             Add {quantity} to Cart
           </button>
