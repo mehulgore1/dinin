@@ -108,7 +108,7 @@ const OrderQ = props => {
         </a>
         <a href={"/" + tempRest + "/requests"}>
           <button className="btn btn-dark btn-lg">
-            Requests ({numRequests})
+            Requests <span className="badge badge-success"> {numRequests}</span>
           </button>{" "}
         </a>
       </div>
