@@ -6,7 +6,10 @@ import { ErrorBoundary } from "react-error-boundary";
 
 const options = {
   timeout: 5000,
-  position: positions.BOTTOM_CENTER
+  position: positions.BOTTOM_CENTER,
+  containerStyle: {
+    zIndex: 10
+  }
 };
 
 const myErrorHandler = (error, componentStack) => {

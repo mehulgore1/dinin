@@ -344,7 +344,7 @@ const CustomerMenu = props => {
                 </div>
               </Fragment>
             )}
-            <div className="fixed-bottom mb-3 d-flex justify-content-center">
+            <div className="fixed-bottom mb-4 d-flex justify-content-center">
               <a href={"/" + tempRest + "/menu/" + table}>
                 <button className="btn btn-dark btn-lg">
                   View Cart{" "}

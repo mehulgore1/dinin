@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
-import { useAlert } from "react-alert";
+import { useAlert, positions } from "react-alert";
 
 const WaiterRequest = props => {
   const alert = useAlert();
@@ -46,7 +46,10 @@ const WaiterRequest = props => {
       .child(key)
       .set(requestObj);
 
-    alert.show("Waitstaff Notified");
+    alert.show("Waitstaff Notified", {
+      timeout: 2000,
+      position: positions.MIDDLE
+    });
   };
 
   const showInputConfirmAlert = () => {
