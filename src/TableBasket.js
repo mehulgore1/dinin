@@ -21,7 +21,7 @@ const TableBasket = props => {
 
   const [tableDone, setTableDone] = useState(false);
   const [userId, setUserId] = useState(null);
-  const [hidePastOrders, setHidePastOrders] = useState(true);
+  const [hidePastOrders, setHidePastOrders] = useState(false);
 
   useEffect(() => {
     initSignedInState();

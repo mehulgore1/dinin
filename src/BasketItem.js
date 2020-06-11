@@ -42,7 +42,18 @@ const BasketItem = props => {
             {tableData["batches"][batch_key] != "" &&
             "ordered_at" in tableData["batches"][batch_key] ? (
               <div>
-                <strong>Status </strong> {item["status"]}{" "}
+                <h6>
+                  <strong>Status </strong>
+                  {item["status"] == "Order Sent" ? (
+                    <span className="badge badge-pill badge-warning">
+                      {item["status"]}
+                    </span>
+                  ) : (
+                    <span className="badge badge-pill badge-success">
+                      {item["status"]}
+                    </span>
+                  )}
+                </h6>
               </div>
             ) : null}
           </div>
