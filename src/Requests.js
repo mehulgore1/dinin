@@ -80,7 +80,10 @@ const Requests = props => {
         <a href={"/" + match.params.restaurant + "/orders"}>
           <button className="btn btn-dark btn-lg">
             {" "}
-            Orders <span className="badge badge-success"> {numOrders}</span>
+            Orders{" "}
+            {numOrders != 0 ? (
+              <span className="badge badge-success"> {numOrders}</span>
+            ) : null}
           </button>{" "}
         </a>
       </div>
