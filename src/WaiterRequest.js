@@ -104,7 +104,7 @@ const WaiterRequest = props => {
         className="btn btn-warning btn-lg"
         onClick={showInputConfirmAlert}
       >
-        Send Waitstaff Request
+        Submit a Request
       </button>
       {/* <a
         href={

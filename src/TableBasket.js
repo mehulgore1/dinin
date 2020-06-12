@@ -333,20 +333,24 @@ const TableBasket = props => {
             return (
               <Fragment key={batch_index}>
                 {!hidePastOrders && batch_index == 1 ? (
-                  <button
-                    className="btn btn-lg btn-block btn-primary mb-3"
-                    onClick={() => setHidePastOrders(true)}
-                  >
-                    Hide Past Orders
-                  </button>
+                  <div className="d-flex justify-content-around">
+                    <button
+                      className="btn btn-light mb-3"
+                      onClick={() => setHidePastOrders(true)}
+                    >
+                      Hide Past Orders
+                    </button>
+                  </div>
                 ) : null}
                 {hidePastOrders && batch_index == 1 ? (
-                  <button
-                    className="btn btn-lg btn-block btn-primary mb-3"
-                    onClick={() => setHidePastOrders(false)}
-                  >
-                    Show Past Orders
-                  </button>
+                  <div className="d-flex justify-content-around">
+                    <button
+                      className="btn btn-dark mb-3"
+                      onClick={() => setHidePastOrders(false)}
+                    >
+                      Show Past Orders
+                    </button>
+                  </div>
                 ) : null}
                 {Object.keys(reverseBatches[batch_index] || {}).map(
                   (batch_key, index) => {
@@ -412,7 +416,7 @@ const TableBasket = props => {
                               onClick={showConfirmAlert}
                             >
                               {" "}
-                              Order these items{" "}
+                              Send Current Order{" "}
                             </button>
                           </div>
                         ) : null}
@@ -424,8 +428,7 @@ const TableBasket = props => {
             );
           })}
           <div className="">
-            {" "}
-            <h1> Requests </h1>{" "}
+            {reverseRequests.length != 0 ? <h1> Requests </h1> : null}
           </div>
           {reverseRequests.map((request_obj, index) => {
             return (

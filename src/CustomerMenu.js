@@ -342,16 +342,21 @@ const CustomerMenu = props => {
                     table={match.params.table}
                   /> */}
                 </div>
+                <div className="fixed-bottom mb-4 d-flex justify-content-center">
+                  <a href={"/" + tempRest + "/menu/" + table}>
+                    <button className="btn btn-dark btn-lg">
+                      View Cart{" "}
+                      {cartSize != 0 ? (
+                        <span className="badge badge-success">
+                          {" "}
+                          {cartSize}{" "}
+                        </span>
+                      ) : null}
+                    </button>
+                  </a>
+                </div>
               </Fragment>
             )}
-            <div className="fixed-bottom mb-4 d-flex justify-content-center">
-              <a href={"/" + tempRest + "/menu/" + table}>
-                <button className="btn btn-dark btn-lg">
-                  View Cart{" "}
-                  <span className="badge badge-success"> {cartSize} </span>
-                </button>
-              </a>
-            </div>
           </Fragment>
         )}
       </div>
