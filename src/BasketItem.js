@@ -44,12 +44,12 @@ const BasketItem = props => {
               <div>
                 <h6>
                   <strong>Status </strong>
-                  {item["status"] == "Order Sent" ? (
-                    <span className="badge badge-pill badge-warning">
+                  {item["status"] == "Kitchen Preparing" ? (
+                    <span className="badge badge-pill badge-success">
                       {item["status"]}
                     </span>
                   ) : (
-                    <span className="badge badge-pill badge-success">
+                    <span className="badge badge-pill badge-warning">
                       {item["status"]}
                     </span>
                   )}

@@ -19,7 +19,7 @@ const SignOutButton = props => {
   };
 
   return (
-    <div className="d-flex justify-content-center">
+    <div className="d-flex justify-content-right">
       <button onClick={handleSignOut} className="btn btn-outline-secondary">
         {" "}
         Sign Out{" "}

@@ -7,7 +7,7 @@ const MenuItem = props => {
 
   return (
     <div>
-      <div className="card" onClick={() => setModalShow(true)}>
+      <div className="shadow card" onClick={() => setModalShow(true)}>
         <div className="card-body">
           <div className="col">
             <div>

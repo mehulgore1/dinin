@@ -10,8 +10,8 @@ const LoginForm = props => {
   const [confResult, setConfResult] = useState({});
   const [name, setName] = useState("");
   const [anonName, setAnonName] = useState("");
-  const [offersChecked, setOffersChecked] = useState(false);
-  const [modalShow, setModalShow] = useState(false);
+  const [offersChecked, setOffersChecked] = useState(true);
+  const [guestSignIn, setGuestSignIn] = useState(false);
 
   const onPhoneNumberChange = event => {
     setPhoneNumber(event.target.value);
@@ -119,6 +119,10 @@ const LoginForm = props => {
       });
   };
 
+  const showGuestSignIn = () => {
+    setGuestSignIn(true);
+  };
+
   return (
     <Fragment>
       <div className="d-flex justify-content-center mt-5">
@@ -132,27 +136,33 @@ const LoginForm = props => {
           <h2 style={{ color: "red" }}> Seat Taken! </h2>{" "}
         </div>
       ) : null}
-      <div className="d-flex justify-content-center">
-        <h2> Verify Seat With Phone </h2>
+      <div className="d-flex justify-content-center mt-5">
+        <h2> Verify Your Seat </h2>
       </div>
       <div className="d-flex justify-content-center">
-        <p>
-          {" "}
-          This way, we can send you your receipts and discounts. You only have
-          to put this in once!{" "}
-        </p>
+        <p> You only have to do this once! </p>
       </div>
+      {/* <div className="d-flex justify-content-center mt-3">
+        <Form.Group controlId="formBasicCheckbox">
+          <Form.Check
+            checked={offersChecked}
+            onChange={e => setOffersChecked(e.target.checked)}
+            type="checkbox"
+            label="Text me Discounts"
+          />
+        </Form.Group>
+      </div> */}
       <div className="form-group">
         <input
-          className="form-control mt-2"
+          className="form-control mt-5"
           type="text"
           value={phoneNumber}
           placeholder="Phone Number"
           onChange={e => setPhoneNumber(e.target.value)}
         />
-        <div className="d-flex justify-content-center mt-2">
+        <div className="d-flex justify-content-center mt-3">
           <button
-            className="btn btn-primary btn-lg"
+            className="btn btn-warning btn-lg btn-block"
             onClick={sendVerificationCode}
           >
             {" "}
@@ -160,10 +170,10 @@ const LoginForm = props => {
           </button>
         </div>
         <input
-          className="form-control mt-2"
+          className="form-control mt-5"
           type="text"
           value={authCode}
-          placeholder="6-digit Verification Code"
+          placeholder="6-Digit Verification Code"
           onChange={e => setAuthCode(e.target.value)}
           autoComplete="one-time-code"
         />
@@ -174,19 +184,9 @@ const LoginForm = props => {
           placeholder="Enter your Name"
           onChange={e => setName(e.target.value)}
         />
-        <div className="d-flex justify-content-center mt-2">
-          <Form.Group controlId="formBasicCheckbox">
-            <Form.Check
-              checked={offersChecked}
-              onChange={e => setOffersChecked(e.target.checked)}
-              type="checkbox"
-              label="Text me Discounts"
-            />
-          </Form.Group>
-        </div>
-        <div className="d-flex justify-content-center mt-2">
+        <div className="d-flex justify-content-center mt-3">
           <button
-            className="btn btn-primary btn-lg"
+            className="btn btn-dark btn-lg btn-block"
             id="sign-in-button"
             onClick={signInWithPhoneNumber}
           >
@@ -195,32 +195,45 @@ const LoginForm = props => {
           </button>
         </div>
       </div>
-      <div className="d-flex justify-content-center mt-5">
-        <h4> Sign In As Guest </h4>
-      </div>
-      <div className="d-flex justify-content-center">
-        <p>Not Recommended - your data will be lost</p>
-      </div>
-      <div className="form-group">
-        <input
-          className="form-control mt-2"
-          type="text"
-          value={anonName}
-          placeholder="Enter your Name"
-          onChange={e => setAnonName(e.target.value)}
-        />
-        <div
-          onClick={function() {}}
-          className="d-flex justify-content-center mt-2"
-        >
-          <button
-            className="btn btn-outline-secondary btn-sm"
-            onClick={signInAsGuest}
-          >
-            Guest Login
+      {guestSignIn ? (
+        <Fragment>
+          <div className="d-flex justify-content-center">
+            <h4 className="text-muted mt-5"> Sign In As Guest </h4>
+          </div>
+          <div className="d-flex justify-content-center">
+            <p className="text-muted">
+              Not Recommended - Your data will be lost
+            </p>
+          </div>
+          <div className="form-group">
+            <input
+              className="form-control"
+              type="text"
+              value={anonName}
+              placeholder="Enter your Name"
+              onChange={e => setAnonName(e.target.value)}
+            />
+            <div
+              onClick={function() {}}
+              className="d-flex justify-content-center mt-2"
+            >
+              <button
+                className="btn btn-outline-secondary btn-sm btn-block"
+                onClick={signInAsGuest}
+              >
+                Guest Login
+              </button>
+            </div>
+          </div>
+        </Fragment>
+      ) : (
+        <div className="d-flex justify-content-center mt-5">
+          <button onClick={showGuestSignIn} className="btn btn-link">
+            {" "}
+            Sign In a Different Way{" "}
           </button>
         </div>
-      </div>
+      )}
     </Fragment>
   );
 };

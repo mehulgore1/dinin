@@ -18,7 +18,7 @@ const CustomerMenu = props => {
   const [table, setTable] = useState("");
   const [seat, setSeat] = useState(0);
   const [stage, setStage] = useState(0);
-  const [signedIn, setSignedIn] = useState(false);
+  const [signedIn, setSignedIn] = useState(true);
   const [currentBatch, setCurrentBatch] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState("");
@@ -336,11 +336,11 @@ const CustomerMenu = props => {
                       </Fragment>
                     );
                   })}
-                  {/* <SignOutButton
+                  <SignOutButton
                     userId={userId}
                     restaurant={match.params.restaurant}
                     table={match.params.table}
-                  /> */}
+                  />
                 </div>
                 <div className="fixed-bottom mb-4 d-flex justify-content-center">
                   <a href={"/" + tempRest + "/menu/" + table}>
