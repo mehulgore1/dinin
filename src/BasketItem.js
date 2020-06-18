@@ -137,7 +137,10 @@ function BasketItemDetailsModal(props) {
           />
         </div>
         <div className="d-flex justify-content-center mt-3">
-          <button onClick={() => decQuantity()} className="btn btn-dark mr-3">
+          <button
+            onClick={() => decQuantity()}
+            className="btn btn-outline-dark mr-3"
+          >
             {" "}
             -{" "}
           </button>
@@ -145,14 +148,17 @@ function BasketItemDetailsModal(props) {
             {" "}
             <h3> {quantity} </h3>
           </div>
-          <button onClick={() => incQuantity()} className="btn btn-dark ml-3">
+          <button
+            onClick={() => incQuantity()}
+            className="btn btn-outline-dark ml-3"
+          >
             {" "}
             +{" "}
           </button>
         </div>
         <div className="d-flex justify-content-around mt-3">
           <button
-            className="btn btn-lg btn-success btn-block mt-3"
+            className="btn btn-lg btn-dark btn-block mt-3"
             onClick={() => {
               props.setModalShow(false);
               updateItem();

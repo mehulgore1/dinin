@@ -13,11 +13,10 @@ const CustomerMenu = props => {
   const alert = useAlert();
   var database = firebase.database();
   const [totalStages, setTotalStages] = useState(4);
-  const [menu, setMenu] = useState([]);
+  const [menu, setMenu] = useState(null);
   const [restaurant, setRestaurant] = useState("");
   const [table, setTable] = useState("");
   const [seat, setSeat] = useState(0);
-  const [stage, setStage] = useState(0);
   const [signedIn, setSignedIn] = useState(true);
   const [currentBatch, setCurrentBatch] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -26,6 +25,12 @@ const CustomerMenu = props => {
   const [stageNames, setStageNames] = useState({});
   const [tableDone, setTableDone] = useState(false);
   const [cartSize, setCartSize] = useState(0);
+
+  const [stageNum, setStageNum] = useState(0);
+  const [stageDesc, setStageDesc] = useState("");
+  const [stageName, setStageName] = useState("");
+
+  const [loaded, setLoaded] = useState(false);
 
   const { match } = props;
   const tempRest = match.params.restaurant;
@@ -45,15 +50,22 @@ const CustomerMenu = props => {
   }, [tableDone, userId]);
 
   useEffect(() => {
-    setStage(match.params.stage);
+    setStageNum(match.params.stage);
   }, [props.location]);
 
   useEffect(() => {
+    if (menu != null && menu[stageNum] != null) {
+      setStageName(menu[stageNum]["stage_name"]);
+      setStageDesc(menu[stageNum]["stage_desc"]);
+    }
+  }, [menu, stageNum]);
+
+  useEffect(() => {
+    initMenu();
     initSignedInState();
     setRestaurant(tempRest);
     setTable(match.params.table);
     setSeat(match.params.seat);
-    initMenu();
     initBatch();
   }, []);
 
@@ -211,39 +223,16 @@ const CustomerMenu = props => {
             .child("menu")
             .once("value")
             .then(function(snapshot) {
-              for (var stage in snapshot.val()) {
-                if (!(stage in finalMenu)) {
-                  finalMenu[stage] = {};
-                }
-                for (var category in snapshot.val()[stage]) {
-                  if (category == "stage_name") {
-                    var temp = stageNames;
-                    temp[stage] = snapshot.val()[stage]["stage_name"];
-                    setStageNames(temp);
-                    continue;
-                  }
-                  if (!(category in finalMenu[stage])) {
-                    finalMenu[stage][category] = [];
-                  }
-                  var categoryItems = snapshot.val()[stage][category];
-                  for (var key in categoryItems) {
-                    var item = categoryItems[key];
-                    var tempItem = {
-                      id: key,
-                      title: item.title,
-                      description: item.description,
-                      price: item.price,
-                      category: item.category
-                    };
-                    finalMenu[stage][category].push(tempItem);
-                  }
-                }
+              var tempMenu = snapshot.val();
+              for (var stage in tempMenu) {
+                // get stage names for menu
+                var temp = stageNames;
+                temp[stage] = tempMenu[stage]["stage_name"];
+                setStageNames(temp);
               }
-              return finalMenu;
-            })
-            .then(menu => {
-              setMenu(menu);
-              setTotalStages(Object.keys(menu).length);
+              setMenu(tempMenu);
+              setTotalStages(Object.keys(tempMenu).length);
+              setLoaded(true);
             });
         }
       })
@@ -285,81 +274,83 @@ const CustomerMenu = props => {
 
   return (
     <div>
-      <div className="container mt-3 mb-5">
-        {!signedIn ? (
-          <LoginForm seatTaken={seatTaken} match={match} />
-        ) : (
-          <Fragment>
-            {tableDone ? (
-              <TableDone />
-            ) : (
-              <Fragment>
-                <div className="fixed-top white-bg mb-1">
-                  <WaiterRequest match={match} />
-                  <div className="hs mb-3 mt-3">
-                    {Object.keys(stageNames).map(thisStage => {
-                      var buttonClass =
-                        thisStage == stage ? "btn-dark" : "btn-outline-dark";
+      {loaded ? (
+        <div className="container mt-3 mb-5">
+          {!signedIn ? (
+            <LoginForm seatTaken={seatTaken} match={match} />
+          ) : (
+            <Fragment>
+              {tableDone ? (
+                <TableDone />
+              ) : (
+                <Fragment>
+                  <div className="fixed-top white-bg mb-1">
+                    <WaiterRequest match={match} />
+                    <div className="hs mb-3 mt-3">
+                      {Object.keys(stageNames).map(thisStage => {
+                        var buttonClass =
+                          thisStage == stageNum
+                            ? "btn-dark"
+                            : "btn-outline-dark";
+                        return (
+                          <button
+                            key={thisStage}
+                            onClick={() => routeToStage(thisStage)}
+                            className={"btn item " + buttonClass}
+                          >
+                            {stageNames[thisStage]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div style={{ paddingTop: "130px" }}>
+                    <h1> {stageName} </h1>
+                    <p> {stageDesc} </p>
+                    {Object.keys(menu[stageNum]["items"]).map(item_key => {
+                      var item = menu[stageNum]["items"][item_key];
                       return (
-                        <button
-                          key={thisStage}
-                          onClick={() => routeToStage(thisStage)}
-                          className={"btn item " + buttonClass}
-                        >
-                          {stageNames[thisStage]}
-                        </button>
+                        <ul key={item_key} className="pl-0">
+                          <MenuItem
+                            key={item.id}
+                            id={item.id}
+                            title={item.title}
+                            description={item.description}
+                            price={item.price}
+                            sendToTable={sendToTable}
+                            category={item.category}
+                            match={match}
+                            //deleteMenuItem={deleteMenuItem}
+                          />
+                        </ul>
                       );
                     })}
+                    <SignOutButton
+                      userId={userId}
+                      restaurant={match.params.restaurant}
+                      table={match.params.table}
+                    />
                   </div>
-                </div>
-
-                <div style={{ paddingTop: "130px" }}>
-                  {Object.keys(menu[stage] || {}).map((category, i) => {
-                    return (
-                      <Fragment key={category}>
-                        <h1> {category} </h1>
-                        {menu[stage][category].map(item => (
-                          <ul key={item.id} className="pl-0">
-                            <MenuItem
-                              key={item.id}
-                              id={item.id}
-                              title={item.title}
-                              description={item.description}
-                              price={item.price}
-                              sendToTable={sendToTable}
-                              category={item.category}
-                              match={match}
-                              //deleteMenuItem={deleteMenuItem}
-                            />
-                          </ul>
-                        ))}
-                      </Fragment>
-                    );
-                  })}
-                  <SignOutButton
-                    userId={userId}
-                    restaurant={match.params.restaurant}
-                    table={match.params.table}
-                  />
-                </div>
-                <div className="fixed-bottom mb-4 d-flex justify-content-center">
-                  <a href={"/" + tempRest + "/menu/" + table}>
-                    <button className="btn btn-dark btn-lg">
-                      View Cart{" "}
-                      {cartSize != 0 ? (
-                        <span className="badge badge-success">
-                          {" "}
-                          {cartSize}{" "}
-                        </span>
-                      ) : null}
-                    </button>
-                  </a>
-                </div>
-              </Fragment>
-            )}
-          </Fragment>
-        )}
-      </div>
+                  <div className="fixed-bottom mb-4 d-flex justify-content-center">
+                    <a href={"/" + tempRest + "/menu/" + table}>
+                      <button className="btn btn-dark btn-lg">
+                        View Cart{" "}
+                        {cartSize != 0 ? (
+                          <span className="badge badge-success">
+                            {" "}
+                            {cartSize}{" "}
+                          </span>
+                        ) : null}
+                      </button>
+                    </a>
+                  </div>
+                </Fragment>
+              )}
+            </Fragment>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 };
