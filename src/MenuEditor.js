@@ -91,38 +91,14 @@ const MenuEditor = props => {
 
   useEffect(() => {
     setRestaurant(match.params.restaurant);
-    var finalMenu = {};
     database
       .ref(tempRest)
       .child("menu")
       .once("value")
       .then(function(snapshot) {
-        for (var stage in snapshot.val()) {
-          if (!(stage in finalMenu)) {
-            finalMenu[stage] = {};
-          }
-          for (var category in snapshot.val()[stage]) {
-            if (!(category in finalMenu[stage])) {
-              finalMenu[stage][category] = [];
-            }
-            var categoryItems = snapshot.val()[stage][category];
-            for (var key in categoryItems) {
-              var item = categoryItems[key];
-              var tempItem = {
-                id: key,
-                title: item.title,
-                description: item.description,
-                price: item.price,
-                category: item.category
-              };
-              finalMenu[stage][category].push(tempItem);
-            }
-          }
-        }
-        console.log(finalMenu);
-        return finalMenu;
-      })
-      .then(menu => setMenu(menu));
+        console.log(snapshot.val());
+        setMenu(snapshot.val());
+      });
   }, []);
 
   const handleSetMenu = menu => {
@@ -135,32 +111,30 @@ const MenuEditor = props => {
       <FileUpload match={match} handleSetMenu={handleSetMenu} />
       {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
       {Object.keys(menu).map((stage, i) => {
+        console.log(menu[stage]);
+        var stageName = menu[stage]["stage_name"];
+        var stageDesc = menu[stage]["stage_desc"];
         return (
           <Fragment key={stage}>
-            <h1> {stage} </h1>
-            {Object.keys(menu[stage]).map((category, i) => {
-              return (
-                <Fragment key={category}>
-                  {category != "stage_name" ? (
-                    <Fragment key={category}>
-                      <h1> {category} </h1>
-                      {menu[stage][category].map(item => (
-                        <ul key={item}>
-                          <MenuItem
-                            key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            description={item.description}
-                            price={item.price}
-                            //deleteMenuItem={deleteMenuItem}
-                          />
-                        </ul>
-                      ))}
-                    </Fragment>
-                  ) : null}
-                </Fragment>
-              );
-            })}
+            <h1> {stageName} </h1>
+            <p> {stageDesc} </p>
+            <Fragment key={stage}>
+              {Object.keys(menu[stage]["items"]).map(item_key => {
+                var item = menu[stage]["items"][item_key];
+                return (
+                  <ul key={item}>
+                    <MenuItem
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
+                      description={item.description}
+                      price={item.price}
+                      //deleteMenuItem={deleteMenuItem}
+                    />
+                  </ul>
+                );
+              })}
+            </Fragment>
           </Fragment>
         );
       })}

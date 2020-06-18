@@ -4,7 +4,11 @@ import * as firebase from "firebase";
 
 const FileUpload = props => {
   const restaurant = props.match.params.restaurant;
+
   const handleOnDrop = data => {
+    var stageCount = 0;
+    var thisStage = 0;
+    var categories = {};
     var database = firebase.database();
     database
       .ref(restaurant)
@@ -13,33 +17,54 @@ const FileUpload = props => {
     var finalMenu = {};
     for (var itemArray of data) {
       var itemData = itemArray.data;
-      if (!(itemData[4] in finalMenu)) {
-        finalMenu[itemData[4]] = {};
+      if (itemData.length < 4) {
+        // do not accept csv row under certain size
+        return;
       }
-      if (!([itemData[3]] in finalMenu[itemData[4]])) {
-        finalMenu[itemData[4]][itemData[3]] = [];
+      var category = itemData[0];
+      var title = itemData[1];
+      var description = itemData[2];
+      var price = itemData[3];
+      if (!(category in categories)) {
+        // category has not been added, create new structure
+        thisStage = stageCount;
+        finalMenu[thisStage] = {};
+        finalMenu[thisStage]["items"] = [];
+        categories[category] = thisStage;
+        stageCount = stageCount + 1;
+      } else {
+        thisStage = categories[category];
+      }
+      if (title == "" && price == "") {
+        // stage description
+        finalMenu[thisStage]["stage_desc"] = description;
+        database
+          .ref(restaurant)
+          .child("menu")
+          .child(thisStage)
+          .update({ stage_desc: description });
+        continue;
       }
       var tempItem = {
-        title: itemData[0],
-        description: itemData[1],
-        price: itemData[2],
-        category: itemData[3]
+        title: title,
+        description: description,
+        price: price,
+        category: category
       };
       var key = database
         .ref(restaurant)
         .child("menu")
-        .child(itemData[4])
-        .child(tempItem.category)
+        .child(thisStage)
+        .child("items")
         .push(tempItem).key;
       database
         .ref(restaurant)
         .child("menu")
-        .child(itemData[4])
-        .update({ stage_name: itemData[5] });
+        .child(thisStage)
+        .update({ stage_name: category });
       tempItem.id = key;
-      console.log(itemData[3] in finalMenu[itemData[4]]);
-      finalMenu[itemData[4]][itemData[3]].push(tempItem);
-      finalMenu[itemData[4]]["stage_name"] = itemData[5];
+      finalMenu[thisStage]["items"].push(tempItem);
+      finalMenu[thisStage]["stage_name"] = category;
     }
     console.log(finalMenu);
     props.handleSetMenu(finalMenu);
