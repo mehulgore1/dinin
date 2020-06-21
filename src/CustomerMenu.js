@@ -33,7 +33,8 @@ const CustomerMenu = props => {
   const [loaded, setLoaded] = useState(false);
 
   const { match } = props;
-  const tempRest = match.params.restaurant;
+  const params = match.params;
+  const thisRest = params.restaurant;
 
   const history = useHistory();
 
@@ -50,7 +51,7 @@ const CustomerMenu = props => {
   }, [tableDone, userId]);
 
   useEffect(() => {
-    setStageNum(match.params.stage);
+    setStageNum(params.stage);
   }, [props.location]);
 
   useEffect(() => {
@@ -63,9 +64,9 @@ const CustomerMenu = props => {
   useEffect(() => {
     initMenu();
     initSignedInState();
-    setRestaurant(tempRest);
-    setTable(match.params.table);
-    setSeat(match.params.seat);
+    setRestaurant(thisRest);
+    setTable(params.table);
+    setSeat(params.seat);
     initBatch();
   }, []);
 
@@ -77,9 +78,9 @@ const CustomerMenu = props => {
 
   const initCartSize = () => {
     database
-      .ref(match.params.restaurant)
+      .ref(thisRest)
       .child("tables")
-      .child(match.params.table)
+      .child(params.table)
       .child("batches")
       .child(currentBatch)
       .on("value", function(snapshot) {
@@ -87,10 +88,10 @@ const CustomerMenu = props => {
         if (
           val &&
           val["seat_data"] &&
-          val["seat_data"][match.params.seat] &&
-          val["seat_data"][match.params.seat]["items"]
+          val["seat_data"][params.seat] &&
+          val["seat_data"][params.seat]["items"]
         ) {
-          var items = val["seat_data"][match.params.seat]["items"];
+          var items = val["seat_data"][params.seat]["items"];
           var size = 0;
           for (var key in items) {
             size += parseInt(items[key]["quantity"], 10);
@@ -102,15 +103,15 @@ const CustomerMenu = props => {
 
   const initTableDone = () => {
     database
-      .ref(match.params.restaurant)
+      .ref(thisRest)
       .child("tables")
-      .child(match.params.table)
+      .child(params.table)
       .on("value", function(snapshot) {
         if (snapshot.hasChild("past_users")) {
           database
-            .ref(match.params.restaurant)
+            .ref(thisRest)
             .child("tables")
-            .child(match.params.table)
+            .child(params.table)
             .child("past_users")
             .on("value", function(snapshot) {
               setTableDone(snapshot.hasChild(userId));
@@ -134,7 +135,7 @@ const CustomerMenu = props => {
       price: price
     };
     database
-      .ref(tempRest)
+      .ref(thisRest)
       .child("tables")
       .child(table)
       .child("batches")
@@ -167,14 +168,14 @@ const CustomerMenu = props => {
       .then(name => {
         setUserName(name);
         database
-          .ref(match.params.restaurant)
+          .ref(thisRest)
           .child("tables")
-          .child(match.params.table)
+          .child(params.table)
           .child("users")
           .child(userId)
           .update({
             name: name,
-            seat: props.match.params.seat,
+            seat: params.seat,
             water_ordered: false
           });
       });
@@ -190,15 +191,15 @@ const CustomerMenu = props => {
         console.log("user NOT signed in ");
         setSignedIn(false);
         database
-          .ref(tempRest)
+          .ref(thisRest)
           .child("tables")
-          .child(match.params.table)
+          .child(params.table)
           .child("users")
           .once("value")
           .then(function(snapshot) {
             var userMap = snapshot.val();
             for (var user_id in userMap) {
-              if (match.params.seat == userMap[user_id]["seat"]) {
+              if (params.seat == userMap[user_id]["seat"]) {
                 setSeatTaken(true);
                 window.alert("Someone is sitting here! Scan another seat");
               }
@@ -211,7 +212,7 @@ const CustomerMenu = props => {
   const initMenu = () => {
     var finalMenu = {};
     database
-      .ref(tempRest)
+      .ref(thisRest)
       .once("value")
       .then(function(snapshot) {
         return snapshot.exists();
@@ -219,7 +220,7 @@ const CustomerMenu = props => {
       .then(valid => {
         if (valid) {
           database
-            .ref(tempRest)
+            .ref(thisRest)
             .child("menu")
             .once("value")
             .then(function(snapshot) {
@@ -241,26 +242,26 @@ const CustomerMenu = props => {
 
   const initBatch = () => {
     database
-      .ref(tempRest)
+      .ref(thisRest)
       .child("tables")
-      .child(match.params.table)
+      .child(params.table)
       .child("batches")
       .on("value", function(snapshot) {
         if (!snapshot.exists()) {
           // create first batch key
           var batch_key = database
-            .ref(tempRest)
+            .ref(thisRest)
             .child("tables")
-            .child(match.params.table)
+            .child(params.table)
             .child("batches")
             .push("").key;
           setCurrentBatch(batch_key);
         } else {
           // get last batch key
           database
-            .ref(tempRest)
+            .ref(thisRest)
             .child("tables")
-            .child(match.params.table)
+            .child(params.table)
             .child("batches")
             .limitToLast(1)
             .on("value", function(snapshot) {
@@ -328,12 +329,12 @@ const CustomerMenu = props => {
                     })}
                     <SignOutButton
                       userId={userId}
-                      restaurant={match.params.restaurant}
-                      table={match.params.table}
+                      restaurant={thisRest}
+                      table={params.table}
                     />
                   </div>
                   <div className="fixed-bottom mb-4 d-flex justify-content-center">
-                    <a href={"/" + tempRest + "/menu/" + table}>
+                    <a href={"/" + thisRest + "/menu/" + table}>
                       <button className="btn btn-dark btn-lg">
                         View Cart{" "}
                         {cartSize != 0 ? (

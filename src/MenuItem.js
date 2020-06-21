@@ -103,7 +103,7 @@ function ItemDetailsModal(props) {
         </div>
         <div className="d-flex justify-content-center mt-3">
           <button
-            className="btn btn-lg btn-success mt-3"
+            className="btn btn-lg btn-dark btn-block mt-3"
             onClick={() => {
               props.setModalShow(false);
               props.sendToTable(
