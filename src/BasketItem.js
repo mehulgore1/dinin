@@ -33,7 +33,7 @@ const BasketItem = props => {
               <span className="badge badge-dark">{props.item["quantity"]}</span>
             </h3>
           </div>
-          <div className="col-8">
+          <div className="col-6">
             <div>
               {" "}
               <strong>{item["title"]}</strong>

@@ -13,10 +13,6 @@ const CustomerMenu = props => {
   const alert = useAlert();
   var database = firebase.database();
   const [totalStages, setTotalStages] = useState(4);
-  const [menu, setMenu] = useState(null);
-  const [restaurant, setRestaurant] = useState("");
-  const [table, setTable] = useState("");
-  const [seat, setSeat] = useState(0);
   const [signedIn, setSignedIn] = useState(true);
   const [currentBatch, setCurrentBatch] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -25,6 +21,12 @@ const CustomerMenu = props => {
   const [stageNames, setStageNames] = useState({});
   const [tableDone, setTableDone] = useState(false);
   const [cartSize, setCartSize] = useState(0);
+  const [tableUsers, setTableUsers] = useState({});
+
+  const [menu, setMenu] = useState(null);
+  const [restaurant, setRestaurant] = useState("");
+  const [table, setTable] = useState("");
+  const [seat, setSeat] = useState(0);
 
   const [stageNum, setStageNum] = useState(0);
   const [stageDesc, setStageDesc] = useState("");
@@ -41,6 +43,7 @@ const CustomerMenu = props => {
   useEffect(() => {
     if (userId != null) {
       initTableDone();
+      initTableUsers();
     }
   }, [userId]);
 
@@ -64,10 +67,10 @@ const CustomerMenu = props => {
   useEffect(() => {
     initMenu();
     initSignedInState();
-    setRestaurant(thisRest);
+    initBatch();
+    setRestaurant(params.restaurant);
     setTable(params.table);
     setSeat(params.seat);
-    initBatch();
   }, []);
 
   useEffect(() => {
@@ -75,6 +78,28 @@ const CustomerMenu = props => {
       initCartSize();
     }
   }, [currentBatch]);
+
+  const initTableUsers = () => {
+    database
+      .ref(thisRest)
+      .child("tables")
+      .child(params.table)
+      .child("users")
+      .once("value")
+      .then(function(snapshot) {
+        var users = snapshot.val();
+        var tempUsers = {};
+        for (var id in users) {
+          if (id != userId) {
+            var name = users[id]["name"];
+            var seat = users[id]["seat"];
+            tempUsers[name] = seat;
+          }
+        }
+        console.log(tempUsers);
+        setTableUsers(tempUsers);
+      });
+  };
 
   const initCartSize = () => {
     database
@@ -123,27 +148,80 @@ const CustomerMenu = props => {
       });
   };
 
-  const sendToTable = (item_id, title, notes, category, quantity, price) => {
+  const sendToTable = (
+    item_id,
+    title,
+    notes,
+    category,
+    quantity,
+    price,
+    splitSeats
+  ) => {
     const id = item_id;
-    var item = {
-      title: title,
-      notes: notes,
-      category: category,
-      quantity: quantity,
-      status: "Order Sent",
-      ordered: false,
-      price: price
-    };
-    database
-      .ref(thisRest)
-      .child("tables")
-      .child(table)
-      .child("batches")
-      .child(currentBatch)
-      .child("seat_data")
-      .child(seat)
-      .child("items")
-      .push(item);
+    if (splitSeats != null) {
+      // handle splitting items
+      var splitCount = 1;
+      for (var seat in splitSeats) {
+        // find number of splitting people
+        if (splitSeats[seat]["taken"]) {
+          splitCount++;
+        }
+      }
+      var fraction = (quantity / splitCount).toFixed(2);
+      var item = {
+        title: title,
+        notes: notes,
+        category: category,
+        quantity: fraction,
+        status: "Order Sent",
+        ordered: false,
+        price: price
+      };
+      // push current user first and get key
+      var key = database
+        .ref(thisRest)
+        .child("tables")
+        .child(table)
+        .child("batches")
+        .child(currentBatch)
+        .child("seat_data")
+        .child(params.seat)
+        .child("items")
+        .push(item).key;
+      for (var currSeat in splitSeats) {
+        database
+          .ref(thisRest)
+          .child("tables")
+          .child(table)
+          .child("batches")
+          .child(currentBatch)
+          .child("seat_data")
+          .child(currSeat)
+          .child("items")
+          .child(key)
+          .update(item);
+      }
+    } else {
+      var item = {
+        title: title,
+        notes: notes,
+        category: category,
+        quantity: quantity,
+        status: "Order Sent",
+        ordered: false,
+        price: price
+      };
+      database
+        .ref(thisRest)
+        .child("tables")
+        .child(table)
+        .child("batches")
+        .child(currentBatch)
+        .child("seat_data")
+        .child(params.seat)
+        .child("items")
+        .push(item);
+    }
   };
 
   const routeToStage = stage => {
@@ -321,6 +399,7 @@ const CustomerMenu = props => {
                             price={item.price}
                             sendToTable={sendToTable}
                             category={item.category}
+                            tableUsers={tableUsers}
                             match={match}
                             //deleteMenuItem={deleteMenuItem}
                           />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useReducer } from "react";
 import "./App.css";
 import { Modal, Button } from "react-bootstrap";
 
@@ -31,6 +31,7 @@ const MenuItem = props => {
                 category={props.category}
                 price={props.price}
                 show={modalShow}
+                tableUsers={props.tableUsers}
                 onHide={() => setModalShow(false)}
                 description={props.description}
                 sendToTable={props.sendToTable}
@@ -47,6 +48,20 @@ const MenuItem = props => {
 function ItemDetailsModal(props) {
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
+  const [isSplit, setIsSplit] = useState(false);
+  const [splitSeats, setSplitSeats] = useState({});
+  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+
+  useEffect(() => {
+    var tempSplitSeats = {};
+    for (var name in props.tableUsers) {
+      var seat = props.tableUsers[name];
+      tempSplitSeats[seat] = {};
+      tempSplitSeats[seat]["taken"] = false;
+      tempSplitSeats[seat]["name"] = name;
+    }
+    setSplitSeats(tempSplitSeats);
+  }, []);
 
   const incQuantity = () => {
     var newQuantity = quantity + 1;
@@ -59,6 +74,41 @@ function ItemDetailsModal(props) {
       newQuantity = 1;
     }
     setQuantity(newQuantity);
+  };
+
+  const toggleSplit = () => {
+    setIsSplit(isSplit => !isSplit);
+  };
+
+  const toggleSplitSeat = seat => {
+    var tempSplitSeats = splitSeats;
+    tempSplitSeats[seat]["taken"] = !tempSplitSeats[seat]["taken"];
+    setSplitSeats(tempSplitSeats);
+    forceUpdate();
+  };
+
+  const handleSendToTable = () => {
+    var validSplit = false;
+    var seats = [];
+    for (var seat in splitSeats) {
+      if (splitSeats[seat]["taken"]) {
+        // seat selected, split is valid
+        validSplit = true;
+        break;
+      }
+    }
+    validSplit = validSplit && isSplit;
+    var splits = validSplit ? splitSeats : null;
+    props.setModalShow(false);
+    props.sendToTable(
+      props.id,
+      props.title,
+      notes,
+      props.category,
+      quantity,
+      props.price,
+      splits
+    );
   };
 
   return (
@@ -101,20 +151,35 @@ function ItemDetailsModal(props) {
             +{" "}
           </button>
         </div>
+        <div className="d-flex justify-content-center mt-3 mb-3">
+          <button onClick={toggleSplit} className="btn btn-warning btn-lg">
+            {" "}
+            Split{" "}
+          </button>
+        </div>
+        {isSplit ? (
+          <ul className="list-group">
+            {" "}
+            {Object.keys(splitSeats).map(seat => {
+              var active = splitSeats[seat]["taken"] ? "active" : "";
+              console.log(active);
+              return (
+                <li
+                  key={seat}
+                  className={"list-group-item " + active}
+                  onClick={() => toggleSplitSeat(seat)}
+                >
+                  {" "}
+                  {splitSeats[seat]["name"]}{" "}
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
         <div className="d-flex justify-content-center mt-3">
           <button
             className="btn btn-lg btn-dark btn-block mt-3"
-            onClick={() => {
-              props.setModalShow(false);
-              props.sendToTable(
-                props.id,
-                props.title,
-                notes,
-                props.category,
-                quantity,
-                props.price
-              );
-            }}
+            onClick={handleSendToTable}
           >
             Add {quantity} to Cart
           </button>
