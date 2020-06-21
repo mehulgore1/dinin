@@ -338,7 +338,7 @@ const TableBasket = props => {
                       className="btn btn-light mb-3"
                       onClick={() => setHidePastOrders(true)}
                     >
-                      Hide Past Orders
+                      Hide Orders
                     </button>
                   </div>
                 ) : null}
@@ -348,7 +348,7 @@ const TableBasket = props => {
                       className="btn btn-dark mb-3"
                       onClick={() => setHidePastOrders(false)}
                     >
-                      Show Past Orders
+                      See Orders
                     </button>
                   </div>
                 ) : null}
@@ -417,8 +417,7 @@ const TableBasket = props => {
                               className="btn btn-lg btn-dark btn-block"
                               onClick={showConfirmAlert}
                             >
-                              {" "}
-                              Send Current Order{" "}
+                              Submit Items
                             </button>
                           </div>
                         ) : null}

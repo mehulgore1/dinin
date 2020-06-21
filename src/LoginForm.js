@@ -104,7 +104,7 @@ const LoginForm = props => {
     database
       .ref("users")
       .child(uid)
-      .update({ name: thisName });
+      .update({ name: thisName, type: "customer" });
 
     database
       .ref(props.match.params.restaurant)
