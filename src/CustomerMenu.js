@@ -85,8 +85,7 @@ const CustomerMenu = props => {
       .child("tables")
       .child(params.table)
       .child("users")
-      .once("value")
-      .then(function(snapshot) {
+      .on("value", function(snapshot) {
         var users = snapshot.val();
         var tempSplitSeats = {};
         for (var id in users) {
@@ -120,9 +119,9 @@ const CustomerMenu = props => {
           var items = val["seat_data"][params.seat]["items"];
           var size = 0;
           for (var key in items) {
-            size += parseInt(items[key]["quantity"], 10);
+            size += Number(items[key]["quantity"]);
           }
-          setCartSize(size);
+          setCartSize(Math.ceil(size));
         }
       });
   };
@@ -169,7 +168,7 @@ const CustomerMenu = props => {
           splitCount++;
         }
       }
-      var fraction = (quantity / splitCount).toFixed(2);
+      var fraction = Number((quantity / splitCount).toFixed(2));
       var item = {
         title: title,
         notes: notes,

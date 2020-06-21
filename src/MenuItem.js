@@ -156,8 +156,7 @@ function ItemDetailsModal(props) {
         </div>
         <div className="d-flex justify-content-center mt-3 mb-3">
           <button onClick={toggleSplit} className="btn btn-warning btn-lg">
-            {" "}
-            Split{" "}
+            {isSplit ? "Remove Split" : "Split"}
           </button>
         </div>
         {isSplit ? (
@@ -168,7 +167,6 @@ function ItemDetailsModal(props) {
               if (splitSeats[seat]["user_id"] == props.userId) {
                 return null;
               }
-              console.log(active);
               return (
                 <li
                   key={seat}

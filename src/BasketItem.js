@@ -96,6 +96,13 @@ function BasketItemDetailsModal(props) {
   const [serverSplit, setServerSplit] = useState(false);
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
   const database = firebase.database();
+  const seatDataRef = database
+    .ref(params.restaurant)
+    .child("tables")
+    .child(params.table)
+    .child("batches")
+    .child(batch_key)
+    .child("seat_data");
 
   useEffect(() => {
     itemRef.on("value", function(snapshot) {
@@ -120,7 +127,6 @@ function BasketItemDetailsModal(props) {
                 tempSplitSeats[i] = splits[i];
               }
             }
-            console.log(tempSplitSeats);
             setSplitSeats(tempSplitSeats);
           });
       } else {
@@ -175,8 +181,6 @@ function BasketItemDetailsModal(props) {
       }
     }
     validSplit = validSplit && isSplit;
-    console.log("valid" + validSplit);
-    console.log("server" + serverSplit);
     if (validSplit) {
       // already split once, just adjusting now
       for (var seat in splitSeats) {
@@ -192,7 +196,7 @@ function BasketItemDetailsModal(props) {
           splitCount++;
         }
       }
-      var fraction = (quantity / splitCount).toFixed(2);
+      var fraction = Number((quantity / splitCount).toFixed(2));
       var tempItem = {
         title: item["title"],
         notes: notes,
@@ -204,29 +208,26 @@ function BasketItemDetailsModal(props) {
       };
       tempItem.split = tempSplitSeats;
       for (var currSeat in tempSplitSeats) {
-        database
-          .ref(params.restaurant)
-          .child("tables")
-          .child(params.table)
-          .child("batches")
-          .child(batch_key)
-          .child("seat_data")
-          .child(currSeat)
-          .child("items")
-          .child(item_key)
-          .update(tempItem);
+        // if taken, then update, otherwise remove
+        if (tempSplitSeats[currSeat]["taken"]) {
+          seatDataRef
+            .child(currSeat)
+            .child("items")
+            .child(item_key)
+            .update(tempItem);
+        } else {
+          seatDataRef
+            .child(currSeat)
+            .child("items")
+            .child(item_key)
+            .remove();
+        }
       }
     } else if (!validSplit && serverSplit) {
       // removing split from this item, delete from other users besides yourself
       for (var currSeat in splitSeats) {
         if (splitSeats[currSeat]["user_id"] != userId) {
-          database
-            .ref(params.restaurant)
-            .child("tables")
-            .child(params.table)
-            .child("batches")
-            .child(batch_key)
-            .child("seat_data")
+          seatDataRef
             .child(currSeat)
             .child("items")
             .child(item_key)
@@ -253,10 +254,34 @@ function BasketItemDetailsModal(props) {
 
   const toggleSplit = () => {
     if (!isSplit) {
-      // currently not split, need to reset quantity to 1
+      // going to be split, need to reset quantity to 1
       setQuantity(1);
     }
     setIsSplit(isSplit => !isSplit);
+  };
+
+  const deleteItem = (batch_key, seat, item_key) => {
+    if (isSplit) {
+      // need to remove from all other seats
+      for (var currSeat in splitSeats) {
+        if (splitSeats[currSeat]["user_id"] != userId) {
+          database
+            .ref(params.restaurant)
+            .child("tables")
+            .child(params.table)
+            .child("batches")
+            .child(batch_key)
+            .child("seat_data")
+            .child(currSeat)
+            .child("items")
+            .child(item_key)
+            .remove();
+        }
+      }
+    }
+    props.setModalShow(false);
+    // remove logic for current session seat
+    props.deleteItem(batch_key, seat, item_key);
   };
 
   return (
@@ -271,10 +296,7 @@ function BasketItemDetailsModal(props) {
           {item["title"]}
           {"  "}
           <button
-            onClick={() => {
-              props.setModalShow(false);
-              props.deleteItem(batch_key, seat, item_key);
-            }}
+            onClick={() => deleteItem(batch_key, seat, item_key)}
             className="btn btn-danger"
           >
             Delete
@@ -325,7 +347,6 @@ function BasketItemDetailsModal(props) {
               if (splitSeats[seat]["user_id"] == props.userId) {
                 return null;
               }
-              console.log(active);
               return (
                 <li
                   key={seat}
