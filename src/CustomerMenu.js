@@ -88,16 +88,17 @@ const CustomerMenu = props => {
       .once("value")
       .then(function(snapshot) {
         var users = snapshot.val();
-        var tempUsers = {};
+        var tempSplitSeats = {};
         for (var id in users) {
-          if (id != userId) {
-            var name = users[id]["name"];
-            var seat = users[id]["seat"];
-            tempUsers[name] = seat;
-          }
+          var name = users[id]["name"];
+          var seat = users[id]["seat"];
+          tempSplitSeats[seat] = {};
+          tempSplitSeats[seat]["taken"] = false;
+          tempSplitSeats[seat]["name"] = name;
+          tempSplitSeats[seat]["user_id"] = id;
         }
-        console.log(tempUsers);
-        setTableUsers(tempUsers);
+        console.log(tempSplitSeats);
+        setTableUsers(tempSplitSeats);
       });
   };
 
@@ -159,8 +160,9 @@ const CustomerMenu = props => {
   ) => {
     const id = item_id;
     if (splitSeats != null) {
+      console.log(splitSeats);
       // handle splitting items
-      var splitCount = 1;
+      var splitCount = 0;
       for (var seat in splitSeats) {
         // find number of splitting people
         if (splitSeats[seat]["taken"]) {
@@ -177,6 +179,7 @@ const CustomerMenu = props => {
         ordered: false,
         price: price
       };
+      item.split = splitSeats;
       // push current user first and get key
       var key = database
         .ref(thisRest)
@@ -401,6 +404,7 @@ const CustomerMenu = props => {
                             category={item.category}
                             tableUsers={tableUsers}
                             match={match}
+                            userId={userId}
                             //deleteMenuItem={deleteMenuItem}
                           />
                         </ul>

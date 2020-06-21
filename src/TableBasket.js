@@ -128,7 +128,7 @@ const TableBasket = props => {
       restaurant: match.params.restaurant,
       table: match.params.table
     });
-    var pathExtra = "/" + seat + "/1";
+    var pathExtra = "/" + seat + "/0";
     history.replace(path + pathExtra);
   };
 
@@ -403,6 +403,8 @@ const TableBasket = props => {
                                     deleteItem={deleteItem}
                                     tableData={tableData}
                                     userInThisSeat={userInThisSeat}
+                                    userId={userId}
+                                    params={match.params}
                                   />
                                 );
                               })}

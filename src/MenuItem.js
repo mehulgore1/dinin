@@ -36,6 +36,7 @@ const MenuItem = props => {
                 description={props.description}
                 sendToTable={props.sendToTable}
                 setModalShow={setModalShow}
+                userId={props.userId}
               />
             </div>
           </div>
@@ -53,15 +54,8 @@ function ItemDetailsModal(props) {
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   useEffect(() => {
-    var tempSplitSeats = {};
-    for (var name in props.tableUsers) {
-      var seat = props.tableUsers[name];
-      tempSplitSeats[seat] = {};
-      tempSplitSeats[seat]["taken"] = false;
-      tempSplitSeats[seat]["name"] = name;
-    }
-    setSplitSeats(tempSplitSeats);
-  }, []);
+    setSplitSeats(props.tableUsers);
+  }, [props]);
 
   const incQuantity = () => {
     var newQuantity = quantity + 1;
@@ -88,17 +82,26 @@ function ItemDetailsModal(props) {
   };
 
   const handleSendToTable = () => {
+    var tempSplitSeats = splitSeats;
     var validSplit = false;
     var seats = [];
     for (var seat in splitSeats) {
-      if (splitSeats[seat]["taken"]) {
+      if (
+        splitSeats[seat]["taken"] &&
+        splitSeats[seat]["user_id"] != props.userId
+      ) {
         // seat selected, split is valid
         validSplit = true;
-        break;
       }
     }
     validSplit = validSplit && isSplit;
-    var splits = validSplit ? splitSeats : null;
+    for (var seat in splitSeats) {
+      if (validSplit && splitSeats[seat]["user_id"] == props.userId) {
+        // valid split, need to add current user
+        tempSplitSeats[seat]["taken"] = true;
+      }
+    }
+    var splits = validSplit ? tempSplitSeats : null;
     props.setModalShow(false);
     props.sendToTable(
       props.id,
@@ -162,6 +165,9 @@ function ItemDetailsModal(props) {
             {" "}
             {Object.keys(splitSeats).map(seat => {
               var active = splitSeats[seat]["taken"] ? "active" : "";
+              if (splitSeats[seat]["user_id"] == props.userId) {
+                return null;
+              }
               console.log(active);
               return (
                 <li
