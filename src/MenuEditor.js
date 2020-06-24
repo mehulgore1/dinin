@@ -2,92 +2,43 @@ import React, { useState, useEffect, Fragment } from "react";
 import "./App.css";
 import * as firebase from "firebase";
 import FileUpload from "./FileUpload";
-import { connect } from "tls";
-
-const MenuItem = props => {
-  const [title, SetTitle] = useState("title");
-  const [description, setDescription] = useState("description");
-  const [price, setPrice] = useState("price");
-
-  return (
-    <div>
-      <h3> {props.title} </h3>
-      <p>{props.description} </p>
-      <p>
-        {" "}
-        <strong> Price: </strong> {props.price}
-      </p>
-      {/* <button onClick={() => props.deleteMenuItem(props.id)}> Delete </button> */}
-    </div>
-  );
-};
-
-const UpdateMenuForm = props => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-
-  return (
-    <div>
-      <h4> Add Menu Item </h4>
-      <input
-        type="text"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-        placeholder="Title"
-      />
-      <input
-        type="text"
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-        placeholder="Description"
-      />
-      <input
-        type="text"
-        value={price}
-        onChange={e => setPrice(e.target.value)}
-        placeholder="Price"
-      />
-      <button onClick={() => props.addMenuItem(title, description, price)}>
-        {" "}
-        Add{" "}
-      </button>
-    </div>
-  );
-};
+import EditMenuItem from "./EditMenuItem";
+import { useHistory, generatePath } from "react-router-dom";
+import TopBarMenu from "./TopBarMenu";
 
 const MenuEditor = props => {
   var database = firebase.database();
-  const [val, setVal] = useState(2);
+  const history = useHistory();
   const [menu, setMenu] = useState([]);
   const [restaurant, setRestaurant] = useState("");
   const { match } = props;
+  const params = match.params;
   const tempRest = match.params.restaurant;
+  const [stageNum, setStageNum] = useState(0);
+  const [stageDesc, setStageDesc] = useState("");
+  const [stageName, setStageName] = useState("");
+  const [stageNames, setStageNames] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
-  //   const addMenuItem = (title, description, price) => {
-  //     var tempMenu = [...menu];
-  //     var tempItem = {
-  //       title: title,
-  //       description: description,
-  //       price: price
-  //     };
-  //     var key = database
-  //       .ref(tempRest)
-  //       .child("menu/")
-  //       .push(tempItem).key;
-  //     tempItem["id"] = key;
-  //     tempMenu.push(tempItem);
-  //     setMenu(tempMenu);
-  //   };
+  useEffect(() => {
+    setStageNum(params.stage);
+  }, [props.location]);
 
-  //   const deleteMenuItem = id => {
-  //     database
-  //       .ref(tempRest)
-  //       .child("menu")
-  //       .child(id)
-  //       .remove();
-  //     setMenu(menu.filter(item => item.id !== id));
-  //   };
+  useEffect(() => {
+    if (menu != null && menu[stageNum] != null) {
+      setStageName(menu[stageNum]["stage_name"]);
+      setStageDesc(menu[stageNum]["stage_desc"]);
+      setIsLoading(false);
+    }
+  }, [menu, stageNum]);
+
+  const routeToStage = stage => {
+    const path = generatePath(match.path, {
+      restaurant: restaurant,
+      stage: stage
+    });
+    history.replace(path);
+  };
 
   useEffect(() => {
     setRestaurant(match.params.restaurant);
@@ -97,7 +48,14 @@ const MenuEditor = props => {
       .once("value")
       .then(function(snapshot) {
         console.log(snapshot.val());
-        setMenu(snapshot.val());
+        var tempMenu = snapshot.val();
+        for (var stage in tempMenu) {
+          // get stage names for menu
+          var temp = stageNames;
+          temp[stage] = tempMenu[stage]["stage_name"];
+          setStageNames(temp);
+        }
+        setMenu(tempMenu);
       });
   }, []);
 
@@ -106,38 +64,27 @@ const MenuEditor = props => {
   };
 
   return (
-    <div className="container mt-5 mb-5">
-      <h1>Manager dashboard for {restaurant} </h1>
-      <FileUpload match={match} handleSetMenu={handleSetMenu} />
-      {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
-      {Object.keys(menu).map((stage, i) => {
-        console.log(menu[stage]);
-        var stageName = menu[stage]["stage_name"];
-        var stageDesc = menu[stage]["stage_desc"];
-        return (
-          <Fragment key={stage}>
-            <h1> {stageName} </h1>
-            <p> {stageDesc} </p>
-            <Fragment key={stage}>
-              {Object.keys(menu[stage]["items"]).map(item_key => {
-                var item = menu[stage]["items"][item_key];
-                return (
-                  <ul key={item}>
-                    <MenuItem
-                      key={item.id}
-                      id={item.id}
-                      title={item.title}
-                      description={item.description}
-                      price={item.price}
-                      //deleteMenuItem={deleteMenuItem}
-                    />
-                  </ul>
-                );
-              })}
-            </Fragment>
+    <div>
+      {!isLoading ? (
+        <div className="container mt-5 mb-5">
+          <h1>Manager dashboard for {restaurant} </h1>
+          <FileUpload match={match} handleSetMenu={handleSetMenu} />
+          {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
+          <TopBarMenu
+            stageNum={stageNum}
+            stageNames={stageNames}
+            routeToStage={routeToStage}
+          />
+          <h1> {stageName} </h1>
+          <p> {stageDesc} </p>
+          <Fragment>
+            {Object.keys(menu[stageNum]["items"]).map(item_key => {
+              var item = menu[stageNum]["items"][item_key];
+              return <EditMenuItem key={item_key} item={item} />;
+            })}
           </Fragment>
-        );
-      })}
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -8,6 +8,7 @@ import WaiterRequest from "./WaiterRequest";
 import { useAlert } from "react-alert";
 import TableDone from "./TableDone";
 import SignOutButton from "./SignOutButton";
+import TopBarMenu from "./TopBarMenu";
 
 const CustomerMenu = props => {
   const alert = useAlert();
@@ -367,23 +368,11 @@ const CustomerMenu = props => {
                 <Fragment>
                   <div className="fixed-top white-bg mb-1">
                     <WaiterRequest match={match} />
-                    <div className="hs mb-3 mt-3">
-                      {Object.keys(stageNames).map(thisStage => {
-                        var buttonClass =
-                          thisStage == stageNum
-                            ? "btn-dark"
-                            : "btn-outline-dark";
-                        return (
-                          <button
-                            key={thisStage}
-                            onClick={() => routeToStage(thisStage)}
-                            className={"btn item " + buttonClass}
-                          >
-                            {stageNames[thisStage]}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <TopBarMenu
+                      stageNum={stageNum}
+                      stageNames={stageNames}
+                      routeToStage={routeToStage}
+                    />
                   </div>
 
                   <div style={{ paddingTop: "130px" }}>

@@ -14,7 +14,11 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/:restaurant/manager/" component={MenuEditor} />
+        <Route
+          exact
+          path="/:restaurant/manager/menu/:stage"
+          component={MenuEditor}
+        />
         <Route
           exact
           path="/:restaurant/menu/:table/:seat/:stage"
