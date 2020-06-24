@@ -85,6 +85,8 @@ const MenuEditor = props => {
   const [stageName, setStageName] = useState("");
   const [stageNames, setStageNames] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [editTitle, setEditTitle] = useState(false);
+  const [editDesc, setEditDesc] = useState(false);
 
   useEffect(() => {
     setStageNum(params.stage);
@@ -127,6 +129,24 @@ const MenuEditor = props => {
     setMenu(menu);
   };
 
+  const saveStageName = () => {
+    database
+      .ref(tempRest)
+      .child("menu")
+      .child(stageNum)
+      .update({ stage_name: stageName });
+    setEditTitle(false);
+  };
+
+  const saveStageDesc = () => {
+    database
+      .ref(tempRest)
+      .child("menu")
+      .child(stageNum)
+      .update({ stage_desc: stageDesc });
+    setEditDesc(false);
+  };
+
   return (
     <div>
       {!isLoading ? (
@@ -144,8 +164,57 @@ const MenuEditor = props => {
             stage={stageNum}
             restaurant={restaurant}
           />
-          <h1> {stageName} </h1>
-          <p> {stageDesc} </p>
+          {editTitle ? (
+            <div>
+              <input
+                className="form-control mt-2"
+                type="text"
+                value={stageName}
+                onChange={e => setStageName(e.target.value)}
+              />
+              <button className="btn btn-dark" onClick={() => saveStageName()}>
+                {" "}
+                Save{" "}
+              </button>
+            </div>
+          ) : (
+            <h1>
+              {stageName}{" "}
+              <button
+                className="btn btn-warning"
+                onClick={() => setEditTitle(true)}
+              >
+                {" "}
+                Edit{" "}
+              </button>
+            </h1>
+          )}
+
+          {editDesc ? (
+            <div>
+              <input
+                className="form-control mt-2"
+                type="text"
+                value={stageDesc}
+                onChange={e => setStageDesc(e.target.value)}
+              />
+              <button className="btn btn-dark" onClick={() => saveStageDesc()}>
+                {" "}
+                Save{" "}
+              </button>
+            </div>
+          ) : (
+            <p>
+              {stageDesc}{" "}
+              <button
+                className="btn btn-warning"
+                onClick={() => setEditDesc(true)}
+              >
+                {" "}
+                Edit{" "}
+              </button>
+            </p>
+          )}
           <Fragment>
             {Object.keys(menu[stageNum]["items"]).map(item_key => {
               var item = menu[stageNum]["items"][item_key];
