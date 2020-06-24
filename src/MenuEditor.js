@@ -5,6 +5,72 @@ import FileUpload from "./FileUpload";
 import EditMenuItem from "./EditMenuItem";
 import { useHistory, generatePath } from "react-router-dom";
 import TopBarMenu from "./TopBarMenu";
+import { useAlert } from "react-alert";
+
+const AddItemForm = props => {
+  const alert = useAlert();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const database = firebase.database();
+
+  const addItem = () => {
+    var item = {
+      price: price,
+      category: props.stageName,
+      description: description,
+      title: title
+    };
+    database
+      .ref(props.restaurant)
+      .child("menu")
+      .child(props.stage)
+      .child("items")
+      .push(item);
+    setTitle("");
+    setDescription("");
+    setPrice("");
+    alert.info("Item Added!");
+  };
+
+  return (
+    <div>
+      <div>
+        <h4> Title </h4>
+        <input
+          className="form-control mt-2"
+          type="text"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+        />
+      </div>
+      <div>
+        <h4> Description </h4>
+        <textarea
+          className="form-control mt-2"
+          type="textarea"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+        />
+      </div>
+      <div>
+        <h4> Price </h4>
+        <input
+          className="form-control mt-2"
+          type="text"
+          value={price}
+          onChange={e => setPrice(e.target.value)}
+        />
+      </div>
+
+      <div className="d-flex justify-content-around mt-3 mb-3">
+        <button className="btn btn-lg btn-dark btn-block" onClick={addItem}>
+          Add Item
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const MenuEditor = props => {
   var database = firebase.database();
@@ -45,9 +111,7 @@ const MenuEditor = props => {
     database
       .ref(tempRest)
       .child("menu")
-      .once("value")
-      .then(function(snapshot) {
-        console.log(snapshot.val());
+      .on("value", function(snapshot) {
         var tempMenu = snapshot.val();
         for (var stage in tempMenu) {
           // get stage names for menu
@@ -75,12 +139,25 @@ const MenuEditor = props => {
             stageNames={stageNames}
             routeToStage={routeToStage}
           />
+          <AddItemForm
+            stageName={stageName}
+            stage={stageNum}
+            restaurant={restaurant}
+          />
           <h1> {stageName} </h1>
           <p> {stageDesc} </p>
           <Fragment>
             {Object.keys(menu[stageNum]["items"]).map(item_key => {
               var item = menu[stageNum]["items"][item_key];
-              return <EditMenuItem key={item_key} item={item} />;
+              return (
+                <EditMenuItem
+                  key={item_key}
+                  item_key={item_key}
+                  item={item}
+                  stage={stageNum}
+                  restaurant={restaurant}
+                />
+              );
             })}
           </Fragment>
         </div>
