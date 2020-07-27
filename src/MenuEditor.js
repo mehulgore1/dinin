@@ -15,6 +15,13 @@ const AddItemForm = props => {
   const database = firebase.database();
 
   const addItem = () => {
+    if (!price.match(/^\d+\.\d{0,2}$/)) {
+      window.alert("Please enter a valid price to 2 decimal places");
+      return;
+    } else if (title == "") {
+      window.alert("Please enter a title for this item");
+      return;
+    }
     var item = {
       price: price,
       category: props.stageName,
@@ -87,6 +94,8 @@ const MenuEditor = props => {
   const [isLoading, setIsLoading] = useState(true);
   const [editTitle, setEditTitle] = useState(false);
   const [editDesc, setEditDesc] = useState(false);
+  const [editStage, setEditStage] = useState(false);
+  const [newStageName, setNewStageName] = useState("");
 
   useEffect(() => {
     setStageNum(params.stage);
@@ -147,6 +156,31 @@ const MenuEditor = props => {
     setEditDesc(false);
   };
 
+  const addStage = () => {
+    var nextStageNum = Object.keys(stageNames).length;
+    database
+      .ref(tempRest)
+      .child("menu")
+      .child(nextStageNum)
+      .update({ stage_name: newStageName, stage_desc: "", items: "null" });
+    setEditStage(false);
+    routeToStage(nextStageNum);
+  };
+
+  const deleteStage = () => {
+    var confirm = window.confirm(
+      "Are you sure you want to delete this category and all its items?"
+    );
+    if (confirm) {
+      routeToStage(0);
+      database
+        .ref(tempRest)
+        .child("menu")
+        .child(stageNum)
+        .remove();
+    }
+  };
+
   return (
     <div>
       {!isLoading ? (
@@ -159,6 +193,28 @@ const MenuEditor = props => {
             stageNames={stageNames}
             routeToStage={routeToStage}
           />
+          {editStage ? (
+            <div>
+              <input
+                className="form-control mt-2"
+                type="text"
+                value={newStageName}
+                onChange={e => setNewStageName(e.target.value)}
+              />
+              <button className="btn btn-dark" onClick={() => addStage()}>
+                {" "}
+                Save{" "}
+              </button>
+            </div>
+          ) : (
+            <button
+              className="btn item btn-outline-dark"
+              onClick={() => setEditStage(true)}
+            >
+              + Add Category
+            </button>
+          )}
+
           <AddItemForm
             stageName={stageName}
             stage={stageNum}
@@ -168,6 +224,7 @@ const MenuEditor = props => {
             <div>
               <input
                 className="form-control mt-2"
+                placeholder="Edit Category Title"
                 type="text"
                 value={stageName}
                 onChange={e => setStageName(e.target.value)}
@@ -185,7 +242,7 @@ const MenuEditor = props => {
                 onClick={() => setEditTitle(true)}
               >
                 {" "}
-                Edit{" "}
+                Edit Title{" "}
               </button>
             </h1>
           )}
@@ -197,6 +254,7 @@ const MenuEditor = props => {
                 type="text"
                 value={stageDesc}
                 onChange={e => setStageDesc(e.target.value)}
+                placeholder="Edit Category Description"
               />
               <button className="btn btn-dark" onClick={() => saveStageDesc()}>
                 {" "}
@@ -211,26 +269,38 @@ const MenuEditor = props => {
                 onClick={() => setEditDesc(true)}
               >
                 {" "}
-                Edit{" "}
+                Edit Description{" "}
               </button>
             </p>
           )}
           <Fragment>
-            {Object.keys(menu[stageNum]["items"]).map(item_key => {
-              var item = menu[stageNum]["items"][item_key];
-              return (
-                <EditMenuItem
-                  key={item_key}
-                  item_key={item_key}
-                  item={item}
-                  stage={stageNum}
-                  restaurant={restaurant}
-                />
-              );
-            })}
+            {menu[stageNum] != null &&
+            menu[stageNum]["items"] != null &&
+            menu[stageNum]["items"] != "null" ? (
+              <Fragment>
+                {Object.keys(menu[stageNum]["items"]).map(item_key => {
+                  var item = menu[stageNum]["items"][item_key];
+                  return (
+                    <EditMenuItem
+                      key={item_key}
+                      item_key={item_key}
+                      item={item}
+                      stage={stageNum}
+                      restaurant={restaurant}
+                    />
+                  );
+                })}
+              </Fragment>
+            ) : null}
           </Fragment>
         </div>
       ) : null}
+      <button
+        className="btn btn-danger btn-block"
+        onClick={() => deleteStage()}
+      >
+        Delete Whole Category
+      </button>
     </div>
   );
 };
