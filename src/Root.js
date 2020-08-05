@@ -3,6 +3,12 @@ import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 import App from "./App";
 import { ErrorBoundary } from "react-error-boundary";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe(
+  "pk_test_51H9McFKtxt3kvNhb3JFchFPW2D3DSus5ZqWQyWRSi7pxFPKLgh10xui8vi62tE6VSzKcwKhzkPo4CD8EYxrvU9SO00L2aKTYsE"
+);
 
 const options = {
   timeout: 5000,
@@ -25,9 +31,11 @@ const Root = () => {
         // reset the state of your app so the error doesn't happen again
       }}
     >
-      <Provider template={AlertTemplate} {...options}>
-        <App />
-      </Provider>
+      <Elements stripe={stripePromise}>
+        <Provider template={AlertTemplate} {...options}>
+          <App />
+        </Provider>
+      </Elements>
     </ErrorBoundary>
   );
 };

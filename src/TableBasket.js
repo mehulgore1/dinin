@@ -6,10 +6,13 @@ import { useHistory, generatePath } from "react-router-dom";
 import { useAlert } from "react-alert";
 import TableDone from "./TableDone";
 import BasketItem from "./BasketItem";
+import axios from "axios";
+import { useStripe } from "@stripe/react-stripe-js";
 
 const TableBasket = props => {
   const alert = useAlert();
   const history = useHistory();
+  const stripe = useStripe();
 
   const database = firebase.database();
   const [tableData, setTableData] = useState({});
@@ -314,6 +317,25 @@ const TableBasket = props => {
     );
   };
 
+  const handlePayment = () => {
+    console.log("payment process initiated");
+    var user = {
+      phone: 2222222222,
+      email: "test@test.com"
+    };
+    axios.post("/api/create-customer", { user }).then(res => {
+      var checkoutSession = res.data.checkoutSession;
+      var customer = res.data.customer;
+      stripe
+        .redirectToCheckout({
+          sessionId: checkoutSession.id
+        })
+        .then(result => {
+          console.log(result);
+        });
+    });
+  };
+
   return (
     <div className="">
       {tableDone ? (
@@ -470,6 +492,12 @@ const TableBasket = props => {
               </Fragment>
             );
           })}
+          <button
+            className="btn btn-success btn-block"
+            onClick={() => handlePayment()}
+          >
+            Finish and Pay
+          </button>
         </div>
       )}
     </div>

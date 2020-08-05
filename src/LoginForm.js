@@ -1,7 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "./App.css";
 import * as firebase from "firebase";
-import { Form } from "react-bootstrap";
 
 const LoginForm = props => {
   const database = firebase.database();

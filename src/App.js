@@ -9,6 +9,7 @@ import TableBasket from "./TableBasket";
 import Requests from "./Requests";
 import Receipt from "./Receipt";
 import Tables from "./Tables";
+import PaymentSuccess from "./PaymentSuccess";
 
 const App = () => {
   return (
@@ -23,6 +24,11 @@ const App = () => {
           exact
           path="/:restaurant/menu/:table/:seat/:stage"
           component={CustomerMenu}
+        />
+        <Route
+          exact
+          path="/redirect/session_id/:id"
+          component={PaymentSuccess}
         />
         <Route exact path="/:restaurant/menu/:table" component={TableBasket} />
         <Route exact path="/:restaurant/orders/" component={OrderQ} />
