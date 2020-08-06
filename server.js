@@ -17,7 +17,7 @@ const stripe = require("stripe")(stripeSecretKey);
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("build/"));
+app.use(express.static(path.join(__dirname, "client", "build")));
 
 //routes
 app.get("/api/pay", (req, res) => {
@@ -60,8 +60,8 @@ app.get("/session_id/:id", async function response(req, res) {
 });
 
 //serve react if no endpoints hit
-router.use(function(req, res) {
-  res.sendFile(path.join(__dirname, "build/index.html"));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
 });
 
 // listener
