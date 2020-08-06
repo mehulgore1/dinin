@@ -10,16 +10,14 @@ import Requests from "./restaurant/Requests";
 import Receipt from "./eater/Receipt";
 import Tables from "./restaurant/Tables";
 import PaymentSuccess from "./eater/PaymentSuccess";
+import ManagerLogin from "./restaurant/ManagerLogin";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route
-          exact
-          path="/:restaurant/manager/menu/:stage"
-          component={MenuEditor}
-        />
+        <Route exact path="/manager/menu/:stage" component={MenuEditor} />
+        <Route exact path="/manager" component={ManagerLogin} />
         <Route
           exact
           path="/:restaurant/menu/:table/:seat/:stage"

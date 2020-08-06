@@ -83,10 +83,9 @@ const MenuEditor = props => {
   var database = firebase.database();
   const history = useHistory();
   const [menu, setMenu] = useState([]);
-  const [restaurant, setRestaurant] = useState("");
+  const [restaurant, setRestaurant] = useState(null);
   const { match } = props;
   const params = match.params;
-  const tempRest = match.params.restaurant;
   const [stageNum, setStageNum] = useState(0);
   const [stageDesc, setStageDesc] = useState("");
   const [stageName, setStageName] = useState("");
@@ -96,6 +95,7 @@ const MenuEditor = props => {
   const [editDesc, setEditDesc] = useState(false);
   const [editStage, setEditStage] = useState(false);
   const [newStageName, setNewStageName] = useState("");
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     setStageNum(params.stage);
@@ -111,19 +111,27 @@ const MenuEditor = props => {
 
   const routeToStage = stage => {
     const path = generatePath(match.path, {
-      restaurant: restaurant,
       stage: stage
     });
     history.replace(path);
   };
 
-  useEffect(() => {
-    setRestaurant(match.params.restaurant);
+  const initSignedInState = () => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+      }
+    });
+  };
+
+  const initMenu = () => {
     database
-      .ref(tempRest)
+      .ref(restaurant)
       .child("menu")
       .on("value", function(snapshot) {
         var tempMenu = snapshot.val();
+        console.log(snapshot.val());
         for (var stage in tempMenu) {
           // get stage names for menu
           var temp = stageNames;
@@ -132,6 +140,30 @@ const MenuEditor = props => {
         }
         setMenu(tempMenu);
       });
+  };
+
+  useEffect(() => {
+    if (restaurant != null) {
+      console.log(restaurant);
+      initMenu();
+    }
+  }, [restaurant]);
+
+  useEffect(() => {
+    if (userId != null) {
+      database
+        .ref("managers")
+        .child(userId)
+        .on("value", function(snapshot) {
+          console.log(snapshot.val());
+          console.log(snapshot.val()["restaurant_name"]);
+          setRestaurant(snapshot.val().restaurant_name);
+        });
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    initSignedInState();
   }, []);
 
   const handleSetMenu = menu => {
@@ -140,7 +172,7 @@ const MenuEditor = props => {
 
   const saveStageName = () => {
     database
-      .ref(tempRest)
+      .ref(restaurant)
       .child("menu")
       .child(stageNum)
       .update({ stage_name: stageName });
@@ -149,7 +181,7 @@ const MenuEditor = props => {
 
   const saveStageDesc = () => {
     database
-      .ref(tempRest)
+      .ref(restaurant)
       .child("menu")
       .child(stageNum)
       .update({ stage_desc: stageDesc });
@@ -159,7 +191,7 @@ const MenuEditor = props => {
   const addStage = () => {
     var nextStageNum = Object.keys(stageNames).length;
     database
-      .ref(tempRest)
+      .ref(restaurant)
       .child("menu")
       .child(nextStageNum)
       .update({ stage_name: newStageName, stage_desc: "", items: "null" });
@@ -174,18 +206,31 @@ const MenuEditor = props => {
     if (confirm) {
       routeToStage(0);
       database
-        .ref(tempRest)
+        .ref(restaurant)
         .child("menu")
         .child(stageNum)
         .remove();
     }
   };
 
+  const handleSignOut = () => {
+    firebase.auth().signOut();
+    history.replace("/manager");
+  };
+
   return (
     <div>
+      <button onClick={handleSignOut}> Sign out </button>
       {!isLoading ? (
         <div className="container mt-5 mb-5">
           <h1>Manager dashboard for {restaurant} </h1>
+          <a
+            href="https://connect.stripe.com/oauth/authorize?client_id=ca_HmWshdSsfZwOc9svGPGlrTgD9kXlrBYt&state=4cdee65a-3c4f-470a-8243-557a04809a33 
+&scope=read_write&response_type=code"
+          >
+            <button>Connect With Stripe</button>
+          </a>
+
           <FileUpload match={match} handleSetMenu={handleSetMenu} />
           {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
           <TopBarMenu

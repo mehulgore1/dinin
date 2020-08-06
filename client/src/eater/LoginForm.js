@@ -48,7 +48,8 @@ const LoginForm = props => {
             .ref("users")
             .child(user.uid)
             .update({
-              phone_number: user.phoneNumber
+              phone_number: user.phoneNumber,
+              type: "eater"
             });
 
           database
