@@ -1,6 +1,5 @@
-import React, { useState, useEffect, Fragment } from "react";
-import { useHistory, generatePath } from "react-router-dom";
-import "./App.css";
+import React from "react";
+import "../App.css";
 import * as firebase from "firebase";
 
 const SignOutButton = props => {

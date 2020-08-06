@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import MenuEditor from "./MenuEditor";
+import MenuEditor from "./restaurant/MenuEditor";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import CustomerMenu from "./CustomerMenu";
-import OrderQ from "./OrderQ";
-import TableBasket from "./TableBasket";
-import Requests from "./Requests";
-import Receipt from "./Receipt";
-import Tables from "./Tables";
-import PaymentSuccess from "./PaymentSuccess";
+import CustomerMenu from "./eater/CustomerMenu";
+import OrderQ from "./restaurant/OrderQ";
+import TableBasket from "./eater/TableBasket";
+import Requests from "./restaurant/Requests";
+import Receipt from "./eater/Receipt";
+import Tables from "./restaurant/Tables";
+import PaymentSuccess from "./eater/PaymentSuccess";
 
 const App = () => {
   return (

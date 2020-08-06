@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
-import "./App.css";
+import "../App.css";
 import * as firebase from "firebase";
 
 const Tables = props => {

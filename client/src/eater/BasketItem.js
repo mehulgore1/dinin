@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment, useReducer } from "react";
-import "./App.css";
+import "../App.css";
 import { Modal, Button } from "react-bootstrap";
 import * as firebase from "firebase";
 

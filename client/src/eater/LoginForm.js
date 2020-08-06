@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
-import "./App.css";
+import "../App.css";
 import * as firebase from "firebase";
 
 const LoginForm = props => {
@@ -11,14 +11,6 @@ const LoginForm = props => {
   const [anonName, setAnonName] = useState("");
   const [offersChecked, setOffersChecked] = useState(true);
   const [guestSignIn, setGuestSignIn] = useState(false);
-
-  const onPhoneNumberChange = event => {
-    setPhoneNumber(event.target.value);
-  };
-
-  const onAuthCodeChange = event => {
-    setAuthCode(event.target.value);
-  };
 
   const sendVerificationCode = () => {
     if (phoneNumber == "") {

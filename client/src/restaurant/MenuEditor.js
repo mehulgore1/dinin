@@ -1,10 +1,10 @@
 import React, { useState, useEffect, Fragment } from "react";
-import "./App.css";
+import "../App.css";
 import * as firebase from "firebase";
 import FileUpload from "./FileUpload";
 import EditMenuItem from "./EditMenuItem";
 import { useHistory, generatePath } from "react-router-dom";
-import TopBarMenu from "./TopBarMenu";
+import TopBarMenu from "../TopBarMenu";
 import { useAlert } from "react-alert";
 
 const AddItemForm = props => {

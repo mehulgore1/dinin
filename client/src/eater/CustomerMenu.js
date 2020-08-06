@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { useHistory, generatePath } from "react-router-dom";
-import "./App.css";
+import "./../App.css";
 import * as firebase from "firebase";
 import MenuItem from "./MenuItem";
 import LoginForm from "./LoginForm";
@@ -8,7 +8,7 @@ import WaiterRequest from "./WaiterRequest";
 import { useAlert } from "react-alert";
 import TableDone from "./TableDone";
 import SignOutButton from "./SignOutButton";
-import TopBarMenu from "./TopBarMenu";
+import TopBarMenu from "../TopBarMenu";
 
 const CustomerMenu = props => {
   const alert = useAlert();

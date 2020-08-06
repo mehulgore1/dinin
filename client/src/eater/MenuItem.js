@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment, useReducer } from "react";
-import "./App.css";
-import { Modal, Button } from "react-bootstrap";
+import React, { useState, useEffect, useReducer } from "react";
+import "../App.css";
+import { Modal } from "react-bootstrap";
 
 const MenuItem = props => {
   const [modalShow, setModalShow] = useState(false);

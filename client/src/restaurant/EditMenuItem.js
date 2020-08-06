@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment, useReducer } from "react";
-import "./App.css";
-import { Modal, Button } from "react-bootstrap";
+import React, { useState, useReducer } from "react";
+import "../App.css";
+import { Modal } from "react-bootstrap";
 import * as firebase from "firebase";
 
 const EditMenuItem = props => {
