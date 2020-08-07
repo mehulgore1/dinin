@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as firebase from "firebase";
 
 const FileUpload = props => {
-  const restaurant = props.match.params.restaurant;
+  const restaurant = props.restaurant;
 
   const handleOnDrop = data => {
     var stageCount = 0;
@@ -11,7 +11,8 @@ const FileUpload = props => {
     var categories = {};
     var database = firebase.database();
     database
-      .ref(restaurant)
+      .ref("restaurants")
+      .child(restaurant)
       .child("menu")
       .remove();
     var finalMenu = {};
@@ -39,7 +40,8 @@ const FileUpload = props => {
         // stage description
         finalMenu[thisStage]["stage_desc"] = description;
         database
-          .ref(restaurant)
+          .ref("restaurants")
+          .child(restaurant)
           .child("menu")
           .child(thisStage)
           .update({ stage_desc: description });
@@ -52,13 +54,15 @@ const FileUpload = props => {
         category: category
       };
       var key = database
-        .ref(restaurant)
+        .ref("restaurants")
+        .child(restaurant)
         .child("menu")
         .child(thisStage)
         .child("items")
         .push(tempItem).key;
       database
-        .ref(restaurant)
+        .ref("restaurants")
+        .child(restaurant)
         .child("menu")
         .child(thisStage)
         .update({ stage_name: category });

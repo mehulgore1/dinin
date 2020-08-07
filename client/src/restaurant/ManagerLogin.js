@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import "../App.css";
 import * as firebase from "firebase";
+import { useAlert } from "react-alert";
 
 const ManagerLogin = props => {
   const { match } = props;
+  const alert = useAlert();
   const history = useHistory();
   const database = firebase.database();
   const [email, setEmail] = useState("");
@@ -15,7 +17,7 @@ const ManagerLogin = props => {
 
   const handleSignup = () => {
     if (!shortName.match(/^[A-Za-z]+$/)) {
-      window.alert("Needs to be lower case with no spaces");
+      alert.error("Short Name Needs to be lower case with no spaces");
       return;
     }
     if (
@@ -23,7 +25,7 @@ const ManagerLogin = props => {
         /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       )
     ) {
-      window.alert("Please type a valid email");
+      alert.error("Please type a valid email");
       return;
     }
     // if (
@@ -49,7 +51,8 @@ const ManagerLogin = props => {
             restaurant_short_name: shortName
           });
         database
-          .ref(shortName)
+          .ref("restaurants")
+          .child(shortName)
           .child("menu")
           .child(0)
           .update({
@@ -71,7 +74,10 @@ const ManagerLogin = props => {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(result => {})
+      .then(result => {
+        var url = "/manager/menu/0";
+        history.replace(url);
+      })
       .catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -88,21 +94,29 @@ const ManagerLogin = props => {
         <div>
           {" "}
           <h4> Manager Login: </h4>
-          <div className="form-group">
-            <input
-              className="form-control mt-5"
-              type="text"
-              value={email}
-              placeholder="Manager Email"
-              onChange={e => setEmail(e.target.value)}
-            />
-            <input
-              className="form-control mt-5"
-              type="password"
-              value={password}
-              placeholder="Password"
-              onChange={e => setPassword(e.target.value)}
-            />
+          <div>
+            <div className="form-group">
+              <label for="email">Email address</label>
+              <input
+                id="email"
+                className="form-control"
+                type="text"
+                value={email}
+                placeholder="Manager Email"
+                onChange={e => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label for="password">Password</label>
+              <input
+                id="password"
+                className="form-control"
+                type="password"
+                value={password}
+                placeholder="Password"
+                onChange={e => setPassword(e.target.value)}
+              />
+            </div>
           </div>
           <button onClick={handleLogin} className="btn btn-primary">
             Login
@@ -111,35 +125,54 @@ const ManagerLogin = props => {
       ) : (
         <div>
           <h4> Setup your Restaurant: </h4>
-          <div className="form-group">
-            <input
-              className="form-control mt-5"
-              type="text"
-              value={restName}
-              placeholder="Restaurant Name"
-              onChange={e => setRestName(e.target.value)}
-            />
-            <input
-              className="form-control mt-5"
-              type="text"
-              value={shortName}
-              placeholder="Create a short name"
-              onChange={e => setShortName(e.target.value)}
-            />
-            <input
-              className="form-control mt-5"
-              type="text"
-              value={email}
-              placeholder="Manager Email"
-              onChange={e => setEmail(e.target.value)}
-            />
-            <input
-              className="form-control mt-5"
-              type="password"
-              value={password}
-              placeholder="Password"
-              onChange={e => setPassword(e.target.value)}
-            />
+          <div>
+            <div className="form-group">
+              <label for="restname">Full Restaurant Name</label>
+              <input
+                id="restname"
+                className="form-control"
+                type="text"
+                value={restName}
+                placeholder="Restaurant Name"
+                onChange={e => setRestName(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label for="shortname">
+                Choose a Short Name (lowercase with no spaces to use with qr
+                code links){" "}
+              </label>
+              <input
+                id="shortname"
+                className="form-control"
+                type="text"
+                value={shortName}
+                placeholder="Create a short name"
+                onChange={e => setShortName(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label for="manageremail">Manager/Owner Email</label>
+              <input
+                if="manageremail"
+                className="form-control"
+                type="text"
+                value={email}
+                placeholder="Manager Email"
+                onChange={e => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label for="password">Password</label>
+              <input
+                id="password"
+                className="form-control"
+                type="password"
+                value={password}
+                placeholder="Password"
+                onChange={e => setPassword(e.target.value)}
+              />
+            </div>
           </div>
           <button onClick={handleSignup} className="btn btn-primary">
             Create Your Account

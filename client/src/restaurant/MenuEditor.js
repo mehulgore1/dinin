@@ -16,10 +16,10 @@ const AddItemForm = props => {
 
   const addItem = () => {
     if (!price.match(/^\d+\.\d{0,2}$/)) {
-      window.alert("Please enter a valid price to 2 decimal places");
+      alert.error("Please enter a valid price to 2 decimal places");
       return;
     } else if (title == "") {
-      window.alert("Please enter a title for this item");
+      alert.error("Please enter a title for this item");
       return;
     }
     var item = {
@@ -29,7 +29,8 @@ const AddItemForm = props => {
       title: title
     };
     database
-      .ref(props.restaurant)
+      .ref("restaurants")
+      .child(props.restaurant)
       .child("menu")
       .child(props.stage)
       .child("items")
@@ -84,13 +85,14 @@ const MenuEditor = props => {
   const history = useHistory();
   const [menu, setMenu] = useState([]);
   const [restaurant, setRestaurant] = useState(null);
+  const [shortName, setShortName] = useState(null);
   const { match } = props;
   const params = match.params;
   const [stageNum, setStageNum] = useState(0);
   const [stageDesc, setStageDesc] = useState("");
   const [stageName, setStageName] = useState("");
   const [stageNames, setStageNames] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [editTitle, setEditTitle] = useState(false);
   const [editDesc, setEditDesc] = useState(false);
   const [editStage, setEditStage] = useState(false);
@@ -105,7 +107,6 @@ const MenuEditor = props => {
     if (menu != null && menu[stageNum] != null) {
       setStageName(menu[stageNum]["stage_name"]);
       setStageDesc(menu[stageNum]["stage_desc"]);
-      setIsLoading(false);
     }
   }, [menu, stageNum]);
 
@@ -127,11 +128,11 @@ const MenuEditor = props => {
 
   const initMenu = () => {
     database
-      .ref(restaurant)
+      .ref("restaurants")
+      .child(shortName)
       .child("menu")
       .on("value", function(snapshot) {
         var tempMenu = snapshot.val();
-        console.log(snapshot.val());
         for (var stage in tempMenu) {
           // get stage names for menu
           var temp = stageNames;
@@ -143,11 +144,10 @@ const MenuEditor = props => {
   };
 
   useEffect(() => {
-    if (restaurant != null) {
-      console.log(restaurant);
+    if (shortName != null && restaurant != null) {
       initMenu();
     }
-  }, [restaurant]);
+  }, [restaurant, shortName]);
 
   useEffect(() => {
     if (userId != null) {
@@ -155,9 +155,9 @@ const MenuEditor = props => {
         .ref("managers")
         .child(userId)
         .on("value", function(snapshot) {
-          console.log(snapshot.val());
-          console.log(snapshot.val()["restaurant_name"]);
-          setRestaurant(snapshot.val().restaurant_name);
+          var manager = snapshot.val();
+          setRestaurant(manager.restaurant_name);
+          setShortName(manager.restaurant_short_name);
         });
     }
   }, [userId]);
@@ -172,31 +172,38 @@ const MenuEditor = props => {
 
   const saveStageName = () => {
     database
-      .ref(restaurant)
+      .ref("restaurants")
+      .child(shortName)
       .child("menu")
       .child(stageNum)
       .update({ stage_name: stageName });
     setEditTitle(false);
+    initMenu();
   };
 
   const saveStageDesc = () => {
     database
-      .ref(restaurant)
+      .ref("restaurants")
+      .child(shortName)
+      .ref(shortName)
       .child("menu")
       .child(stageNum)
       .update({ stage_desc: stageDesc });
     setEditDesc(false);
+    initMenu();
   };
 
   const addStage = () => {
     var nextStageNum = Object.keys(stageNames).length;
     database
-      .ref(restaurant)
+      .ref("restaurants")
+      .child(shortName)
       .child("menu")
       .child(nextStageNum)
       .update({ stage_name: newStageName, stage_desc: "", items: "null" });
     setEditStage(false);
     routeToStage(nextStageNum);
+    initMenu();
   };
 
   const deleteStage = () => {
@@ -206,16 +213,27 @@ const MenuEditor = props => {
     if (confirm) {
       routeToStage(0);
       database
-        .ref(restaurant)
+        .ref("restaurants")
+        .child(shortName)
         .child("menu")
         .child(stageNum)
         .remove();
+      initMenu();
     }
   };
 
   const handleSignOut = () => {
     firebase.auth().signOut();
     history.replace("/manager");
+  };
+
+  const isValidMenu = () => {
+    return (
+      menu != null &&
+      menu[stageNum] != null &&
+      menu[stageNum]["items"] != null &&
+      menu[stageNum]["items"] != "null"
+    );
   };
 
   return (
@@ -231,7 +249,11 @@ const MenuEditor = props => {
             <button>Connect With Stripe</button>
           </a>
 
-          <FileUpload match={match} handleSetMenu={handleSetMenu} />
+          <FileUpload
+            restaurant={shortName}
+            match={match}
+            handleSetMenu={handleSetMenu}
+          />
           {/* <UpdateMenuForm addMenuItem={addMenuItem} /> */}
           <TopBarMenu
             stageNum={stageNum}
@@ -263,7 +285,7 @@ const MenuEditor = props => {
           <AddItemForm
             stageName={stageName}
             stage={stageNum}
-            restaurant={restaurant}
+            restaurant={shortName}
           />
           {editTitle ? (
             <div>
@@ -319,9 +341,7 @@ const MenuEditor = props => {
             </p>
           )}
           <Fragment>
-            {menu[stageNum] != null &&
-            menu[stageNum]["items"] != null &&
-            menu[stageNum]["items"] != "null" ? (
+            {isValidMenu() ? (
               <Fragment>
                 {Object.keys(menu[stageNum]["items"]).map(item_key => {
                   var item = menu[stageNum]["items"][item_key];
@@ -331,7 +351,7 @@ const MenuEditor = props => {
                       item_key={item_key}
                       item={item}
                       stage={stageNum}
-                      restaurant={restaurant}
+                      restaurant={shortName}
                     />
                   );
                 })}
