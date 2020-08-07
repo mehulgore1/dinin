@@ -21,6 +21,8 @@ const TableBasket = props => {
   const [currentBatch, setCurrentBatch] = useState(1);
 
   const { match } = props;
+  const thisRest = match.params.restaurant;
+  const thisTable = match.params.table;
 
   const [tableDone, setTableDone] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -56,15 +58,17 @@ const TableBasket = props => {
 
   const initTableDone = () => {
     database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
-      .child(match.params.table)
+      .child(thisTable)
       .on("value", function(snapshot) {
         if (snapshot.hasChild("past_users")) {
           database
-            .ref(match.params.restaurant)
+            .ref("restaurants")
+            .child(thisRest)
             .child("tables")
-            .child(match.params.table)
+            .child(thisTable)
             .child("past_users")
             .on("value", function(snapshot) {
               setTableDone(snapshot.hasChild(userId));
@@ -90,18 +94,20 @@ const TableBasket = props => {
 
   const initTableData = () => {
     database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
       .once("value")
       .then(function(snapshot) {
-        return snapshot.hasChild(match.params.table);
+        return snapshot.hasChild(thisTable);
       })
       .then(exists => {
         if (exists) {
           database
-            .ref(match.params.restaurant)
+            .ref("restaurants")
+            .child(thisRest)
             .child("tables")
-            .child(match.params.table)
+            .child(thisTable)
             .on("value", function(snapshot) {
               if (snapshot.val() != null) {
                 setTableData(snapshot.val());
@@ -111,9 +117,10 @@ const TableBasket = props => {
             });
 
           database
-            .ref(match.params.restaurant)
+            .ref("restaurants")
+            .child(thisRest)
             .child("tables")
-            .child(match.params.table)
+            .child(thisTable)
             .child("batches")
             .limitToLast(1)
             .on("value", function(snapshot) {
@@ -128,8 +135,8 @@ const TableBasket = props => {
   const handleAddMoreItems = () => {
     var seat = tableData["users"][userId]["seat"];
     const path = generatePath(match.path, {
-      restaurant: match.params.restaurant,
-      table: match.params.table
+      restaurant: thisRest,
+      table: thisTable
     });
     var pathExtra = "/" + seat + "/0";
     history.replace(path + pathExtra);
@@ -160,7 +167,7 @@ const TableBasket = props => {
     if (batchObject == "") {
       return;
     }
-    batchObject["table"] = match.params.table;
+    batchObject["table"] = thisTable;
 
     for (var seat in tableData["batches"][currentBatch]["seat_data"]) {
       for (var item_key in tableData["batches"][currentBatch]["seat_data"][
@@ -170,9 +177,10 @@ const TableBasket = props => {
           item_key
         ]["ordered"] = true;
         database
-          .ref(match.params.restaurant)
+          .ref("restaurants")
+          .child(thisRest)
           .child("tables")
-          .child(match.params.table)
+          .child(thisTable)
           .child("batches")
           .child(currentBatch)
           .child("seat_data")
@@ -185,16 +193,18 @@ const TableBasket = props => {
 
     var time = formatAMPM(new Date());
     database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
-      .child(match.params.table)
+      .child(thisTable)
       .child("batches")
       .child(currentBatch)
       .child("ordered_at")
       .set(time);
 
     database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(thisRest)
       .child("order_queue")
       .child(currentBatch)
       .set(batchObject);
@@ -206,9 +216,10 @@ const TableBasket = props => {
       var userItems = seat_data[seat]["items"];
 
       database
-        .ref(match.params.restaurant)
+        .ref("restaurants")
+        .child(thisRest)
         .child("tables")
-        .child(match.params.table)
+        .child(thisTable)
         .child("users")
         .child(user_id)
         .child("items")
@@ -216,9 +227,10 @@ const TableBasket = props => {
     }
 
     var batch_key = database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
-      .child(match.params.table)
+      .child(thisTable)
       .child("batches")
       .push("").key;
     setCurrentBatch(batch_key);
@@ -229,9 +241,10 @@ const TableBasket = props => {
   const deleteItem = (batch_key, seat_num, item_key) => {
     const batch_key_param = batch_key;
     database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
-      .child(match.params.table)
+      .child(thisTable)
       .child("batches")
       .child(batch_key)
       .child("seat_data")
@@ -241,18 +254,20 @@ const TableBasket = props => {
       .remove();
     // removed only item, old batch key does not exist
     database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
-      .child(match.params.table)
+      .child(thisTable)
       .child("batches")
       .once("value", function(snapshot) {
         console.log(batch_key_param);
         if (!snapshot.hasChild(batch_key_param)) {
           // set to same batch key
           database
-            .ref(match.params.restaurant)
+            .ref("restaurants")
+            .child(thisRest)
             .child("tables")
-            .child(match.params.table)
+            .child(thisTable)
             .child("batches")
             .child(batch_key_param)
             .set("");
@@ -404,9 +419,10 @@ const TableBasket = props => {
                               {Object.keys(items || {}).map((item_key, i) => {
                                 var item = items[item_key];
                                 const itemRef = database
-                                  .ref(match.params.restaurant)
+                                  .ref("restaurants")
+                                  .child(thisRest)
                                   .child("tables")
-                                  .child(match.params.table)
+                                  .child(thisTable)
                                   .child("batches")
                                   .child(batch_key)
                                   .child("seat_data")

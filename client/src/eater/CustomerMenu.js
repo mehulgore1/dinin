@@ -82,7 +82,8 @@ const CustomerMenu = props => {
 
   const initTableUsers = () => {
     database
-      .ref(thisRest)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
       .child(params.table)
       .child("users")
@@ -104,7 +105,8 @@ const CustomerMenu = props => {
 
   const initCartSize = () => {
     database
-      .ref(thisRest)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
       .child(params.table)
       .child("batches")
@@ -129,13 +131,15 @@ const CustomerMenu = props => {
 
   const initTableDone = () => {
     database
-      .ref(thisRest)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
       .child(params.table)
       .on("value", function(snapshot) {
         if (snapshot.hasChild("past_users")) {
           database
-            .ref(thisRest)
+            .ref("restaurants")
+            .child(thisRest)
             .child("tables")
             .child(params.table)
             .child("past_users")
@@ -182,7 +186,8 @@ const CustomerMenu = props => {
       item.split = splitSeats;
       // push current user first and get key
       var key = database
-        .ref(thisRest)
+        .ref("restaurants")
+        .child(thisRest)
         .child("tables")
         .child(table)
         .child("batches")
@@ -193,7 +198,8 @@ const CustomerMenu = props => {
         .push(item).key;
       for (var currSeat in splitSeats) {
         database
-          .ref(thisRest)
+          .ref("restaurants")
+          .child(thisRest)
           .child("tables")
           .child(table)
           .child("batches")
@@ -215,7 +221,8 @@ const CustomerMenu = props => {
         price: price
       };
       database
-        .ref(thisRest)
+        .ref("restaurants")
+        .child(thisRest)
         .child("tables")
         .child(table)
         .child("batches")
@@ -249,7 +256,8 @@ const CustomerMenu = props => {
       .then(name => {
         setUserName(name);
         database
-          .ref(thisRest)
+          .ref("restaurants")
+          .child(thisRest)
           .child("tables")
           .child(params.table)
           .child("users")
@@ -272,7 +280,8 @@ const CustomerMenu = props => {
         console.log("user NOT signed in ");
         setSignedIn(false);
         database
-          .ref(thisRest)
+          .ref("restaurants")
+          .child(thisRest)
           .child("tables")
           .child(params.table)
           .child("users")
@@ -291,9 +300,9 @@ const CustomerMenu = props => {
   };
 
   const initMenu = () => {
-    var finalMenu = {};
     database
-      .ref(thisRest)
+      .ref("restaurants")
+      .child(thisRest)
       .once("value")
       .then(function(snapshot) {
         return snapshot.exists();
@@ -301,7 +310,8 @@ const CustomerMenu = props => {
       .then(valid => {
         if (valid) {
           database
-            .ref(thisRest)
+            .ref("restaurants")
+            .child(thisRest)
             .child("menu")
             .once("value")
             .then(function(snapshot) {
@@ -323,7 +333,8 @@ const CustomerMenu = props => {
 
   const initBatch = () => {
     database
-      .ref(thisRest)
+      .ref("restaurants")
+      .child(thisRest)
       .child("tables")
       .child(params.table)
       .child("batches")
@@ -331,7 +342,8 @@ const CustomerMenu = props => {
         if (!snapshot.exists()) {
           // create first batch key
           var batch_key = database
-            .ref(thisRest)
+            .ref("restaurants")
+            .child(thisRest)
             .child("tables")
             .child(params.table)
             .child("batches")
@@ -340,7 +352,8 @@ const CustomerMenu = props => {
         } else {
           // get last batch key
           database
-            .ref(thisRest)
+            .ref("restaurants")
+            .child(thisRest)
             .child("tables")
             .child(params.table)
             .child("batches")
