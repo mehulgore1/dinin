@@ -25,25 +25,24 @@ app.get("/api/pay", (req, res) => {
 });
 
 app.post("/api/create-customer", async (req, res) => {
-  var phone = req.body.user.phone;
-  var email = req.body.user.email;
+  var phone = req.body.data.user.phone;
+  var line_items = req.body.data.line_items;
+  console.log(line_items);
   try {
     // Create a new customer object
-    const customer = await stripe.customers.create({
-      phone,
-      email
-    });
 
     // Create a CheckoutSession to set up our payment methods recurring usage
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      mode: "setup",
-      customer: customer.id,
+      line_items: line_items,
+      mode: "payment",
       success_url: `${req.headers.origin}/session_id/{CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/`
     });
 
-    res.send({ customer, checkoutSession });
+    console.log(checkoutSession);
+
+    res.send({ checkoutSession });
   } catch (error) {
     res.status(400).send({ error });
   }

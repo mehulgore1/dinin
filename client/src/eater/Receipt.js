@@ -10,6 +10,7 @@ const Receipt = props => {
   const [items, setItems] = useState({});
   const [userId, setUserId] = useState(null);
   const [phone, setPhone] = useState(null);
+  const [lineItems, setLineItems] = useState({});
   const [itemSubTotal, setItemSubtotal] = useState(0);
   const { match } = props;
   const thisRest = match.params.restaurant;
@@ -54,17 +55,41 @@ const Receipt = props => {
   useEffect(() => {
     if (Object.keys(items).length !== 0) {
       calcItemSubTotal();
+      constructLineItems();
     }
   }, [items]);
 
+  const constructLineItems = () => {
+    var tempList = [];
+    for (var key in items) {
+      var quantity = Number(items[key].quantity);
+      var price = Number(items[key].price) * quantity * 100;
+      var title = items[key].title;
+      var tempObj = {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: title
+          },
+          unit_amount: price
+        },
+        quantity: 1
+      };
+      tempList.push(tempObj);
+    }
+    setLineItems(tempList);
+  };
+
   const handlePayment = () => {
     console.log("payment process initiated");
-    var user = {
-      phone: phone
+    var data = {
+      user: {
+        phone: phone
+      },
+      line_items: lineItems
     };
-    axios.post("/api/create-customer", { user }).then(res => {
+    axios.post("/api/create-customer", { data }).then(res => {
       var checkoutSession = res.data.checkoutSession;
-      var customer = res.data.customer;
       stripe
         .redirectToCheckout({
           sessionId: checkoutSession.id
