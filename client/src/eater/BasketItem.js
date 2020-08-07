@@ -96,10 +96,14 @@ function BasketItemDetailsModal(props) {
   const [serverSplit, setServerSplit] = useState(false);
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
   const database = firebase.database();
+  const thisRest = params.restaurant;
+  const thisTable = params.table;
+
   const seatDataRef = database
-    .ref(params.restaurant)
+    .ref("restaurants")
+    .child(thisRest)
     .child("tables")
-    .child(params.table)
+    .child(thisTable)
     .child("batches")
     .child(batch_key)
     .child("seat_data");
@@ -132,9 +136,10 @@ function BasketItemDetailsModal(props) {
       } else {
         // create split seats
         database
-          .ref(params.restaurant)
+          .ref("restaurants")
+          .child(thisRest)
           .child("tables")
-          .child(params.table)
+          .child(thisTable)
           .child("users")
           .once("value")
           .then(function(snapshot) {
@@ -266,9 +271,10 @@ function BasketItemDetailsModal(props) {
       for (var currSeat in splitSeats) {
         if (splitSeats[currSeat]["user_id"] != userId) {
           database
-            .ref(params.restaurant)
+            .ref("restaurants")
+            .ref(thisRest)
             .child("tables")
-            .child(params.table)
+            .child(thisTable)
             .child("batches")
             .child(batch_key)
             .child("seat_data")

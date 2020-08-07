@@ -367,6 +367,15 @@ const CustomerMenu = props => {
       });
   };
 
+  const isValidMenu = () => {
+    return (
+      menu != null &&
+      menu[stageNum] != null &&
+      menu[stageNum]["items"] != null &&
+      menu[stageNum]["items"] != "null"
+    );
+  };
+
   return (
     <div>
       {loaded ? (
@@ -391,26 +400,30 @@ const CustomerMenu = props => {
                   <div style={{ paddingTop: "130px" }}>
                     <h1> {stageName} </h1>
                     <p> {stageDesc} </p>
-                    {Object.keys(menu[stageNum]["items"]).map(item_key => {
-                      var item = menu[stageNum]["items"][item_key];
-                      return (
-                        <ul key={item_key} className="pl-0">
-                          <MenuItem
-                            key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            description={item.description}
-                            price={item.price}
-                            sendToTable={sendToTable}
-                            category={item.category}
-                            tableUsers={tableUsers}
-                            match={match}
-                            userId={userId}
-                            //deleteMenuItem={deleteMenuItem}
-                          />
-                        </ul>
-                      );
-                    })}
+                    {isValidMenu() ? (
+                      <div>
+                        {Object.keys(menu[stageNum]["items"]).map(item_key => {
+                          var item = menu[stageNum]["items"][item_key];
+                          return (
+                            <ul key={item_key} className="pl-0">
+                              <MenuItem
+                                key={item.id}
+                                id={item.id}
+                                title={item.title}
+                                description={item.description}
+                                price={item.price}
+                                sendToTable={sendToTable}
+                                category={item.category}
+                                tableUsers={tableUsers}
+                                match={match}
+                                userId={userId}
+                                //deleteMenuItem={deleteMenuItem}
+                              />
+                            </ul>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                     <SignOutButton
                       userId={userId}
                       restaurant={thisRest}

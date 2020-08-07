@@ -106,7 +106,7 @@ const WaiterRequest = props => {
       >
         Waiter Request
       </button>
-      {/* <a
+      <a
         href={
           "/" +
           props.match.params.restaurant +
@@ -115,8 +115,8 @@ const WaiterRequest = props => {
           "/receipt"
         }
       >
-        <button className="btn btn-dark btn-lg">Your Items</button>{" "}
-      </a> */}
+        <button className="btn btn-dark btn-lg">Your Receipt</button>{" "}
+      </a>
     </div>
   );
 };
