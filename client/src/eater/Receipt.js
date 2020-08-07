@@ -38,8 +38,10 @@ const Receipt = props => {
         .child(userId)
         .child("items")
         .on("value", function(snapshot) {
-          console.log(snapshot.val());
-          setItems(snapshot.val());
+          var data = snapshot.val();
+          if (data != null) {
+            setItems(data);
+          }
         });
       database
         .ref("users")
