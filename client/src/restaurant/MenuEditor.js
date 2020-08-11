@@ -243,8 +243,11 @@ const MenuEditor = props => {
         <div className="container mt-5 mb-5">
           <h1>Manager dashboard for {restaurant} </h1>
           <a
-            href="https://connect.stripe.com/oauth/authorize?client_id=ca_HmWshdSsfZwOc9svGPGlrTgD9kXlrBYt&state=4cdee65a-3c4f-470a-8243-557a04809a33 
-&scope=read_write&response_type=code"
+            href={
+              "https://connect.stripe.com/oauth/authorize?client_id=ca_HmWshdSsfZwOc9svGPGlrTgD9kXlrBYt&state=" +
+              shortName +
+              "&scope=read_write&response_type=code"
+            }
           >
             <button>Connect With Stripe</button>
           </a>

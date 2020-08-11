@@ -7,12 +7,18 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const admin = require("firebase-admin");
+const firebaseApp = admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  databaseURL: "https://dinin-2f0b9.firebaseio.com"
+});
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripePublishableKey = process.env.STRIPE_PUBLISHABLE_KEY;
 
 const app = express();
 const router = express.Router();
 const port = process.env.PORT || 5000;
+const database = firebaseApp.database();
 const stripe = require("stripe")(stripeSecretKey);
 
 app.use(cors());
@@ -61,13 +67,6 @@ app.get("/session_id/:id", async function response(req, res) {
 app.get("/api/manager/connect/oauth", async (req, res) => {
   const { code, state } = req.query;
 
-  // Assert the state matches the state you provided in the OAuth link (optional).
-  if (!stateMatches(state)) {
-    return res
-      .status(403)
-      .json({ error: "Incorrect state parameter: " + state });
-  }
-
   // Send the authorization code to Stripe's API.
   stripe.oauth
     .token({
@@ -77,7 +76,7 @@ app.get("/api/manager/connect/oauth", async (req, res) => {
     .then(
       response => {
         var connected_account_id = response.stripe_user_id;
-        saveAccountId(connected_account_id);
+        saveAccountId(connected_account_id, state);
 
         // Render some HTML or redirect to a different page.
         return res.status(200).json({ success: true });
@@ -94,16 +93,14 @@ app.get("/api/manager/connect/oauth", async (req, res) => {
     );
 });
 
-const stateMatches = state_parameter => {
-  // Load the same state value that you randomly generated for your OAuth link.
-  const saved_state = "sv_53124";
-
-  return saved_state == state_parameter;
-};
-
-const saveAccountId = id => {
+const saveAccountId = (id, rest) => {
   // Save the connected account ID from the response to your database.
-  console.log("Connected account ID: " + id);
+  database
+    .ref("restaurants")
+    .child(rest)
+    .update({
+      stripe_connect_id: id
+    });
 };
 
 //serve react if no endpoints hit
