@@ -13,7 +13,6 @@ const firebaseApp = admin.initializeApp({
   databaseURL: "https://dinin-2f0b9.firebaseio.com"
 });
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const stripePublishableKey = process.env.STRIPE_PUBLISHABLE_KEY;
 
 const app = express();
 const router = express.Router();
@@ -30,28 +29,28 @@ app.get("/api/pay", (req, res) => {
   res.json("Hello World AYYYYYY");
 });
 
-app.post("/api/create-customer", async (req, res) => {
-  var phone = req.body.data.user.phone;
-  var line_items = req.body.data.line_items;
-  console.log(line_items);
-  try {
-    // Create a new customer object
+app.post("/api/dashboard-link", async (req, res) => {
+  var stripe_id = req.body.stripe_id;
+  const link = await stripe.accounts.createLoginLink(stripe_id);
+  res.send({ link });
+});
 
-    // Create a CheckoutSession to set up our payment methods recurring usage
-    const checkoutSession = await stripe.checkout.sessions.create({
+app.post("/api/checkout-session", async (req, res) => {
+  var line_items = req.body.data.line_items;
+  var stripe_id = req.body.data.stripe_id;
+  const checkoutSession = await stripe.checkout.sessions.create(
+    {
       payment_method_types: ["card"],
       line_items: line_items,
       mode: "payment",
       success_url: `${req.headers.origin}/session_id/{CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/`
-    });
+    },
+    { stripeAccount: stripe_id }
+  );
 
-    console.log(checkoutSession);
-
-    res.send({ checkoutSession });
-  } catch (error) {
-    res.status(400).send({ error });
-  }
+  console.log(checkoutSession);
+  res.send({ checkoutSession });
 });
 
 app.get("/session_id/:id", async function response(req, res) {
@@ -64,6 +63,37 @@ app.get("/session_id/:id", async function response(req, res) {
   res.send({ checkoutSession });
 });
 
+app.post("/api/create-standard-account", async (req, res) => {
+  console.log(req.body.name);
+  const account = await stripe.accounts.create(req.body.data);
+  saveAccountId(account.id, req.body.name);
+  const accountLinks = await stripe.accountLinks.create({
+    account: account.id,
+    refresh_url: "http://localhost:3000/manager/menu/0",
+    return_url: "http://localhost:3000/manager/menu/0",
+    type: "account_onboarding"
+  });
+  res.send({ accountLinks });
+});
+
+// app.post("/api/get-account-link", async (req, res) => {
+//   var id = req.body.stripe_id;
+//   const accountLinks = await stripe.accountLinks.create({
+//     account: id,
+//     refresh_url: "http://localhost:3000/manager/menu/0",
+//     return_url: "http://localhost:3000/manager/menu/0",
+//     type: "account_onboarding"
+//   });
+//   console.log(accountLinks);
+//   res.send({ accountLinks });
+// });
+
+app.post("/api/retrieve-connect-account", async (req, res) => {
+  var id = req.body.stripeId;
+  const account = await stripe.accounts.retrieve(id);
+  res.send({ account });
+});
+
 app.get("/api/manager/connect/oauth", async (req, res) => {
   const { code, state } = req.query;
 
@@ -74,12 +104,9 @@ app.get("/api/manager/connect/oauth", async (req, res) => {
       code
     })
     .then(
-      response => {
-        var connected_account_id = response.stripe_user_id;
-        saveAccountId(connected_account_id, state);
-
+      async response => {
         // Render some HTML or redirect to a different page.
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ account });
       },
       err => {
         if (err.type === "StripeInvalidGrantError") {

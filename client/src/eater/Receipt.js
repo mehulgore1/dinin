@@ -3,15 +3,17 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 import axios from "axios";
 import { useStripe } from "@stripe/react-stripe-js";
+import Stripe from "stripe";
 
 const Receipt = props => {
-  const stripe = useStripe();
+  var stripe = useStripe();
   const database = firebase.database();
   const [items, setItems] = useState({});
   const [userId, setUserId] = useState(null);
   const [phone, setPhone] = useState(null);
   const [lineItems, setLineItems] = useState({});
   const [itemSubTotal, setItemSubtotal] = useState(0);
+  const [stripeId, setStripeId] = useState(null);
   const { match } = props;
   const thisRest = match.params.restaurant;
   const thisTable = match.params.table;
@@ -48,8 +50,17 @@ const Receipt = props => {
         .child(userId)
         .once("value")
         .then(snapshot => {
-          var fullPhone = String(snapshot.val().phone_number);
-          setPhone(fullPhone.substring(2));
+          if (snapshot.child("phone_number").exists()) {
+            var fullPhone = String(snapshot.val().phone_number);
+            setPhone(fullPhone.substring(2));
+          }
+        });
+      database
+        .ref("restaurants")
+        .child(thisRest)
+        .once("value")
+        .then(snapshot => {
+          setStripeId(snapshot.val().stripe_connect_id);
         });
     }
   }, [userId]);
@@ -85,13 +96,14 @@ const Receipt = props => {
   const handlePayment = () => {
     console.log("payment process initiated");
     var data = {
-      user: {
-        phone: phone
-      },
-      line_items: lineItems
+      line_items: lineItems,
+      stripe_id: stripeId
     };
-    axios.post("/api/create-customer", { data }).then(res => {
+    axios.post("/api/checkout-session", { data }).then(res => {
       var checkoutSession = res.data.checkoutSession;
+      stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY, {
+        stripeAccount: stripeId
+      });
       stripe
         .redirectToCheckout({
           sessionId: checkoutSession.id

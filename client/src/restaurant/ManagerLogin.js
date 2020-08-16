@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import "../App.css";
 import * as firebase from "firebase";
 import { useAlert } from "react-alert";
+import axios from "axios";
 
 const ManagerLogin = props => {
   const { match } = props;
@@ -59,8 +60,8 @@ const ManagerLogin = props => {
             stage_desc: "empty description",
             stage_name: "empty category"
           });
-        var url = "/manager/menu/0";
-        history.replace(url);
+        createConnectedAccount();
+        routeToDashboard();
       })
       .catch(function(error) {
         // Handle Errors here.
@@ -70,13 +71,45 @@ const ManagerLogin = props => {
       });
   };
 
+  const createConnectedAccount = () => {
+    var data = {
+      type: "standard",
+      email: email,
+      business_profile: {
+        name: restName,
+        url: "https://www.rodeogoat.com/"
+      }
+    };
+    var name = shortName;
+    axios.post("/api/create-standard-account", { data, name }).then(res => {
+      const url = res.data.accountLinks.url;
+      window.location.assign(url);
+    });
+  };
+
+  useEffect(() => {
+    initSignedInState();
+  });
+
+  const initSignedInState = () => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        routeToDashboard();
+      }
+    });
+  };
+
+  const routeToDashboard = () => {
+    var url = "/manager/menu/0";
+    history.replace(url);
+  };
+
   const handleLogin = () => {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(result => {
-        var url = "/manager/menu/0";
-        history.replace(url);
+        routeToDashboard();
       })
       .catch(function(error) {
         // Handle Errors here.

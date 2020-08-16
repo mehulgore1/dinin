@@ -6,6 +6,7 @@ import EditMenuItem from "./EditMenuItem";
 import { useHistory, generatePath } from "react-router-dom";
 import TopBarMenu from "../TopBarMenu";
 import { useAlert } from "react-alert";
+import axios from "axios";
 
 const AddItemForm = props => {
   const alert = useAlert();
@@ -98,6 +99,8 @@ const MenuEditor = props => {
   const [editStage, setEditStage] = useState(false);
   const [newStageName, setNewStageName] = useState("");
   const [userId, setUserId] = useState(null);
+  const [stripeId, setStripeId] = useState(null);
+  const [stripeAccount, setStripeAccount] = useState({});
 
   useEffect(() => {
     setStageNum(params.stage);
@@ -122,6 +125,7 @@ const MenuEditor = props => {
       if (user) {
         setUserId(user.uid);
       } else {
+        history.replace("/manager");
       }
     });
   };
@@ -140,6 +144,14 @@ const MenuEditor = props => {
           setStageNames(temp);
         }
         setMenu(tempMenu);
+      });
+    database
+      .ref("restaurants")
+      .child(shortName)
+      .on("value", function(snapshot) {
+        if (snapshot.child("stripe_connect_id").exists()) {
+          setStripeId(snapshot.val().stripe_connect_id);
+        }
       });
   };
 
@@ -165,6 +177,19 @@ const MenuEditor = props => {
   useEffect(() => {
     initSignedInState();
   }, []);
+
+  useEffect(() => {
+    if (stripeId != null) {
+      pullStripeAccount();
+    }
+  }, [stripeId]);
+
+  const pullStripeAccount = () => {
+    console.log(stripeId);
+    axios.post("/api/retrieve-connect-account", { stripeId }).then(res => {
+      setStripeAccount(res.data.account);
+    });
+  };
 
   const handleSetMenu = menu => {
     setMenu(menu);
@@ -236,12 +261,24 @@ const MenuEditor = props => {
     );
   };
 
+  const goToDashboard = () => {
+    axios.post("/api/dashboard-link", { stripe_id: stripeId }).then(res => {
+      const url = res.data.accountLinks.url;
+      window.location.assign(url);
+    });
+  };
+
   return (
     <div>
       <button onClick={handleSignOut}> Sign out </button>
       {!isLoading ? (
         <div className="container mt-5 mb-5">
           <h1>Manager dashboard for {restaurant} </h1>
+          <h5>
+            {" "}
+            Stripe Status:{" "}
+            {stripeAccount.details_submitted ? "Connected" : "Unfinished"}{" "}
+          </h5>
           <a
             href={
               "https://connect.stripe.com/oauth/authorize?client_id=ca_HmWshdSsfZwOc9svGPGlrTgD9kXlrBYt&state=" +
@@ -251,7 +288,10 @@ const MenuEditor = props => {
           >
             <button>Connect With Stripe</button>
           </a>
-
+          {/* <button className="btn btn-primary" onClick={() => goToDashboard()}>
+            {" "}
+            Login to your dashboard{" "}
+          </button> */}
           <FileUpload
             restaurant={shortName}
             match={match}
