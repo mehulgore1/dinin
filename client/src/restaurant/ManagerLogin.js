@@ -60,7 +60,6 @@ const ManagerLogin = props => {
             stage_desc: "empty description",
             stage_name: "empty category"
           });
-        createConnectedAccount();
         routeToDashboard();
       })
       .catch(function(error) {
@@ -69,22 +68,6 @@ const ManagerLogin = props => {
         var errorMessage = error.message;
         console.log(error);
       });
-  };
-
-  const createConnectedAccount = () => {
-    var data = {
-      type: "standard",
-      email: email,
-      business_profile: {
-        name: restName,
-        url: "https://www.rodeogoat.com/"
-      }
-    };
-    var name = shortName;
-    axios.post("/api/create-standard-account", { data, name }).then(res => {
-      const url = res.data.accountLinks.url;
-      window.location.assign(url);
-    });
   };
 
   useEffect(() => {
@@ -121,7 +104,7 @@ const ManagerLogin = props => {
   };
 
   return (
-    <div>
+    <div className="jumbotron container mx-5 my-2">
       <h1> Welcome to your Restaurant Dashboard </h1>
       {hasAccount ? (
         <div>
@@ -151,7 +134,7 @@ const ManagerLogin = props => {
               />
             </div>
           </div>
-          <button onClick={handleLogin} className="btn btn-primary">
+          <button onClick={handleLogin} className="btn btn-dark">
             Login
           </button>
         </div>
@@ -207,18 +190,25 @@ const ManagerLogin = props => {
               />
             </div>
           </div>
-          <button onClick={handleSignup} className="btn btn-primary">
+          <button onClick={handleSignup} className="btn btn-dark">
             Create Your Account
           </button>
         </div>
       )}
+      <br />
       {hasAccount ? (
-        <button onClick={() => setHasAccount(false)}>
+        <button
+          className="btn btn-secondary"
+          onClick={() => setHasAccount(false)}
+        >
           {" "}
           Create an Account{" "}
         </button>
       ) : (
-        <button onClick={() => setHasAccount(true)}>
+        <button
+          className="btn btn-secondary"
+          onClick={() => setHasAccount(true)}
+        >
           {" "}
           Login to existing account
         </button>

@@ -6,9 +6,9 @@ import { ErrorBoundary } from "react-error-boundary";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 
-const stripePromise = loadStripe(
-  "pk_test_51H9McFKtxt3kvNhb3JFchFPW2D3DSus5ZqWQyWRSi7pxFPKLgh10xui8vi62tE6VSzKcwKhzkPo4CD8EYxrvU9SO00L2aKTYsE"
-);
+var stripePublishKey =
+  "pk_test_51H9McFKtxt3kvNhb3JFchFPW2D3DSus5ZqWQyWRSi7pxFPKLgh10xui8vi62tE6VSzKcwKhzkPo4CD8EYxrvU9SO00L2aKTYsE";
+const stripePromise = loadStripe(stripePublishKey);
 
 const options = {
   timeout: 5000,

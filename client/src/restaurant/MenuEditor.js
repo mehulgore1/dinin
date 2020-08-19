@@ -210,7 +210,7 @@ const MenuEditor = props => {
     database
       .ref("restaurants")
       .child(shortName)
-      .ref(shortName)
+      .child(shortName)
       .child("menu")
       .child(stageNum)
       .update({ stage_desc: stageDesc });
@@ -270,7 +270,13 @@ const MenuEditor = props => {
 
   return (
     <div>
-      <button onClick={handleSignOut}> Sign out </button>
+      <div className="mt-5 d-flex justify-content-around">
+        <button className="btn btn-danger" onClick={handleSignOut}>
+          {" "}
+          Sign out{" "}
+        </button>{" "}
+      </div>
+
       {!isLoading ? (
         <div className="container mt-5 mb-5">
           <h1>Manager dashboard for {restaurant} </h1>
@@ -279,15 +285,27 @@ const MenuEditor = props => {
             Stripe Status:{" "}
             {stripeAccount.details_submitted ? "Connected" : "Unfinished"}{" "}
           </h5>
-          <a
-            href={
-              "https://connect.stripe.com/oauth/authorize?client_id=ca_HmWshdSsfZwOc9svGPGlrTgD9kXlrBYt&state=" +
-              shortName +
-              "&scope=read_write&response_type=code"
-            }
-          >
-            <button>Connect With Stripe</button>
-          </a>
+          {stripeAccount.details_submitted ? (
+            <a href="https://dashboard.stripe.com/dashboard">
+              <button className="btn btn-primary">
+                Stripe Payments Dashboard
+              </button>
+            </a>
+          ) : (
+            <a
+              href={
+                "https://connect.stripe.com/oauth/authorize?client_id=ca_HmWshdSsfZwOc9svGPGlrTgD9kXlrBYt&state=" +
+                shortName +
+                "&scope=read_write&response_type=code"
+              }
+            >
+              <button className="btn btn-primary">
+                {" "}
+                Connect to Stripe Payments{" "}
+              </button>
+            </a>
+          )}
+
           {/* <button className="btn btn-primary" onClick={() => goToDashboard()}>
             {" "}
             Login to your dashboard{" "}

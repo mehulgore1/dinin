@@ -63,31 +63,6 @@ app.get("/session_id/:id", async function response(req, res) {
   res.send({ checkoutSession });
 });
 
-app.post("/api/create-standard-account", async (req, res) => {
-  console.log(req.body.name);
-  const account = await stripe.accounts.create(req.body.data);
-  saveAccountId(account.id, req.body.name);
-  const accountLinks = await stripe.accountLinks.create({
-    account: account.id,
-    refresh_url: "http://localhost:3000/manager/menu/0",
-    return_url: "http://localhost:3000/manager/menu/0",
-    type: "account_onboarding"
-  });
-  res.send({ accountLinks });
-});
-
-// app.post("/api/get-account-link", async (req, res) => {
-//   var id = req.body.stripe_id;
-//   const accountLinks = await stripe.accountLinks.create({
-//     account: id,
-//     refresh_url: "http://localhost:3000/manager/menu/0",
-//     return_url: "http://localhost:3000/manager/menu/0",
-//     type: "account_onboarding"
-//   });
-//   console.log(accountLinks);
-//   res.send({ accountLinks });
-// });
-
 app.post("/api/retrieve-connect-account", async (req, res) => {
   var id = req.body.stripeId;
   const account = await stripe.accounts.retrieve(id);
@@ -106,7 +81,9 @@ app.get("/api/manager/connect/oauth", async (req, res) => {
     .then(
       async response => {
         // Render some HTML or redirect to a different page.
-        return res.status(200).json({ account });
+        var connected_account_id = response.stripe_user_id;
+        saveAccountId(connected_account_id, state);
+        return res.status(200).json({ success: true });
       },
       err => {
         if (err.type === "StripeInvalidGrantError") {

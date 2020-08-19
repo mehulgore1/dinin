@@ -3,9 +3,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
 import axios from "axios";
 import { useStripe } from "@stripe/react-stripe-js";
-import Stripe from "stripe";
+import { loadStripe } from "@stripe/stripe-js";
 
 const Receipt = props => {
+  var stripePublishKey =
+    "pk_test_51H9McFKtxt3kvNhb3JFchFPW2D3DSus5ZqWQyWRSi7pxFPKLgh10xui8vi62tE6VSzKcwKhzkPo4CD8EYxrvU9SO00L2aKTYsE";
   var stripe = useStripe();
   const database = firebase.database();
   const [items, setItems] = useState({});
@@ -72,6 +74,16 @@ const Receipt = props => {
     }
   }, [items]);
 
+  useEffect(() => {
+    if (stripeId != null) {
+      resolveStripeObj();
+    }
+  }, [stripeId]);
+
+  async function resolveStripeObj() {
+    stripe = await loadStripe(stripePublishKey, stripeId);
+  }
+
   const constructLineItems = () => {
     var tempList = [];
     for (var key in items) {
@@ -101,9 +113,6 @@ const Receipt = props => {
     };
     axios.post("/api/checkout-session", { data }).then(res => {
       var checkoutSession = res.data.checkoutSession;
-      stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY, {
-        stripeAccount: stripeId
-      });
       stripe
         .redirectToCheckout({
           sessionId: checkoutSession.id
