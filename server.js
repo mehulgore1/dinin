@@ -38,18 +38,18 @@ app.post("/api/dashboard-link", async (req, res) => {
 app.post("/api/checkout-session", async (req, res) => {
   var line_items = req.body.data.line_items;
   var stripe_id = req.body.data.stripe_id;
-  const checkoutSession = await stripe.checkout.sessions.create(
-    {
-      payment_method_types: ["card"],
-      line_items: line_items,
-      mode: "payment",
-      success_url: `${req.headers.origin}/session_id/{CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.origin}/`
+  const checkoutSession = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: line_items,
+    payment_intent_data: {
+      transfer_data: {
+        destination: stripe_id
+      }
     },
-    { stripeAccount: stripe_id }
-  );
-
-  console.log(checkoutSession);
+    mode: "payment",
+    success_url: `${req.headers.origin}/session_id/{CHECKOUT_SESSION_ID}`,
+    cancel_url: `${req.headers.origin}/`
+  });
   res.send({ checkoutSession });
 });
 
