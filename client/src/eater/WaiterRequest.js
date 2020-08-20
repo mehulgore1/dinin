@@ -115,7 +115,7 @@ const WaiterRequest = props => {
           "/receipt"
         }
       >
-        <button className="btn btn-dark btn-lg">Your Receipt</button>{" "}
+        <button className="btn btn-dark btn-lg">View Check</button>{" "}
       </a>
     </div>
   );

@@ -4,18 +4,25 @@ import * as firebase from "firebase";
 import axios from "axios";
 import { useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { type } from "os";
 
 const Receipt = props => {
   var stripePublishKey =
     "pk_test_51H9McFKtxt3kvNhb3JFchFPW2D3DSus5ZqWQyWRSi7pxFPKLgh10xui8vi62tE6VSzKcwKhzkPo4CD8EYxrvU9SO00L2aKTYsE";
   var stripe = useStripe();
   const database = firebase.database();
+  const tax = 0.085;
+
   const [items, setItems] = useState({});
   const [userId, setUserId] = useState(null);
   const [phone, setPhone] = useState(null);
   const [lineItems, setLineItems] = useState({});
   const [itemSubTotal, setItemSubtotal] = useState(0);
   const [stripeId, setStripeId] = useState(null);
+  const [tip, setTip] = useState(0);
+  const [displayTax, setDisplayTax] = useState();
+  const [total, setTotal] = useState(0);
+
   const { match } = props;
   const thisRest = match.params.restaurant;
   const thisTable = match.params.table;
@@ -71,6 +78,7 @@ const Receipt = props => {
     if (Object.keys(items).length !== 0) {
       calcItemSubTotal();
       constructLineItems();
+      calcTaxAmt();
     }
   }, [items]);
 
@@ -79,6 +87,13 @@ const Receipt = props => {
       resolveStripeObj();
     }
   }, [stripeId]);
+
+  useEffect(() => {
+    if (itemSubTotal > 0 && displayTax > 0) {
+      var rawTotal = displayTax + tip + itemSubTotal;
+    }
+    console.log(rawTotal);
+  }, [tip, itemSubTotal, displayTax]);
 
   async function resolveStripeObj() {
     stripe = await loadStripe(stripePublishKey, stripeId);
@@ -132,27 +147,48 @@ const Receipt = props => {
     setItemSubtotal(total);
   };
 
+  const setTipPercent = percent => {
+    var decimal = percent / 100;
+    var rawTip = decimal * itemSubTotal;
+    var shownTip = rawTip.toFixed(2);
+    setTip(shownTip);
+    calcTotal();
+  };
+
+  const calcTaxAmt = () => {
+    var raw = Number(itemSubTotal * tax);
+    setDisplayTax(raw.toFixed(2));
+  };
+
+  const calcTotal = () => {
+    var rawTotal = Number(displayTax + tip + itemSubTotal);
+    setTotal(rawTotal.toFixed(2));
+  };
+
   return (
-    <Fragment>
+    <div className="container">
       <div className="d-flex justify-content-center mt-3">
         <a href={"/" + thisRest + "/menu/" + thisTable}>
           <button className="btn btn-dark btn-lg">Go to Table Dashboard</button>
         </a>
       </div>
-      <div className="d-flex justify-content-center">
-        <h1> Receipt </h1>{" "}
+      <div className="d-flex justify-content-center mt-3 mb-3">
+        <h1> Check </h1>{" "}
       </div>
       {Object.keys(items || {}).map((key, i) => {
         var item = items[key];
         return (
           <Fragment key={key}>
             <div className="d-flex justify-content-between">
-              <div className="ml-3">
+              <div>
                 {" "}
-                <h2> {item.quantity} </h2>
+                <h2>
+                  {" "}
+                  <span className="badge badge-dark">{item.quantity}</span>{" "}
+                </h2>
               </div>
               <div>
-                <div>
+                <div className="ml-3">
                   {" "}
                   <h2>{item.title}</h2>
                 </div>
@@ -161,24 +197,97 @@ const Receipt = props => {
                   <h2> {item.notes}</h2>
                 </div>
               </div>
-              <div className="mr-3">
+              <div>
                 {" "}
-                <h2> ${Number(item.price) * Number(item.quantity)} </h2>
+                <h2>
+                  {" "}
+                  <span className="badge badge-warning">
+                    ${Number(item.price) * Number(item.quantity)}{" "}
+                  </span>{" "}
+                </h2>
               </div>
             </div>
           </Fragment>
         );
       })}
-
-      <h1> Subtotal {itemSubTotal} </h1>
-
-      <button
-        className="btn btn-success btn-block"
-        onClick={() => handlePayment()}
-      >
-        Finish and Pay
-      </button>
-    </Fragment>
+      <hr />
+      <div className="d-flex justify-content-between mt-3">
+        <h1> Subtotal </h1>
+        <h1>{itemSubTotal} </h1>
+      </div>
+      <div className="d-flex justify-content-between mt-1">
+        <h1> Tax </h1>
+        <h1> {displayTax} </h1>
+      </div>
+      <div className="d-flex justify-content-between mt-1">
+        <h1> Tip </h1>
+        <h1> {tip} </h1>
+      </div>
+      <div className="d-flex justify-content-center mt-1">
+        <div className="btn-group">
+          <button
+            onClick={() => setTipPercent(5)}
+            type="button"
+            className="btn btn-outline-dark"
+          >
+            5%
+          </button>
+          <button
+            onClick={() => setTipPercent(10)}
+            type="button"
+            className="btn btn-outline-dark"
+          >
+            10%
+          </button>
+          <button
+            onClick={() => setTipPercent(15)}
+            type="button"
+            className="btn btn-outline-dark"
+          >
+            15%
+          </button>
+          <button
+            onClick={() => setTipPercent(20)}
+            type="button"
+            className="btn btn-outline-dark"
+          >
+            20%
+          </button>
+          <button
+            onClick={() => setTipPercent(25)}
+            type="button"
+            className="btn btn-outline-dark"
+          >
+            25%
+          </button>
+          <button
+            onClick={() => setTipPercent(30)}
+            type="button"
+            className="btn btn-outline-dark"
+          >
+            30%
+          </button>
+        </div>
+      </div>
+      <div className="d-flex justify-content-between mt-3">
+        <h1>
+          {" "}
+          <strong> Total </strong>{" "}
+        </h1>
+        <h1>
+          {" "}
+          <span className="badge badge-success">{total}</span>{" "}
+        </h1>
+      </div>
+      <div className="d-flex justify-content-center mt-3">
+        <button
+          className="btn btn-dark btn-lg btn-block"
+          onClick={() => handlePayment()}
+        >
+          Finish and Pay
+        </button>
+      </div>
+    </div>
   );
 };
 
