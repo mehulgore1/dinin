@@ -4,7 +4,7 @@ import * as firebase from "firebase";
 import axios from "axios";
 import { useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { type } from "os";
+import { Modal } from "react-bootstrap";
 
 const Receipt = props => {
   var stripePublishKey =
@@ -22,6 +22,7 @@ const Receipt = props => {
   const [tip, setTip] = useState(0);
   const [displayTax, setDisplayTax] = useState();
   const [total, setTotal] = useState(0);
+  const [modalShow, setModalShow] = useState(false);
 
   const { match } = props;
   const thisRest = match.params.restaurant;
@@ -78,7 +79,6 @@ const Receipt = props => {
     if (Object.keys(items).length !== 0) {
       calcItemSubTotal();
       constructLineItems();
-      calcTaxAmt();
     }
   }, [items]);
 
@@ -89,11 +89,22 @@ const Receipt = props => {
   }, [stripeId]);
 
   useEffect(() => {
-    if (itemSubTotal > 0 && displayTax > 0) {
-      var rawTotal = displayTax + tip + itemSubTotal;
+    if (itemSubTotal > 0) {
+      var raw = Number(itemSubTotal * tax);
+      setDisplayTax(raw.toFixed(2));
     }
-    console.log(rawTotal);
-  }, [tip, itemSubTotal, displayTax]);
+  }, [itemSubTotal]);
+
+  useEffect(() => {
+    if (displayTax != null && displayTax > 0) {
+      var displayTaxNum = Number(displayTax);
+      var tipNum = Number(tip);
+      var itemSubTotalNum = Number(itemSubTotal);
+      var raw = displayTaxNum + tipNum + itemSubTotalNum;
+      setTotal(raw.toFixed(2));
+      constructLineItems();
+    }
+  }, [displayTax, tip]);
 
   async function resolveStripeObj() {
     stripe = await loadStripe(stripePublishKey, stripeId);
@@ -117,10 +128,39 @@ const Receipt = props => {
       };
       tempList.push(tempObj);
     }
+    var tipNum = tip * 100;
+    var taxNum = Number(displayTax) * 100;
+    var tipObj = {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: "Tip"
+        },
+        unit_amount: tipNum
+      },
+      quantity: 1
+    };
+    var taxObj = {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: "Tax"
+        },
+        unit_amount: taxNum
+      },
+      quantity: 1
+    };
+    tempList.push(taxObj);
+    tempList.push(tipObj);
     setLineItems(tempList);
   };
 
   const handlePayment = () => {
+    if (tip == 0) {
+      console.log(tip);
+      alert("Please Enter a Tip Amount");
+      return;
+    }
     console.log("payment process initiated");
     var data = {
       line_items: lineItems,
@@ -152,17 +192,11 @@ const Receipt = props => {
     var rawTip = decimal * itemSubTotal;
     var shownTip = rawTip.toFixed(2);
     setTip(shownTip);
-    calcTotal();
   };
 
-  const calcTaxAmt = () => {
-    var raw = Number(itemSubTotal * tax);
-    setDisplayTax(raw.toFixed(2));
-  };
-
-  const calcTotal = () => {
-    var rawTotal = Number(displayTax + tip + itemSubTotal);
-    setTotal(rawTotal.toFixed(2));
+  const showPrice = (price, quantity) => {
+    var priceWithQuantity = Number(price) * Number(quantity);
+    return priceWithQuantity.toFixed(2);
   };
 
   return (
@@ -182,15 +216,15 @@ const Receipt = props => {
             <div className="d-flex justify-content-between">
               <div>
                 {" "}
-                <h2>
+                <h4>
                   {" "}
                   <span className="badge badge-dark">{item.quantity}</span>{" "}
-                </h2>
+                </h4>
               </div>
               <div>
                 <div className="ml-3">
                   {" "}
-                  <h2>{item.title}</h2>
+                  <h4>{item.title}</h4>
                 </div>
                 <div>
                   {" "}
@@ -199,12 +233,12 @@ const Receipt = props => {
               </div>
               <div>
                 {" "}
-                <h2>
+                <h4>
                   {" "}
                   <span className="badge badge-warning">
-                    ${Number(item.price) * Number(item.quantity)}{" "}
+                    {showPrice(item.price, item.quantity)}
                   </span>{" "}
-                </h2>
+                </h4>
               </div>
             </div>
           </Fragment>
@@ -212,62 +246,75 @@ const Receipt = props => {
       })}
       <hr />
       <div className="d-flex justify-content-between mt-3">
-        <h1> Subtotal </h1>
-        <h1>{itemSubTotal} </h1>
+        <h3> Subtotal </h3>
+        <h3>{Number(itemSubTotal).toFixed(2)} </h3>
       </div>
       <div className="d-flex justify-content-between mt-1">
-        <h1> Tax </h1>
-        <h1> {displayTax} </h1>
+        <h3> Tax </h3>
+        <h3> {displayTax} </h3>
       </div>
       <div className="d-flex justify-content-between mt-1">
-        <h1> Tip </h1>
-        <h1> {tip} </h1>
+        <h3> Tip </h3>
+        <h3> {Number(tip).toFixed(2)} </h3>
       </div>
       <div className="d-flex justify-content-center mt-1">
-        <div className="btn-group">
+        <div className="btn-group" style={{ width: "100%" }}>
           <button
-            onClick={() => setTipPercent(5)}
+            onClick={() => setTipPercent(18)}
             type="button"
-            className="btn btn-outline-dark"
+            className="btn btn-outline-dark px-3"
+            style={{ width: "20%" }}
           >
-            5%
-          </button>
-          <button
-            onClick={() => setTipPercent(10)}
-            type="button"
-            className="btn btn-outline-dark"
-          >
-            10%
-          </button>
-          <button
-            onClick={() => setTipPercent(15)}
-            type="button"
-            className="btn btn-outline-dark"
-          >
-            15%
+            18%
           </button>
           <button
             onClick={() => setTipPercent(20)}
             type="button"
-            className="btn btn-outline-dark"
+            className="btn btn-outline-dark px-3"
+            style={{ width: "20%" }}
           >
             20%
           </button>
           <button
             onClick={() => setTipPercent(25)}
             type="button"
-            className="btn btn-outline-dark"
+            className="btn btn-outline-dark px-3"
+            style={{ width: "20%" }}
           >
             25%
           </button>
           <button
             onClick={() => setTipPercent(30)}
             type="button"
-            className="btn btn-outline-dark"
+            className="btn btn-outline-dark px-3"
+            style={{ width: "20%" }}
           >
             30%
           </button>
+          <button
+            onClick={() => {
+              setTip(0);
+              setModalShow(true);
+            }}
+            type="button"
+            className="btn btn-outline-dark px-3"
+            style={{ width: "20%" }}
+          >
+            Other
+          </button>
         </div>
+      </div>
+      <div
+        onClick={e => e.stopPropagation()}
+        className="d-flex justify-content-around"
+      >
+        <TipModal
+          onHide={() => setModalShow(false)}
+          setModalShow={setModalShow}
+          show={modalShow}
+          tip={tip}
+          setCustomTip={setTip}
+        />
       </div>
       <div className="d-flex justify-content-between mt-3">
         <h1>
@@ -288,6 +335,39 @@ const Receipt = props => {
         </button>
       </div>
     </div>
+  );
+};
+
+const TipModal = props => {
+  const setValidatedTip = value => {
+    if (value.match(/^\d*\.?\d*$/)) {
+      props.setCustomTip(value);
+    } else {
+      props.setCustomTip(0);
+    }
+  };
+
+  return (
+    <Modal
+      {...props}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Enter Custom Tip
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <input
+          type="text"
+          value={props.tip}
+          placeholder="Enter Tip Amt"
+          onChange={e => setValidatedTip(e.target.value)}
+        />
+      </Modal.Body>
+    </Modal>
   );
 };
 
