@@ -83,10 +83,7 @@ const WaiterRequest = props => {
   useEffect(() => {
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
-        console.log("user signed in ");
         setUserId(user.uid);
-      } else {
-        console.log("user NOT signed in ");
       }
     });
     database

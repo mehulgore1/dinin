@@ -186,7 +186,6 @@ const MenuEditor = props => {
   }, [stripeId]);
 
   const pullStripeAccount = () => {
-    console.log(stripeId);
     axios.post("/api/retrieve-connect-account", { stripeId }).then(res => {
       setStripeAccount(res.data.account);
     });
@@ -262,7 +261,6 @@ const MenuEditor = props => {
       {shortName != null ? <ManagerMenu shortName={shortName} /> : null}
       {!isLoading ? (
         <div className="container mt-5 mb-5">
-          <h1>Manager dashboard for {restaurant} </h1>
           <h5>
             {" "}
             Stripe Status:{" "}

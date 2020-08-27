@@ -106,7 +106,6 @@ const TableBasket = props => {
             .child("tables")
             .child(thisTable)
             .on("value", function(snapshot) {
-              console.log(snapshot.val());
               if (snapshot.val() != null) {
                 setTableData(snapshot.val());
               } else {
@@ -258,7 +257,6 @@ const TableBasket = props => {
       .child(thisTable)
       .child("batches")
       .once("value", function(snapshot) {
-        console.log(batch_key_param);
         if (!snapshot.hasChild(batch_key_param)) {
           // set to same batch key
           database

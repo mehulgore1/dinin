@@ -42,7 +42,6 @@ const ManagerLogin = props => {
       .createUserWithEmailAndPassword(email, password)
       .then(result => {
         var user = firebase.auth().currentUser;
-        console.log(user);
         database
           .ref("managers")
           .child(user.uid)

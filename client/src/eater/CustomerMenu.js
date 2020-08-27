@@ -98,7 +98,6 @@ const CustomerMenu = props => {
           tempSplitSeats[seat]["name"] = name;
           tempSplitSeats[seat]["user_id"] = id;
         }
-        console.log(tempSplitSeats);
         setTableUsers(tempSplitSeats);
       });
   };
@@ -164,7 +163,6 @@ const CustomerMenu = props => {
   ) => {
     const id = item_id;
     if (splitSeats != null) {
-      console.log(splitSeats);
       // handle splitting items
       var splitCount = 0;
       for (var seat in splitSeats) {

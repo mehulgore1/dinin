@@ -153,7 +153,6 @@ function BasketItemDetailsModal(props) {
               tempSplitSeats[seat]["name"] = name;
               tempSplitSeats[seat]["user_id"] = id;
             }
-            console.log(tempSplitSeats);
             setSplitSeats(tempSplitSeats);
           });
       }

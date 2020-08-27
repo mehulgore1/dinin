@@ -70,7 +70,6 @@ const FileUpload = props => {
       finalMenu[thisStage]["items"].push(tempItem);
       finalMenu[thisStage]["stage_name"] = category;
     }
-    console.log(finalMenu);
     props.handleSetMenu(finalMenu);
   };
 
