@@ -8,11 +8,9 @@ const WaiterRequest = props => {
   var database = firebase.database();
   const [userId, setUserId] = useState({});
   const [users, setUsers] = useState({});
-  //const [request, setRequest] = useState("Get water");
-
-  //   const handleRequestChange = event => {
-  //     setRequest(event.target.value);
-  //   };
+  const { match } = props;
+  const restName = match.params.restaurant;
+  const table = match.params.table;
 
   const formatAMPM = date => {
     var hours = date.getHours();
@@ -34,14 +32,16 @@ const WaiterRequest = props => {
       requestedAt: time
     };
     var key = database
-      .ref(props.match.params.restaurant)
+      .ref("restaurants")
+      .child(restName)
       .child("tables")
-      .child(props.match.params.table)
+      .child(table)
       .child("requests")
       .push(requestObj).key;
 
     database
-      .ref(props.match.params.restaurant)
+      .ref("restaurants")
+      .child(restName)
       .child("requests")
       .child(key)
       .set(requestObj);
@@ -68,9 +68,10 @@ const WaiterRequest = props => {
         // hasn't ordered water get 1 glass
         handleSendRequest("One New Glass of Water Requested");
         database
-          .ref(props.match.params.restaurant)
+          .ref("restaurants")
+          .child(restName)
           .child("tables")
-          .child(props.match.params.table)
+          .child(table)
           .child("users")
           .child(userId)
           .child("water_ordered")
@@ -89,9 +90,10 @@ const WaiterRequest = props => {
       }
     });
     database
-      .ref(props.match.params.restaurant)
+      .ref("restaurants")
+      .child(restName)
       .child("tables")
-      .child(props.match.params.table)
+      .child(table)
       .child("users")
       .on("value", function(snapshot) {
         setUsers(snapshot.val());
@@ -106,15 +108,7 @@ const WaiterRequest = props => {
       >
         Waiter Request
       </button>
-      <a
-        href={
-          "/" +
-          props.match.params.restaurant +
-          "/" +
-          props.match.params.table +
-          "/receipt"
-        }
-      >
+      <a href={"/" + restName + "/" + table + "/receipt"}>
         <button className="btn btn-dark btn-lg">View Check</button>{" "}
       </a>
     </div>
