@@ -1,15 +1,22 @@
 import React, { useState, useEffect, Fragment } from "react";
-import "../App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import * as firebase from "firebase";
+import { useHistory } from "react-router-dom";
+import { useAlert } from "react-alert";
+import ManagerMenu from "./ManagerMenu";
 
 const Tables = props => {
-  var database = firebase.database();
+  const history = useHistory();
+  const database = firebase.database();
   const [tables, setTables] = useState([]);
-  const { match } = props;
+  const [restName, setRestName] = useState(null);
+  const [shortName, setShortName] = useState(null);
+  const [managerId, setManagerId] = useState(null);
 
-  useEffect(() => {
+  const initTables = () => {
     database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(shortName)
       .child("tables")
       .on("value", function(snapshot) {
         if (snapshot.val() != null) {
@@ -18,11 +25,65 @@ const Tables = props => {
           setTables([]);
         }
       });
+  };
+
+  useEffect(() => {
+    initSignedInState();
   }, []);
+
+  useEffect(() => {
+    if (shortName != null && restName != null) {
+      initTables();
+    }
+  }, [shortName, restName]);
+
+  useEffect(() => {
+    if (managerId != null) {
+      initRestNames();
+    }
+  }, [managerId]);
+
+  const initRestNames = () => {
+    database
+      .ref("managers")
+      .child(managerId)
+      .once("value")
+      .then(snapshot => {
+        var manager = snapshot.val();
+        setRestName(manager.restaurant_name);
+        setShortName(manager.restaurant_short_name);
+      });
+  };
+
+  const initSignedInState = () => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        var uid = user.uid;
+        database
+          .ref("managers")
+          .once("value")
+          .then(snapshot => {
+            if (!snapshot.hasChild(uid)) {
+              routeToManagerLogin();
+            } else {
+              setManagerId(uid);
+            }
+          });
+      } else {
+        routeToManagerLogin();
+      }
+    });
+  };
+
+  const routeToManagerLogin = () => {
+    var url = "/manager";
+    history.replace(url);
+  };
 
   const finishSession = tableNum => {
     database
-      .ref(match.params.restaurant)
+      .ref("restaurants")
+      .child(shortName)
       .child("tables")
       .child(tableNum)
       .child("users")
@@ -32,7 +93,8 @@ const Tables = props => {
       })
       .then(users => {
         database
-          .ref(match.params.restaurant)
+          .ref("restaurants")
+          .child(shortName)
           .child("tables")
           .child(tableNum)
           .child("past_users")
@@ -40,21 +102,24 @@ const Tables = props => {
       })
       .then(irr => {
         database
-          .ref(match.params.restaurant)
+          .ref("restaurants")
+          .child(shortName)
           .child("tables")
           .child(tableNum)
           .child("users")
           .remove();
 
         database
-          .ref(match.params.restaurant)
+          .ref("restaurants")
+          .child(shortName)
           .child("tables")
           .child(tableNum)
           .child("batches")
           .remove();
 
         database
-          .ref(match.params.restaurant)
+          .ref("restaurants")
+          .child(shortName)
           .child("tables")
           .child(tableNum)
           .child("requests")
@@ -74,18 +139,7 @@ const Tables = props => {
 
   return (
     <div className="container mt-5">
-      <div className="d-flex justify-content-center">
-        <h1> Table Management </h1>
-      </div>
-      <div className="d-flex justify-content-around">
-        <a href={"/" + match.params.restaurant + "/orders"}>
-          {" "}
-          <button className="btn btn-lg btn-dark">Orders</button>{" "}
-        </a>
-        <a href={"/" + match.params.restaurant + "/requests"}>
-          <button className="btn btn-dark btn-lg"> View Requests </button>{" "}
-        </a>
-      </div>
+      {shortName != null ? <ManagerMenu shortName={shortName} /> : null}
       {tables.map(tableNum => {
         return (
           <div key={tableNum} className="d-flex justify-content-around mt-3">
