@@ -29,8 +29,8 @@ const App = () => {
           component={PaymentSuccess}
         />
         <Route exact path="/:restaurant/menu/:table" component={TableBasket} />
-        <Route exact path="/:restaurant/orders/" component={OrderQ} />
-        <Route exact path="/:restaurant/requests" component={Requests} />
+        <Route exact path="/manager/orders/" component={OrderQ} />
+        <Route exact path="/manager/requests" component={Requests} />
         <Route exact path="/:restaurant/:table/receipt" component={Receipt} />
         <Route exact path="/:restaurant/tables" component={Tables} />
       </Switch>

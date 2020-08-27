@@ -1,20 +1,25 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useHistory } from "react-router-dom";
 import * as firebase from "firebase";
 import { useAlert } from "react-alert";
+import ManagerMenu from "./ManagerMenu";
 
 const OrderQ = props => {
   const alert = useAlert();
+  const history = useHistory();
   var database = firebase.database();
   const [orders, setOrders] = useState([]);
-  const [restaurant, setRestaurant] = useState("");
   const { match } = props;
-  const tempRest = match.params.restaurant;
   const [numRequests, setNumRequests] = useState(0);
+  const [restName, setRestName] = useState(null);
+  const [shortName, setShortName] = useState(null);
+  const [managerId, setManagerId] = useState(null);
 
   const sendStatus = (table, batch, seat_num, item_key, status) => {
     database
-      .ref(tempRest)
+      .ref("restaurants")
+      .child(shortName)
       .child("tables")
       .child(table)
       .child("batches")
@@ -28,14 +33,38 @@ const OrderQ = props => {
     alert.show("Table Notified");
   };
 
-  const removeBatchOrder = batch_key => {};
+  const initSignedInState = () => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        var uid = user.uid;
+        database
+          .ref("managers")
+          .once("value")
+          .then(snapshot => {
+            if (!snapshot.hasChild(uid)) {
+              routeToManagerLogin();
+            } else {
+              setManagerId(uid);
+            }
+          });
+      } else {
+        routeToManagerLogin();
+      }
+    });
+  };
+
+  const routeToManagerLogin = () => {
+    var url = "/manager";
+    history.replace(url);
+  };
 
   const completeBatch = (table, batch_key) => {
     const thisTable = table;
     var confirm = window.confirm("Are you sure all items are in?");
     if (confirm) {
       database
-        .ref(tempRest)
+        .ref("restaurants")
+        .child(shortName)
         .child("tables")
         .once("value")
         .then(function(snapshot) {
@@ -52,7 +81,8 @@ const OrderQ = props => {
                 "items"
               ]) {
                 database
-                  .ref(tempRest)
+                  .ref("restaurants")
+                  .child(shortName)
                   .child("tables")
                   .child(table)
                   .child("batches")
@@ -68,7 +98,8 @@ const OrderQ = props => {
         })
         .then(() => {
           database
-            .ref(tempRest)
+            .ref("restaurants")
+            .child(shortName)
             .child("order_queue")
             .child(batch_key)
             .remove();
@@ -81,40 +112,53 @@ const OrderQ = props => {
   };
 
   useEffect(() => {
-    setRestaurant(tempRest);
+    initSignedInState();
+  }, []);
+
+  useEffect(() => {
+    if (shortName != null && restName != null) {
+      initOrders();
+    }
+  }, [shortName, restName]);
+
+  useEffect(() => {
+    if (managerId != null) {
+      initRestNames();
+    }
+  }, [managerId]);
+
+  const initRestNames = () => {
     database
-      .ref(tempRest)
+      .ref("managers")
+      .child(managerId)
+      .once("value")
+      .then(snapshot => {
+        var manager = snapshot.val();
+        setRestName(manager.restaurant_name);
+        setShortName(manager.restaurant_short_name);
+      });
+  };
+
+  const initOrders = () => {
+    database
+      .ref("restaurants")
+      .child(shortName)
       .child("order_queue")
       .on("value", function(snapshot) {
         setOrders(snapshot.val());
       });
     database
-      .ref(tempRest)
+      .ref("restaurants")
+      .child(shortName)
       .child("requests")
       .on("value", function(snapshot) {
         setNumRequests(snapshot.numChildren());
       });
-  }, []);
+  };
 
   return (
     <div className="container mt-5">
-      <div className="d-flex justify-content-around">
-        {" "}
-        <h1> Orders for {restaurant} </h1>{" "}
-      </div>
-      <div className="d-flex justify-content-around mb-3">
-        <a href={"/" + tempRest + "/tables"}>
-          <button className="btn btn-dark btn-lg"> Manage Tables </button>{" "}
-        </a>
-        <a href={"/" + tempRest + "/requests"}>
-          <button className="btn btn-dark btn-lg">
-            Requests{" "}
-            {numRequests != 0 ? (
-              <span className="badge badge-success"> {numRequests}</span>
-            ) : null}
-          </button>{" "}
-        </a>
-      </div>
+      {shortName != null ? <ManagerMenu shortName={shortName} /> : null}
       {Object.keys(orders || {}).map((batch_key, index) => {
         return (
           <Fragment key={batch_key}>

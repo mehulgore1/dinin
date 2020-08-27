@@ -360,12 +360,22 @@ const TipModal = props => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <input
-          type="text"
-          value={props.tip}
-          placeholder="Enter Tip Amt"
-          onChange={e => setValidatedTip(e.target.value)}
-        />
+        <div className="d-flex justify-content-around">
+          <input
+            className="form-control mx-3"
+            type="text"
+            value={props.tip}
+            placeholder="Enter Tip Amt"
+            onChange={e => setValidatedTip(e.target.value)}
+          />
+          <button
+            className="btn btn-success"
+            onClick={() => props.setModalShow(false)}
+          >
+            {" "}
+            Save{" "}
+          </button>
+        </div>
       </Modal.Body>
     </Modal>
   );

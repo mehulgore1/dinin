@@ -77,7 +77,15 @@ const ManagerLogin = props => {
   const initSignedInState = () => {
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
-        routeToDashboard();
+        var uid = user.uid;
+        database
+          .ref("managers")
+          .once("value")
+          .then(snapshot => {
+            if (snapshot.hasChild(uid)) {
+              routeToDashboard();
+            }
+          });
       }
     });
   };

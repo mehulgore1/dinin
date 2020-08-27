@@ -7,6 +7,7 @@ import { useHistory, generatePath } from "react-router-dom";
 import TopBarMenu from "../TopBarMenu";
 import { useAlert } from "react-alert";
 import axios from "axios";
+import ManagerMenu from "./ManagerMenu";
 
 const AddItemForm = props => {
   const alert = useAlert();
@@ -247,11 +248,6 @@ const MenuEditor = props => {
     }
   };
 
-  const handleSignOut = () => {
-    firebase.auth().signOut();
-    history.replace("/manager");
-  };
-
   const isValidMenu = () => {
     return (
       menu != null &&
@@ -261,22 +257,9 @@ const MenuEditor = props => {
     );
   };
 
-  const goToDashboard = () => {
-    axios.post("/api/dashboard-link", { stripe_id: stripeId }).then(res => {
-      const url = res.data.accountLinks.url;
-      window.location.assign(url);
-    });
-  };
-
   return (
     <div>
-      <div className="mt-5 d-flex justify-content-around">
-        <button className="btn btn-danger" onClick={handleSignOut}>
-          {" "}
-          Sign out{" "}
-        </button>{" "}
-      </div>
-
+      {shortName != null ? <ManagerMenu shortName={shortName} /> : null}
       {!isLoading ? (
         <div className="container mt-5 mb-5">
           <h1>Manager dashboard for {restaurant} </h1>
