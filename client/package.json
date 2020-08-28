@@ -12,6 +12,7 @@
     "bootstrap": "^4.5.1",
     "firebase": "^7.17.1",
     "firebaseui": "^4.6.1",
+    "jquery": "^3.5.1",
     "react": "^16.13.1",
     "react-alert": "^7.0.2",
     "react-alert-template-basic": "^1.0.0",
@@ -20,7 +21,7 @@
     "react-error-boundary": "^2.3.1",
     "react-papaparse": "^3.7.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^3.4.1"
+    "react-scripts": "^3.4.3"
   },
   "scripts": {
     "start": "react-scripts start",

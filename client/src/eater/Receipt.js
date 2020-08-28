@@ -5,6 +5,7 @@ import axios from "axios";
 import { useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Modal } from "react-bootstrap";
+import $ from "jquery";
 
 const Receipt = props => {
   var stripePublishKey =
@@ -36,6 +37,12 @@ const Receipt = props => {
       } else {
         console.log("user NOT signed in ");
       }
+    });
+    $(".btn-group > .btn").click(function() {
+      $(this)
+        .addClass("active")
+        .siblings()
+        .removeClass("active");
     });
   }, []);
 
@@ -189,7 +196,8 @@ const Receipt = props => {
 
   const setTipPercent = percent => {
     var decimal = percent / 100;
-    var rawTip = decimal * itemSubTotal;
+    var subAndTax = Number(itemSubTotal) + Number(displayTax);
+    var rawTip = decimal * subAndTax;
     var shownTip = rawTip.toFixed(2);
     setTip(shownTip);
   };
@@ -203,11 +211,11 @@ const Receipt = props => {
     <div className="container">
       <div className="d-flex justify-content-center mt-3">
         <a href={"/" + thisRest + "/menu/" + thisTable}>
-          <button className="btn btn-dark btn-lg">Go to Table Dashboard</button>
+          <button className="btn btn-dark btn-lg">View Cart</button>
         </a>
       </div>
       <div className="d-flex justify-content-center mt-3 mb-3">
-        <h1> Check </h1>{" "}
+        <h1> Your Check </h1>{" "}
       </div>
       {Object.keys(items || {}).map((key, i) => {
         var item = items[key];
@@ -252,6 +260,16 @@ const Receipt = props => {
       <div className="d-flex justify-content-between mt-1">
         <h3> Tax </h3>
         <h3> {displayTax} </h3>
+      </div>
+      <hr />
+      <div className="d-flex justify-content-between mt-1">
+        <h3> Charged </h3>
+        <h3>
+          {" "}
+          {displayTax != null && itemSubTotal != null
+            ? Number(Number(displayTax) + Number(itemSubTotal)).toFixed(2)
+            : 0}{" "}
+        </h3>
       </div>
       <div className="d-flex justify-content-between mt-1">
         <h3> Tip </h3>
