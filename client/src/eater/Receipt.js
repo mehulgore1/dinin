@@ -210,7 +210,7 @@ const Receipt = props => {
   return (
     <div className="container">
       <div className="d-flex justify-content-center mt-3">
-        <a href={"/" + thisRest + "/menu/" + thisTable}>
+        <a href={"/" + thisRest + "/" + thisTable + "/cart"}>
           <button className="btn btn-dark btn-lg">View Cart</button>
         </a>
       </div>
