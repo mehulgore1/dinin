@@ -130,13 +130,7 @@ const TableBasket = props => {
   };
 
   const handleAddMoreItems = () => {
-    var seat = tableData["users"][userId]["seat"];
-    const path = generatePath(match.path, {
-      restaurant: thisRest,
-      table: thisTable
-    });
-    var pathExtra = "/" + seat + "/0";
-    history.replace(path + pathExtra);
+    history.replace("/" + thisRest + "/" + thisTable + "/menu/0");
   };
 
   const formatAMPM = date => {

@@ -18,16 +18,13 @@ const CustomerMenu = props => {
   const [currentBatch, setCurrentBatch] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState("");
-  const [seatTaken, setSeatTaken] = useState(false);
   const [stageNames, setStageNames] = useState({});
   const [tableDone, setTableDone] = useState(false);
   const [cartSize, setCartSize] = useState(0);
   const [tableUsers, setTableUsers] = useState({});
 
   const [menu, setMenu] = useState(null);
-  const [restaurant, setRestaurant] = useState("");
-  const [table, setTable] = useState("");
-  const [seat, setSeat] = useState(0);
+  const [currSeat, setCurrSeat] = useState(null);
 
   const [stageNum, setStageNum] = useState(0);
   const [stageDesc, setStageDesc] = useState("");
@@ -37,7 +34,8 @@ const CustomerMenu = props => {
 
   const { match } = props;
   const params = match.params;
-  const thisRest = params.restaurant;
+  const restName = params.restaurant;
+  const table = params.table;
 
   const history = useHistory();
 
@@ -50,7 +48,7 @@ const CustomerMenu = props => {
 
   useEffect(() => {
     if (!tableDone && userId != null) {
-      addUserToSeat();
+      initSeatNum();
     }
   }, [tableDone, userId]);
 
@@ -69,23 +67,35 @@ const CustomerMenu = props => {
     initMenu();
     initSignedInState();
     initBatch();
-    setRestaurant(params.restaurant);
-    setTable(params.table);
-    setSeat(params.seat);
   }, []);
 
   useEffect(() => {
-    if (currentBatch != null) {
+    if (currentBatch != null && currSeat != null) {
+      addUserToSeat();
       initCartSize();
     }
-  }, [currentBatch]);
+  }, [currentBatch, currSeat]);
+
+  const initSeatNum = () => {
+    database
+      .ref("restaurants")
+      .child(restName)
+      .child("tables")
+      .child(table)
+      .child("users")
+      .child(userId)
+      .once("value")
+      .then(snapshot => {
+        setCurrSeat(snapshot.val().seat);
+      });
+  };
 
   const initTableUsers = () => {
     database
       .ref("restaurants")
-      .child(thisRest)
+      .child(restName)
       .child("tables")
-      .child(params.table)
+      .child(table)
       .child("users")
       .on("value", function(snapshot) {
         var users = snapshot.val();
@@ -105,9 +115,9 @@ const CustomerMenu = props => {
   const initCartSize = () => {
     database
       .ref("restaurants")
-      .child(thisRest)
+      .child(restName)
       .child("tables")
-      .child(params.table)
+      .child(table)
       .child("batches")
       .child(currentBatch)
       .on("value", function(snapshot) {
@@ -115,10 +125,10 @@ const CustomerMenu = props => {
         if (
           val &&
           val["seat_data"] &&
-          val["seat_data"][params.seat] &&
-          val["seat_data"][params.seat]["items"]
+          val["seat_data"][currSeat] &&
+          val["seat_data"][currSeat]["items"]
         ) {
-          var items = val["seat_data"][params.seat]["items"];
+          var items = val["seat_data"][currSeat]["items"];
           var size = 0;
           for (var key in items) {
             size += Number(items[key]["quantity"]);
@@ -131,16 +141,16 @@ const CustomerMenu = props => {
   const initTableDone = () => {
     database
       .ref("restaurants")
-      .child(thisRest)
+      .child(restName)
       .child("tables")
-      .child(params.table)
+      .child(table)
       .on("value", function(snapshot) {
         if (snapshot.hasChild("past_users")) {
           database
             .ref("restaurants")
-            .child(thisRest)
+            .child(restName)
             .child("tables")
-            .child(params.table)
+            .child(table)
             .child("past_users")
             .on("value", function(snapshot) {
               setTableDone(snapshot.hasChild(userId));
@@ -153,6 +163,7 @@ const CustomerMenu = props => {
   };
 
   const sendToTable = (
+    thisSeat,
     item_id,
     title,
     notes,
@@ -185,19 +196,19 @@ const CustomerMenu = props => {
       // push current user first and get key
       var key = database
         .ref("restaurants")
-        .child(thisRest)
+        .child(restName)
         .child("tables")
         .child(table)
         .child("batches")
         .child(currentBatch)
         .child("seat_data")
-        .child(params.seat)
+        .child(thisSeat)
         .child("items")
         .push(item).key;
       for (var currSeat in splitSeats) {
         database
           .ref("restaurants")
-          .child(thisRest)
+          .child(restName)
           .child("tables")
           .child(table)
           .child("batches")
@@ -220,13 +231,13 @@ const CustomerMenu = props => {
       };
       database
         .ref("restaurants")
-        .child(thisRest)
+        .child(restName)
         .child("tables")
         .child(table)
         .child("batches")
         .child(currentBatch)
         .child("seat_data")
-        .child(params.seat)
+        .child(thisSeat)
         .child("items")
         .push(item);
     }
@@ -234,9 +245,9 @@ const CustomerMenu = props => {
 
   const routeToStage = stage => {
     const path = generatePath(match.path, {
-      restaurant: restaurant,
+      restaurant: restName,
       table: table,
-      seat: seat,
+      seat: currSeat,
       stage: stage
     });
     history.replace(path);
@@ -255,14 +266,14 @@ const CustomerMenu = props => {
         setUserName(name);
         database
           .ref("restaurants")
-          .child(thisRest)
+          .child(restName)
           .child("tables")
-          .child(params.table)
+          .child(table)
           .child("users")
           .child(userId)
           .update({
             name: name,
-            seat: params.seat,
+            seat: currSeat,
             water_ordered: false
           });
       });
@@ -277,22 +288,6 @@ const CustomerMenu = props => {
       } else {
         console.log("user NOT signed in ");
         setSignedIn(false);
-        database
-          .ref("restaurants")
-          .child(thisRest)
-          .child("tables")
-          .child(params.table)
-          .child("users")
-          .once("value")
-          .then(function(snapshot) {
-            var userMap = snapshot.val();
-            for (var user_id in userMap) {
-              if (params.seat == userMap[user_id]["seat"]) {
-                setSeatTaken(true);
-                window.alert("Someone is sitting here! Scan another seat");
-              }
-            }
-          });
       }
     });
   };
@@ -300,7 +295,7 @@ const CustomerMenu = props => {
   const initMenu = () => {
     database
       .ref("restaurants")
-      .child(thisRest)
+      .child(restName)
       .once("value")
       .then(function(snapshot) {
         return snapshot.exists();
@@ -309,7 +304,7 @@ const CustomerMenu = props => {
         if (valid) {
           database
             .ref("restaurants")
-            .child(thisRest)
+            .child(restName)
             .child("menu")
             .once("value")
             .then(function(snapshot) {
@@ -332,18 +327,18 @@ const CustomerMenu = props => {
   const initBatch = () => {
     database
       .ref("restaurants")
-      .child(thisRest)
+      .child(restName)
       .child("tables")
-      .child(params.table)
+      .child(table)
       .child("batches")
       .on("value", function(snapshot) {
         if (!snapshot.exists()) {
           // create first batch key
           var batch_key = database
             .ref("restaurants")
-            .child(thisRest)
+            .child(restName)
             .child("tables")
-            .child(params.table)
+            .child(table)
             .child("batches")
             .push("").key;
           setCurrentBatch(batch_key);
@@ -351,9 +346,9 @@ const CustomerMenu = props => {
           // get last batch key
           database
             .ref("restaurants")
-            .child(thisRest)
+            .child(restName)
             .child("tables")
-            .child(params.table)
+            .child(table)
             .child("batches")
             .limitToLast(1)
             .on("value", function(snapshot) {
@@ -367,6 +362,7 @@ const CustomerMenu = props => {
 
   const isValidMenu = () => {
     return (
+      currSeat != null &&
       menu != null &&
       menu[stageNum] != null &&
       menu[stageNum]["items"] != null &&
@@ -379,7 +375,7 @@ const CustomerMenu = props => {
       {loaded ? (
         <div className="container mt-3 mb-5">
           {!signedIn ? (
-            <LoginForm seatTaken={seatTaken} match={match} />
+            <LoginForm match={match} />
           ) : (
             <Fragment>
               {tableDone ? (
@@ -415,7 +411,7 @@ const CustomerMenu = props => {
                                 tableUsers={tableUsers}
                                 match={match}
                                 userId={userId}
-                                //deleteMenuItem={deleteMenuItem}
+                                currSeat={currSeat}
                               />
                             </ul>
                           );
@@ -424,12 +420,12 @@ const CustomerMenu = props => {
                     ) : null}
                     <SignOutButton
                       userId={userId}
-                      restaurant={thisRest}
-                      table={params.table}
+                      restaurant={restName}
+                      table={table}
                     />
                   </div>
                   <div className="fixed-bottom mb-4 d-flex justify-content-center">
-                    <a href={"/" + thisRest + "/menu/" + table}>
+                    <a href={"/" + restName + "/" + table + "/cart"}>
                       <button className="btn btn-dark btn-lg">
                         View Cart{" "}
                         {cartSize != 0 ? (

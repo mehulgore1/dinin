@@ -37,6 +37,7 @@ const MenuItem = props => {
                 sendToTable={props.sendToTable}
                 setModalShow={setModalShow}
                 userId={props.userId}
+                currSeat={props.currSeat}
               />
             </div>
           </div>
@@ -84,7 +85,6 @@ function ItemDetailsModal(props) {
   const handleSendToTable = () => {
     var tempSplitSeats = splitSeats;
     var validSplit = false;
-    var seats = [];
     for (var seat in splitSeats) {
       if (
         splitSeats[seat]["taken"] &&
@@ -103,7 +103,9 @@ function ItemDetailsModal(props) {
     }
     var splits = validSplit ? tempSplitSeats : null;
     props.setModalShow(false);
+    console.log(props.currSeat);
     props.sendToTable(
+      props.currSeat,
       props.id,
       props.title,
       notes,

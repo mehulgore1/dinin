@@ -20,7 +20,7 @@ const App = () => {
         <Route exact path="/manager" component={ManagerLogin} />
         <Route
           exact
-          path="/:restaurant/menu/:table/:seat/:stage"
+          path="/:restaurant/:table/menu/:stage"
           component={CustomerMenu}
         />
         <Route
@@ -28,7 +28,7 @@ const App = () => {
           path="/redirect/session_id/:id"
           component={PaymentSuccess}
         />
-        <Route exact path="/:restaurant/menu/:table" component={TableBasket} />
+        <Route exact path="/:restaurant/:table/cart" component={TableBasket} />
         <Route exact path="/manager/orders/" component={OrderQ} />
         <Route exact path="/manager/requests" component={Requests} />
         <Route exact path="/:restaurant/:table/receipt" component={Receipt} />

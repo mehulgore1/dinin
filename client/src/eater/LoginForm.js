@@ -11,6 +11,10 @@ const LoginForm = props => {
   const [anonName, setAnonName] = useState("");
   const [offersChecked, setOffersChecked] = useState(true);
   const [guestSignIn, setGuestSignIn] = useState(false);
+  const [numSeats, setNumSeats] = useState(0);
+  const { match } = props;
+  const restName = match.params.restaurant;
+  const table = match.params.table;
 
   const sendVerificationCode = () => {
     if (phoneNumber == "") {
@@ -56,7 +60,7 @@ const LoginForm = props => {
             .ref("users")
             .child(user.uid)
             .child("restaurants")
-            .child(props.match.params.restaurant)
+            .child(restName)
             .update({ offers: offersChecked });
           addUserToDb(user.uid, name);
         })
@@ -67,6 +71,7 @@ const LoginForm = props => {
   };
 
   useEffect(() => {
+    getNumUsersAtTable();
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
       "sign-in-button",
       {
@@ -75,6 +80,22 @@ const LoginForm = props => {
       }
     );
   }, []);
+
+  const getNumUsersAtTable = () => {
+    database
+      .ref("restaurants")
+      .child(restName)
+      .child("tables")
+      .child(table)
+      .child("users")
+      .on("value", function(snapshot) {
+        var val = snapshot.val();
+        if (val != null) {
+          var seats = Object.keys(val).length;
+          setNumSeats(seats);
+        }
+      });
+  };
 
   const signInAsGuest = () => {
     if (anonName != "") {
@@ -93,20 +114,23 @@ const LoginForm = props => {
   };
 
   const addUserToDb = (uid, thisName) => {
+    var seatNum = numSeats + 1;
+    console.log(seatNum);
     database
       .ref("users")
       .child(uid)
       .update({ name: thisName, type: "customer" });
 
     database
-      .ref(props.match.params.restaurant)
+      .ref("restaurants")
+      .child(restName)
       .child("tables")
-      .child(props.match.params.table)
+      .child(table)
       .child("users")
       .child(uid)
       .update({
         name: thisName,
-        seat: props.match.params.seat,
+        seat: seatNum,
         water_ordered: false
       });
   };
@@ -118,16 +142,8 @@ const LoginForm = props => {
   return (
     <Fragment>
       <div className="d-flex justify-content-center mt-5">
-        <h2 className="text-capitalize">
-          {" "}
-          Welcome to {props.match.params.restaurant}
-        </h2>
+        <h2 className="text-capitalize"> Welcome to {restName}</h2>
       </div>
-      {props.seatTaken ? (
-        <div className="d-flex justify-content-center">
-          <h2 style={{ color: "red" }}> Seat Taken! </h2>{" "}
-        </div>
-      ) : null}
       <div className="d-flex justify-content-center mt-5">
         <h2> Verify Your Seat </h2>
       </div>

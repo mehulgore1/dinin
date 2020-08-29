@@ -34,7 +34,7 @@ const BasketItem = props => {
       />
       <div className="container">
         <div className="row align-items-center h-100">
-          <div className="col">
+          <div className="col-3">
             <h3>
               <span className="badge badge-dark">{props.item["quantity"]}</span>
             </h3>
@@ -63,7 +63,7 @@ const BasketItem = props => {
               </div>
             ) : null}
           </div>
-          <div className="col">
+          <div className="col-3">
             {props.userInThisSeat(seat) && !item["ordered"] ? (
               <div
                 className="d-flex justify-content-around"
