@@ -22,6 +22,7 @@ const CustomerMenu = props => {
   const [tableDone, setTableDone] = useState(false);
   const [cartSize, setCartSize] = useState(0);
   const [tableUsers, setTableUsers] = useState({});
+  const [isValidMenu, setIsValidMenu] = useState(false);
 
   const [menu, setMenu] = useState(null);
   const [currSeat, setCurrSeat] = useState(null);
@@ -75,6 +76,16 @@ const CustomerMenu = props => {
       initCartSize();
     }
   }, [currentBatch, currSeat]);
+
+  useEffect(() => {
+    setIsValidMenu(
+      currSeat != null &&
+        menu != null &&
+        menu[stageNum] != null &&
+        menu[stageNum]["items"] != null &&
+        menu[stageNum]["items"] != "null"
+    );
+  }, [currSeat, menu]);
 
   const initSeatNum = () => {
     database
@@ -360,16 +371,6 @@ const CustomerMenu = props => {
       });
   };
 
-  const isValidMenu = () => {
-    return (
-      currSeat != null &&
-      menu != null &&
-      menu[stageNum] != null &&
-      menu[stageNum]["items"] != null &&
-      menu[stageNum]["items"] != "null"
-    );
-  };
-
   return (
     <div>
       {loaded ? (
@@ -394,7 +395,7 @@ const CustomerMenu = props => {
                   <div style={{ paddingTop: "130px" }}>
                     <h1> {stageName} </h1>
                     <p> {stageDesc} </p>
-                    {isValidMenu() ? (
+                    {isValidMenu ? (
                       <div>
                         {Object.keys(menu[stageNum]["items"]).map(item_key => {
                           var item = menu[stageNum]["items"][item_key];

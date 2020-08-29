@@ -16,23 +16,25 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/manager/menu/:stage" component={MenuEditor} />
         <Route exact path="/manager" component={ManagerLogin} />
+        <Route exact path="/manager/menu/:stage" component={MenuEditor} />
+        <Route exact path="/manager/orders/" component={OrderQ} />
+        <Route exact path="/manager/requests" component={Requests} />
+        <Route exact path="/manager/tables" component={Tables} />
+
         <Route
           exact
           path="/:restaurant/:table/menu/:stage"
           component={CustomerMenu}
         />
+        <Route exact path="/:restaurant/:table/cart" component={TableBasket} />
+        <Route exact path="/:restaurant/:table/receipt" component={Receipt} />
+
         <Route
           exact
           path="/redirect/session_id/:id"
           component={PaymentSuccess}
         />
-        <Route exact path="/:restaurant/:table/cart" component={TableBasket} />
-        <Route exact path="/manager/orders/" component={OrderQ} />
-        <Route exact path="/manager/requests" component={Requests} />
-        <Route exact path="/:restaurant/:table/receipt" component={Receipt} />
-        <Route exact path="/:restaurant/tables" component={Tables} />
       </Switch>
     </BrowserRouter>
   );
