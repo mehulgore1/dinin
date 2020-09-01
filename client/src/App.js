@@ -11,11 +11,14 @@ import Receipt from "./eater/Receipt";
 import Tables from "./restaurant/Tables";
 import PaymentSuccess from "./eater/PaymentSuccess";
 import ManagerLogin from "./restaurant/ManagerLogin";
+import Home from "./home/Home";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Switch>
+        <Route exact path="/" component={Home} />
+
         <Route exact path="/manager" component={ManagerLogin} />
         <Route exact path="/manager/menu/:stage" component={MenuEditor} />
         <Route exact path="/manager/orders/" component={OrderQ} />
