@@ -72,8 +72,6 @@ const LoginForm = props => {
 
   useEffect(() => {
     getNumUsersAtTable();
-    // HACK below, delete for scale production
-    firebase.auth().settings.appVerificationDisabledForTesting = true;
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
       "sign-in-button",
       {
