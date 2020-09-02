@@ -4,20 +4,9 @@ import "./index.css";
 import Root from "./Root";
 import * as serviceWorker from "./serviceWorker";
 import * as firebase from "firebase";
+import { initFirebase } from "../src/utils/firebase";
 
-var firebaseConfig = {
-  apiKey: "AIzaSyA5mq106o1VmVPrEJef61P2XNNLcFsE2uQ",
-  authDomain: "dinin-2f0b9.firebaseapp.com",
-  databaseURL: "https://dinin-2f0b9.firebaseio.com",
-  projectId: "dinin-2f0b9",
-  storageBucket: "dinin-2f0b9.appspot.com",
-  messagingSenderId: "181153685615",
-  appId: "1:181153685615:web:35cb2d9171341283aa6d9a",
-  measurementId: "G-YSTCM76J2T"
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-firebase.analytics();
+initFirebase();
 
 ReactDOM.render(
   <React.StrictMode>

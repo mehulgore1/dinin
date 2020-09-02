@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "../App.css";
 import * as firebase from "firebase";
+import { addUserToSeat, isUserAtTable } from "../utils/firebase";
 
 const LoginForm = props => {
   const database = firebase.database();
@@ -121,18 +122,7 @@ const LoginForm = props => {
       .child(uid)
       .update({ name: thisName, type: "customer" });
 
-    database
-      .ref("restaurants")
-      .child(restName)
-      .child("tables")
-      .child(table)
-      .child("users")
-      .child(uid)
-      .update({
-        name: thisName,
-        seat: seatNum,
-        water_ordered: false
-      });
+    addUserToSeat(restName, table, uid, thisName, seatNum);
   };
 
   const showGuestSignIn = () => {
