@@ -6,13 +6,13 @@ button {
   cursor: pointer;
 }
 
-.card {
-  cursor: pointer;
-}
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.badge {
+  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: no-preference) {
