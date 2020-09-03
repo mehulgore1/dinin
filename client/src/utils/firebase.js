@@ -53,7 +53,6 @@ export const getUserName = async uid => {
     .child(uid)
     .once("value")
     .then(function(snapshot) {
-      console.log(snapshot.val());
       return snapshot.val().name;
     });
 };
@@ -65,7 +64,8 @@ export const getNumUsersAtTable = async (restName, table) => {
     .child("tables")
     .child(table)
     .child("users")
-    .on("value", function(snapshot) {
+    .once("value")
+    .then(function(snapshot) {
       var val = snapshot.val();
       if (val != null) {
         var seats = Object.keys(val).length;
@@ -88,8 +88,4 @@ export const getCurrentSeat = async (restName, table, uid) => {
     .then(snapshot => {
       return snapshot.val().seat;
     });
-};
-
-export const getUser = async () => {
-  return firebase.auth().onAuthStateChanged();
 };

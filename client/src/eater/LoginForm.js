@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import "../App.css";
 import * as firebase from "firebase";
-import { addUserToSeat, isUserAtTable } from "../utils/firebase";
+import { addUserToSeat, getNumUsersAtTable } from "../utils/firebase";
 
 const LoginForm = props => {
   const database = firebase.database();
@@ -72,7 +72,7 @@ const LoginForm = props => {
   };
 
   useEffect(() => {
-    getNumUsersAtTable();
+    initNumSeats();
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
       "sign-in-button",
       {
@@ -82,20 +82,9 @@ const LoginForm = props => {
     );
   }, []);
 
-  const getNumUsersAtTable = () => {
-    database
-      .ref("restaurants")
-      .child(restName)
-      .child("tables")
-      .child(table)
-      .child("users")
-      .on("value", function(snapshot) {
-        var val = snapshot.val();
-        if (val != null) {
-          var seats = Object.keys(val).length;
-          setNumSeats(seats);
-        }
-      });
+  const initNumSeats = async () => {
+    var seats = await getNumUsersAtTable(restName, table);
+    setNumSeats(seats);
   };
 
   const signInAsGuest = () => {

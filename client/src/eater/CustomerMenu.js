@@ -9,6 +9,14 @@ import { useAlert } from "react-alert";
 import TableDone from "./TableDone";
 import SignOutButton from "./SignOutButton";
 import TopBarMenu from "../TopBarMenu";
+import {
+  isUserAtTable,
+  getNumUsersAtTable,
+  getUser,
+  getUserName,
+  addUserToSeat,
+  getCurrentSeat
+} from "../utils/firebase";
 
 const CustomerMenu = props => {
   const alert = useAlert();
@@ -48,12 +56,6 @@ const CustomerMenu = props => {
   }, [userId]);
 
   useEffect(() => {
-    if (!tableDone && userId != null) {
-      initSeatNum();
-    }
-  }, [tableDone, userId]);
-
-  useEffect(() => {
     setStageNum(params.stage);
   }, [props.location]);
 
@@ -65,14 +67,13 @@ const CustomerMenu = props => {
   }, [menu, stageNum]);
 
   useEffect(() => {
-    initMenu();
     initSignedInState();
+    initMenu();
     initBatch();
   }, []);
 
   useEffect(() => {
     if (currentBatch != null && currSeat != null) {
-      addUserToSeat();
       initCartSize();
     }
   }, [currentBatch, currSeat]);
@@ -86,20 +87,6 @@ const CustomerMenu = props => {
         menu[stageNum]["items"] != "null"
     );
   }, [currSeat, menu]);
-
-  const initSeatNum = () => {
-    database
-      .ref("restaurants")
-      .child(restName)
-      .child("tables")
-      .child(table)
-      .child("users")
-      .child(userId)
-      .once("value")
-      .then(snapshot => {
-        setCurrSeat(snapshot.val().seat);
-      });
-  };
 
   const initTableUsers = () => {
     database
@@ -264,38 +251,33 @@ const CustomerMenu = props => {
     history.replace(path);
   };
 
-  const addUserToSeat = () => {
-    database
-      .ref("users")
-      .child(userId)
-      .child("name")
-      .once("value")
-      .then(function(snapshot) {
-        return snapshot.val();
-      })
-      .then(name => {
-        setUserName(name);
-        database
-          .ref("restaurants")
-          .child(restName)
-          .child("tables")
-          .child(table)
-          .child("users")
-          .child(userId)
-          .update({
-            name: name,
-            seat: currSeat,
-            water_ordered: false
-          });
-      });
-  };
-
-  const initSignedInState = () => {
-    firebase.auth().onAuthStateChanged(function(user) {
+  const initSignedInState = async () => {
+    firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
         console.log("user signed in ");
+        var uid = user.uid;
         setSignedIn(true);
-        setUserId(user.uid);
+        setUserId(uid);
+        var numUsers = await getNumUsersAtTable(restName, table);
+        var name = await getUserName(uid);
+        var seatNum = numUsers + 1;
+        if (numUsers == 0) {
+          // first user at this table, add to seat 1
+          addUserToSeat(restName, table, uid, name, seatNum);
+          setCurrSeat(seatNum);
+        } else {
+          // users exist, check if user is there already
+          var atTable = await isUserAtTable(restName, table, uid);
+          if (!atTable) {
+            // user not here yet, add to next seat
+            addUserToSeat(restName, table, uid, name, seatNum);
+            setCurrSeat(seatNum);
+          } else {
+            // user already here, get their seat num
+            var seat = await getCurrentSeat(restName, table, uid);
+            setCurrSeat(seat);
+          }
+        }
       } else {
         console.log("user NOT signed in ");
         setSignedIn(false);
