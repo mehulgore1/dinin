@@ -89,3 +89,41 @@ export const getCurrentSeat = async (restName, table, uid) => {
       return snapshot.val().seat;
     });
 };
+
+export const wasPastUser = async (restName, table, uid) => {
+  return database
+    .ref("restaurants")
+    .child(restName)
+    .child("tables")
+    .child(table)
+    .child("past_users")
+    .once("value")
+    .then(snapshot => {
+      if (snapshot != null) {
+        return snapshot.hasChild(uid);
+      }
+      return false;
+    });
+};
+
+export const getTableDoneStatus = async (restName, table, uid) => {
+  const tableRef = database
+    .ref("restaurants")
+    .child(restName)
+    .child("tables")
+    .child(table);
+
+  console.log(restName, table, uid);
+
+  return tableRef.on("value", function(snapshot) {
+    if (snapshot.hasChild("past_users")) {
+      return tableRef.child("past_users").on("value", function(snapshot) {
+        return snapshot.hasChild(uid);
+      });
+    } else {
+      console.log("returning false");
+      // previously unseen table, set to false
+      return false;
+    }
+  });
+};

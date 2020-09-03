@@ -8,7 +8,8 @@ const SignOutButton = props => {
   const handleSignOut = () => {
     // remove user from table
     database
-      .ref(props.restaurant)
+      .ref("restaurants")
+      .child(props.restaurant)
       .child("tables")
       .child(props.table)
       .child("users")

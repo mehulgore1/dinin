@@ -105,7 +105,6 @@ const LoginForm = props => {
 
   const addUserToDb = (uid, thisName) => {
     var seatNum = numSeats + 1;
-    console.log(seatNum);
     database
       .ref("users")
       .child(uid)

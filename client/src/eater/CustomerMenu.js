@@ -5,7 +5,6 @@ import * as firebase from "firebase";
 import MenuItem from "./MenuItem";
 import LoginForm from "./LoginForm";
 import WaiterRequest from "./WaiterRequest";
-import { useAlert } from "react-alert";
 import TableDone from "./TableDone";
 import SignOutButton from "./SignOutButton";
 import TopBarMenu from "../TopBarMenu";
@@ -15,11 +14,11 @@ import {
   getUser,
   getUserName,
   addUserToSeat,
-  getCurrentSeat
+  getCurrentSeat,
+  wasPastUser
 } from "../utils/firebase";
 
 const CustomerMenu = props => {
-  const alert = useAlert();
   var database = firebase.database();
   const [totalStages, setTotalStages] = useState(4);
   const [signedIn, setSignedIn] = useState(true);
@@ -256,6 +255,12 @@ const CustomerMenu = props => {
       if (user) {
         console.log("user signed in ");
         var uid = user.uid;
+        var pastUser = await wasPastUser(restName, table, uid);
+        if (pastUser) {
+          setSignedIn(false);
+          firebase.auth().signOut();
+          return;
+        }
         setSignedIn(true);
         setUserId(uid);
         var numUsers = await getNumUsersAtTable(restName, table);
