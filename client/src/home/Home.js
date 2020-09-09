@@ -17,14 +17,14 @@ const Home = props => {
           <h5>
             Focus on providing quality food and customer service, not logistics{" "}
           </h5>
-          <h4>
+          <h6>
             <span
               className="badge badge-light"
               onClick={() => setShowOwner(!showOwner)}
             >
-              Details
+              Click for Details
             </span>
-          </h4>
+          </h6>
           {showOwner ? (
             <div>
               {" "}
@@ -69,14 +69,14 @@ const Home = props => {
             {" "}
             Focus on your friends and family, not waiting, ordering and payments
           </h5>
-          <h4>
+          <h6>
             <span
               className="badge badge-light"
               onClick={() => setShowEater(!showEater)}
             >
-              Details
+              Click for Details
             </span>
-          </h4>
+          </h6>
           {showEater ? (
             <div>
               <ul class="list-group list-group-flush">
@@ -116,14 +116,14 @@ const Home = props => {
         <div class="card-body">
           <h2 class="card-title">For Waitstaff</h2>
           <h5>Increase your tips with faster, genuine service</h5>
-          <h4>
+          <h6>
             <span
               className="badge badge-light"
               onClick={() => setShowWaiter(!showWaiter)}
             >
-              Details
+              Click for Details
             </span>
-          </h4>
+          </h6>
           {showWaiter ? (
             <div>
               <ul class="list-group list-group-flush">

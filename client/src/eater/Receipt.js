@@ -234,9 +234,8 @@ const Receipt = props => {
                   {" "}
                   <h4>{item.title}</h4>
                 </div>
-                <div>
-                  {" "}
-                  <h2> {item.notes}</h2>
+                <div className="d-flex justify-content-center">
+                  {item.notes}
                 </div>
               </div>
               <div>
